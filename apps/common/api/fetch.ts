@@ -1,5 +1,4 @@
 import { ApiError } from "../types/api";
-import { logFetch } from "../services/loger";
 
 /**
  * Базовая функция для http запроса
