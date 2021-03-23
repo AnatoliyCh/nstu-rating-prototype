@@ -1,29 +1,71 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div id="app-authorization">
+    <a-card class="card-authorization" title="Форма входа" hoverable>
+      <form class="card-authorization-form" @submit.prevent="authorization">
+        <a-input placeholder="Логин" allow-clear>
+          <a-icon
+            slot="prefix"
+            type="user"
+            style="color: rgba(0, 0, 0, 0.25)"
+          />
+        </a-input>
+        <a-input-password placeholder="Пароль" allow-clear>
+          <a-icon
+            slot="prefix"
+            type="lock"
+            style="color: rgba(0, 0, 0, 0.25)"
+          />
+        </a-input-password>
+        <a-button type="primary" html-type="submit" block> Вход </a-button>
+      </form>
+    </a-card>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
 
-@Component({
-  components: {
-    HelloWorld,
-  },
-})
-export default class App extends Vue {}
+@Component
+export default class App extends Vue {
+  async authorization() {
+    console.log("11");
+    // this.isLoading = true;
+    // const [response, error] = await api.auth.login(this.account);
+    // if (response && !error) {
+    //   this.accessKeys = response;
+    //   this.$router.push({ name: "admin" });
+    // } else console.error(error);
+    // this.isLoading = false;
+  }
+}
 </script>
 
 <style lang="scss">
-#app {
+#app-authorization {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  // шрифты
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+
+  .card-authorization {
+    width: 500px;
+    margin: auto;
+
+    .ant-card-head-title {
+      text-align: center;
+    }
+
+    form.card-authorization-form {
+      > * {
+        margin-bottom: 24px;
+        &:last-child {
+          margin-bottom: 0px;
+        }
+      }
+    }
+  }
 }
 </style>
