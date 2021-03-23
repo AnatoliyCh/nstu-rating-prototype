@@ -24,18 +24,24 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import api from "../../common/api";
+import { Account, AccessKeys } from "../../common/types/model";
 
 @Component
 export default class App extends Vue {
+  account: Account = { login: null, password: null };
+  accessKeys: AccessKeys | null = null;
+
+  isLoading = false;
+
   async authorization() {
-    console.log("11");
-    // this.isLoading = true;
+    this.isLoading = true;
     // const [response, error] = await api.auth.login(this.account);
     // if (response && !error) {
     //   this.accessKeys = response;
-    //   this.$router.push({ name: "admin" });
+    //   // this.$router.push({ name: "admin" });
     // } else console.error(error);
-    // this.isLoading = false;
+    this.isLoading = false;
   }
 }
 </script>
