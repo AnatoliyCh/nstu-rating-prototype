@@ -24,7 +24,6 @@ async function http<T>(
       apiError.message = body.message;
       responseData = [undefined, apiError];
     } else responseData = [await response.json().catch(() => ({})), undefined];
-    // logFetch(request, responseData); // логирование
     return responseData;
   } catch (error) {
     const newError: ApiError = {
