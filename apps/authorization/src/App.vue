@@ -1,5 +1,5 @@
 <template>
-  <div id="app-authorization">
+  <div id="app">
     <a-card class="card-authorization" title="Форма входа" hoverable>
       <form class="card-authorization-form" @submit.prevent="authorization">
         <a-input
@@ -100,7 +100,7 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-#app-authorization {
+#app {
   height: 100%;
   display: flex;
   flex-direction: column;

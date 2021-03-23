@@ -19,7 +19,7 @@ Vue.use(Card);
 
 new Vue({
   render: (h) => h(App),
-}).$mount("#app-authorization");
+}).$mount("#app");
 // подключение уведомлений
 Vue.prototype.$notification = notification;
 Vue.prototype.$message = message;
