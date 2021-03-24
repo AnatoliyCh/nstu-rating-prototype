@@ -7,6 +7,19 @@
     <router-view />
   </div>
 </template>
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+// import VLayoutEmpty from "@/app/common/layouts/v-layout-empty.vue";
+// import VLayoutContent from "@/app/common/layouts/v-layout-content.vue";
+
+@Component
+export default class App extends Vue {
+  created(): void {
+    this.$store.commit("setAccessToken", localStorage.getItem("aT"));
+    this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
