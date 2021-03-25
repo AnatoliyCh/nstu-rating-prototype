@@ -5,6 +5,8 @@ import store from "./store";
 
 Vue.config.productionTip = false;
 // подключение контроллов
+import "@/common/components/registration"; // компоненты
+// ant
 import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
 Vue.use(Antd);

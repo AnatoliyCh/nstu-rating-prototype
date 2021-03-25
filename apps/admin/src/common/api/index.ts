@@ -49,10 +49,11 @@ export class Api {
           `event/api/v1/outstudy-event?offset=${offset}&limit=${limit}`
       );
     },
-    createEvent: async (requestBody: OutstudyEvent) => {
+    createEvent: async (requestBody: OutstudyEvent, accessToken: string) => {
       return event.createEvent(
         this.basePath + "event/api/v1/outstudy-event",
-        requestBody
+        requestBody,
+        accessToken
       );
     },
     getMembersEvent: async (idEvent: number) => {

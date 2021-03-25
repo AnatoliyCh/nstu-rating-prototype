@@ -1,14 +1,17 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <a-locale-provider :locale="currentLocale">
+    <div id="app">
+      <v-add-edit-event> </v-add-edit-event>
     </div>
-    <router-view />
-  </div>
+  </a-locale-provider>
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+// локализация
+import ru_RU from "ant-design-vue/lib/locale-provider/ru_RU";
+import moment from "moment";
+import "moment/locale/ru";
+
 // import VLayoutEmpty from "@/app/common/layouts/v-layout-empty.vue";
 // import VLayoutContent from "@/app/common/layouts/v-layout-content.vue";
 
@@ -18,28 +21,22 @@ export default class App extends Vue {
     this.$store.commit("setAccessToken", localStorage.getItem("aT"));
     this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
   }
+
+  get currentLocale() {
+    return ru_RU;
+  }
 }
 </script>
 
 <style lang="scss">
+@import "src/common/main.scss";
 #app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  // шрифты
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>

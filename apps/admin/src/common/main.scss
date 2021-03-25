@@ -1,0 +1,18 @@
+// добавляет звездочку к label
+.required-label:after {
+  content: "*";
+  color: red;
+}
+// вертикальные блоки: отступы
+.vertical-margin-element-24 {
+  margin-bottom: 24px;
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}
+.vertical-margin-element-16 {
+  margin-bottom: 16px;
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}

@@ -39,12 +39,14 @@ export async function getEvents(
 /** создание мероприятия */
 export async function createEvent(
   path: string,
-  requestBody: OutstudyEvent
+  requestBody: OutstudyEvent,
+  accessToken: string
 ): Promise<[{ id: number } | undefined, ApiError | undefined]> {
   return await http.post<OutstudyEvent, { id: number }>(path, requestBody, {
     headers: {
       accept: "application/json",
       "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
     },
   });
 }

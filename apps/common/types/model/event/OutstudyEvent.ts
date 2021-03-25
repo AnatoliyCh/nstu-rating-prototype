@@ -25,7 +25,7 @@ export interface OutstudyEvent {
   /** максимальное количество участников */
   maxMembers?: number | null;
   /** окончание даты регистрации */
-  dateRegistrationEnd?: Date | null;
+  dateRegistrationEnd?: string | null;
   /** организатор */
   organizer?: { user: User | null };
 }
