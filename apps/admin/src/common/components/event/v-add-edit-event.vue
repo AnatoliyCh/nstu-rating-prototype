@@ -26,7 +26,7 @@
           <a-button
             type="primary"
             :disabled="!disabledButton"
-            @click="createevent"
+            @click="createEvent"
           >
             Создать
           </a-button>
@@ -199,7 +199,8 @@ export default class VAddEditEvent extends mixins(VBaseMixin) {
       this.isLoading === false
     );
   }
-  async createevent(): Promise<void> {
+  // создание мероприятия
+  async createEvent(): Promise<void> {
     this.isLoading = true;
     const [response, error] = await api.event.createEvent(
       this.accessToken,

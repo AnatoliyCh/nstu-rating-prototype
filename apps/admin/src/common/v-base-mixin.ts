@@ -3,6 +3,8 @@ import Component from "vue-class-component";
 
 @Component
 export default class VBaseMixin extends Vue {
+  isLoading = false; // состояние
+
   get accessToken() {
     return this.$store.state.accessKeys.accessToken;
   }
