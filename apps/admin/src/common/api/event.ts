@@ -10,10 +10,14 @@ import * as http from "../api";
 
 /** получение типов мероприятия */
 export async function getTypes(
+  accessToken: string,
   path: string
 ): Promise<[TypeEvent[] | undefined, ApiError | undefined]> {
   return await http.get<TypeEvent[]>(path, {
-    headers: { accept: "application/json" },
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
   });
 }
 /** создание типа мероприятия */
@@ -30,17 +34,21 @@ export async function createType(
 }
 /** получение списка мероприятий */
 export async function getEvents(
+  accessToken: string,
   path: string
 ): Promise<[EventObject | undefined, ApiError | undefined]> {
   return await http.get<EventObject>(path, {
-    headers: { accept: "application/json" },
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
   });
 }
 /** создание мероприятия */
 export async function createEvent(
+  accessToken: string,
   path: string,
-  requestBody: OutstudyEvent,
-  accessToken: string
+  requestBody: OutstudyEvent
 ): Promise<[{ id: number } | undefined, ApiError | undefined]> {
   return await http.post<OutstudyEvent, { id: number }>(path, requestBody, {
     headers: {
@@ -68,10 +76,11 @@ export async function getRequestsEvent(
 }
 /** отправка заявки на участие в мероприятии */
 export async function memberEventRegistration(
+  accessToken: string,
   path: string
 ): Promise<[any | undefined, ApiError | undefined]> {
   return await http.post<undefined, any>(path, undefined, {
-    headers: { accept: "*/*" },
+    headers: { accept: "*/*", Authorization: "Bearer " + accessToken },
   });
 }
 /** изменение статуса заявки участиника (принять/тклонить)*/

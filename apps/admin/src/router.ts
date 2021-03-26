@@ -1,23 +1,56 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "./views/Home.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
+  // базовый пути приложения
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "empty",
+    redirect: "/event/list",
   },
+  //* мероприятия
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "./views/About.vue"),
+    path: "/event",
+    name: "event",
+    meta: {
+      exact: false,
+      name: "Мероприятия",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/event/list",
+    children: [
+      // список мероприятий
+      {
+        path: "/event/list",
+        name: "event-list",
+        meta: {
+          exact: true,
+        },
+        component: () => import("@/common/components/event/v-event-list.vue"),
+      },
+      // создание мероприятия
+      {
+        path: "/event/create",
+        name: "event-create",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/event/v-add-edit-event.vue"),
+      },
+      // создание типа мероприятия
+      {
+        path: "/event/create/type",
+        name: "event-create-type",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/event/v-add-event-type.vue"),
+      },
+    ],
   },
 ];
 

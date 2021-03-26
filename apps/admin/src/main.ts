@@ -8,7 +8,7 @@ Vue.config.productionTip = false;
 import "@/common/components/registration"; // компоненты
 // ant
 import "ant-design-vue/dist/antd.css";
-import Antd from "ant-design-vue";
+import Antd, { notification, message } from "ant-design-vue";
 Vue.use(Antd);
 
 new Vue({
@@ -18,5 +18,5 @@ new Vue({
 }).$mount("#app");
 
 // подключение уведомлений
-Vue.prototype.$notification = Antd.notification;
-Vue.prototype.$message = Antd.message;
+Vue.prototype.$notification = notification;
+Vue.prototype.$message = message;

@@ -28,4 +28,6 @@ export interface OutstudyEvent {
   dateRegistrationEnd?: string | null;
   /** организатор */
   organizer?: { user: User | null };
+  /** привязанный чат */
+  chat?: { id?: number | null; name?: string | null; type?: number | null };
 }

@@ -5,9 +5,9 @@
 }
 // вертикальные блоки: отступы
 .vertical-margin-element-24 {
-  margin-bottom: 24px;
+  margin-bottom: 24px !important;
   &:last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0px !important;
   }
 }
 .vertical-margin-element-16 {

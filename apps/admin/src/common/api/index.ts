@@ -34,8 +34,11 @@ export class Api {
   };
 
   public event = {
-    getEventTypes: async () => {
-      return event.getTypes(this.basePath + `event/api/v1/outstudy-eventkind`);
+    getEventTypes: async (accessToken: string) => {
+      return event.getTypes(
+        accessToken,
+        this.basePath + `event/api/v1/outstudy-eventkind`
+      );
     },
     createEventType: async (requestBody: TypeEvent) => {
       return event.createType(
@@ -43,17 +46,18 @@ export class Api {
         requestBody
       );
     },
-    getEvents: async (offset: number, limit: number) => {
+    getEvents: async (accessToken: string, offset: number, limit: number) => {
       return event.getEvents(
+        accessToken,
         this.basePath +
           `event/api/v1/outstudy-event?offset=${offset}&limit=${limit}`
       );
     },
-    createEvent: async (requestBody: OutstudyEvent, accessToken: string) => {
+    createEvent: async (accessToken: string, requestBody: OutstudyEvent) => {
       return event.createEvent(
+        accessToken,
         this.basePath + "event/api/v1/outstudy-event",
-        requestBody,
-        accessToken
+        requestBody
       );
     },
     getMembersEvent: async (idEvent: number) => {
@@ -66,8 +70,9 @@ export class Api {
         this.basePath + `event/api/v1/outstudy-event/${idEvent}/request`
       );
     },
-    memberEventRegistration: async (idEvent: number) => {
+    memberEventRegistration: async (accessToken: string, idEvent: number) => {
       return event.memberEventRegistration(
+        accessToken,
         this.basePath + `event/api/v1/outstudy-event/${idEvent}/registration`
       );
     },

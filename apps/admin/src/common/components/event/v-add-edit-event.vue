@@ -118,12 +118,14 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import { mixins } from "vue-class-component";
+import VBaseMixin from "@/common/v-base-mixin";
 import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
 import api from "@/common/api";
 
 @Component
-export default class VAddEditEvent extends Vue {
+export default class VAddEditEvent extends mixins(VBaseMixin) {
   // типы мероприятия
   typesEvent: TypeEvent[] = [];
   // мероприятие
@@ -149,7 +151,7 @@ export default class VAddEditEvent extends Vue {
   //* типы мероприятия
   // получение типов мероприятия
   async getEventTypes(): Promise<void> {
-    const [response, error] = await api.event.getEventTypes();
+    const [response, error] = await api.event.getEventTypes(this.accessToken);
     if (response && !error) {
       this.typesEvent = response;
     } else console.error(error);
@@ -200,8 +202,8 @@ export default class VAddEditEvent extends Vue {
   async createevent(): Promise<void> {
     this.isLoading = true;
     const [response, error] = await api.event.createEvent(
-      this.outstudyEvent,
-      this.$store.state.accessKeys.accessToken
+      this.accessToken,
+      this.outstudyEvent
     );
     if (response && !error) {
       console.log(response);

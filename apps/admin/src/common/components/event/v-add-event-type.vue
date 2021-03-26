@@ -9,7 +9,11 @@ import api from "@/common/api";
 export default class VAddEventType extends Vue {
   async created() {
     console.log("v-event-list");
-    const [response, error] = await api.event.getEvents(0, 100);
+    const [response, error] = await api.event.getEvents(
+      this.$store.state.accessKeys.accessToken,
+      0,
+      100
+    );
     console.log([response, error]);
   }
 }
