@@ -16,3 +16,10 @@
     margin-bottom: 0px;
   }
 }
+
+.vertical-margin-element-8 {
+  margin-bottom: 8px;
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}

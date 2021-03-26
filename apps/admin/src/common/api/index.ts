@@ -40,8 +40,9 @@ export class Api {
         this.basePath + `event/api/v1/outstudy-eventkind`
       );
     },
-    createEventType: async (requestBody: TypeEvent) => {
+    createEventType: async (accessToken: string, requestBody: TypeEvent) => {
       return event.createType(
+        accessToken,
         this.basePath + "event/api/v1/outstudy-eventkind",
         requestBody
       );

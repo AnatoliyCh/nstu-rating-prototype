@@ -22,6 +22,7 @@ export async function getTypes(
 }
 /** создание типа мероприятия */
 export async function createType(
+  accessToken: string,
   path: string,
   requestBody: TypeEvent
 ): Promise<[{ id: number } | undefined, ApiError | undefined]> {
@@ -29,6 +30,7 @@ export async function createType(
     headers: {
       accept: "application/json",
       "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
     },
   });
 }

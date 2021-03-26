@@ -1,9 +1,10 @@
 <template>
   <div class="v-event-list">
-    <!-- действия для орг. и админа -->
+    <!-- кнопки -->
     <div class="v-event-list-actions">
       <a-space :size="24">
-        <label>Действия: </label>
+        <h2>Список: мероприятия</h2>
+        <!-- действия для орг. и админа -->
         <a-button type="primary" @click="routing('event-create')">
           Создать мероприятие
         </a-button>
@@ -155,11 +156,15 @@ export default class VEventList extends mixins(VBaseMixin) {
 
 <style lang="scss">
 .v-event-list {
-  > .v-event-list-actions {
+  &-actions {
     display: flex;
     height: 64px;
     padding: 8px;
     border-block-end: 1px solid #e8e8e8;
+    margin-bottom: 16px;
+    h2 {
+      margin-bottom: 0px;
+    }
   }
   > .v-event-list-body {
     padding-top: 16px;

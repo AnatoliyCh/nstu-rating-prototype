@@ -1,6 +1,16 @@
 <template>
   <div class="v-add-event-type">
+    <!-- кнопки -->
+    <div class="v-add-event-type-actions">
+      <a-space :size="24">
+        <h2>Создание: тип мероприятия</h2>
+        <a-button type="primary" @click="routing('event-list')">
+          К списку мероприятий
+        </a-button>
+      </a-space>
+    </div>
     <a-row :gutter="16" class="vertical-margin-element-16">
+      <!-- основная информация -->
       <a-col :span="6">
         <a-card title="Основная информация" hoverable>
           <div class="vertical-margin-element-24">
@@ -21,6 +31,7 @@
           </div>
         </a-card>
       </a-col>
+      <!-- 1 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeOneName" hoverable>
           <div class="vertical-margin-element-24">
@@ -49,6 +60,7 @@
           </div>
         </a-card>
       </a-col>
+      <!-- 2 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeTwoName" hoverable>
           <div class="vertical-margin-element-24">
@@ -56,14 +68,71 @@
               Добавить критерий
             </a-button>
           </div>
+          <!-- список притериев -->
+          <div
+            v-for="(criteria, index) in criteriaTypeTwo"
+            :key="index"
+            class="vertical-margin-element-24"
+          >
+            <a-space :size="8">
+              <label style="white-space: nowrap">#{{ index + 1 }} Балл </label>
+              <a-input-number
+                v-model="criteria.value"
+                :min="0"
+                style="width: 100%"
+              />
+              <label style="white-space: nowrap">места c </label>
+              <a-input-number
+                v-model="criteria.topPlace"
+                :min="1"
+                style="width: 100%"
+              />
+              <label style="white-space: nowrap">по </label>
+              <a-input-number
+                v-model="criteria.bottomPlace"
+                :min="criteria.topPlace"
+                style="width: 100%"
+              />
+              <a-button @click="removeCriteria(2, index)" type="danger">
+                X
+              </a-button>
+            </a-space>
+          </div>
         </a-card>
       </a-col>
+      <!-- 3 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeThreeName" hoverable>
           <div class="vertical-margin-element-24">
             <a-button @click="addNewCriteria(3)" block>
               Добавить критерий
             </a-button>
+          </div>
+          <!-- список притериев -->
+          <div
+            v-for="(criteria, index) in criteriaTypeThree"
+            :key="index"
+            class="vertical-margin-element-24"
+          >
+            <a-space :size="8">
+              <label class="required-label" style="white-space: nowrap"
+                >#{{ index + 1 }}
+              </label>
+              <a-input
+                v-model="criteria.name"
+                placeholder="задание"
+                allowClear
+              />
+              <a-input-number
+                v-model="criteria.value"
+                placeholder="балл"
+                :min="0"
+                style="width: 100%"
+              />
+              <a-button @click="removeCriteria(3, index)" type="danger" block>
+                X
+              </a-button>
+            </a-space>
           </div>
         </a-card>
       </a-col>
@@ -79,7 +148,7 @@ import api from "@/common/api";
 
 @Component
 export default class VAddEventType extends mixins(VBaseMixin) {
-  typeEvent: TypeEvent = { name: null, criteria: null }; // модеоль типа критерия
+  typeEvent: TypeEvent = { name: null, criteria: null }; // модель типа критерия
 
   readonly criteriaTypeOneName =
     "Критерий: Фиксированное количество баллов за участие";
@@ -90,16 +159,6 @@ export default class VAddEventType extends mixins(VBaseMixin) {
 
   readonly criteriaTypeThreeName = "Критерий: По набранному баллу";
   criteriaTypeThree: Criteria[] = []; // по набранному баллу
-
-  async created(): Promise<void> {
-    console.log("v-event-list");
-    const [response, error] = await api.event.getEvents(
-      this.$store.state.accessKeys.accessToken,
-      0,
-      100
-    );
-    console.log([response, error]);
-  }
 
   // блокировка кнопки
   get disabledButton(): boolean {
@@ -124,7 +183,7 @@ export default class VAddEventType extends mixins(VBaseMixin) {
       case 3:
         this.criteriaTypeThree.push({
           typeId: typeId,
-          value: null,
+          value: 0,
           name: null,
         });
         break;
@@ -149,8 +208,15 @@ export default class VAddEventType extends mixins(VBaseMixin) {
       ...this.criteriaTypeTwo,
       ...this.criteriaTypeThree,
     ];
-    const [response, error] = await api.event.createEventType(this.typeEvent);
+    const [response, error] = await api.event.createEventType(
+      this.accessToken,
+      this.typeEvent
+    );
     if (response && !error) {
+      this.$notification.success({
+        message: "Тип мероприятия создан",
+        description: `Название: ${this.typeEvent.name}`,
+      });
       console.log(response);
     } else if (error) {
       console.warn(error);
@@ -166,8 +232,19 @@ export default class VAddEventType extends mixins(VBaseMixin) {
 
 <style lang="scss">
 .v-add-event-type {
-  padding: 16px;
+  &-actions {
+    display: flex;
+    height: 64px;
+    padding: 8px;
+    border-block-end: 1px solid #e8e8e8;
+    margin-bottom: 16px;
+    h2 {
+      margin-bottom: 0px;
+    }
+  }
+
   > .ant-row {
+    padding: 0px 16px;
     .ant-card-head-title {
       text-align: center;
     }

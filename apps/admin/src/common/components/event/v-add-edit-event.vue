@@ -1,5 +1,14 @@
 <template>
   <div class="v-add-edit-event">
+    <!-- кнопки -->
+    <div class="v-add-edit-event-actions">
+      <a-space :size="24">
+        <h2>Создание: мероприятие</h2>
+        <a-button type="primary" @click="routing('event-list')">
+          К списку мероприятий
+        </a-button>
+      </a-space>
+    </div>
     <!-- основные блоки -->
     <a-row :gutter="16" class="vertical-margin-element-16">
       <a-col :span="8">
@@ -217,8 +226,18 @@ export default class VAddEditEvent extends mixins(VBaseMixin) {
 <style lang="scss">
 @import "src/common/main.scss";
 .v-add-edit-event {
-  padding: 16px;
+  &-actions {
+    display: flex;
+    height: 64px;
+    padding: 8px;
+    border-block-end: 1px solid #e8e8e8;
+    margin-bottom: 16px;
+    h2 {
+      margin-bottom: 0px;
+    }
+  }
   > .ant-row {
+    padding: 0px 16px;
     .ant-card-head-title {
       text-align: center;
     }
