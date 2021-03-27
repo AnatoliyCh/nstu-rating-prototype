@@ -6,8 +6,8 @@ export interface OutstudyEvent {
   /** название */
   name: string | null;
   /** id типа мероприятия */
-  outstudyEventKindId: number | null;
-  eventKindId?: number | null; //TODO: удалить (разные id)
+  outstudyEventKindId: number | null; // для создания
+  eventKindId?: number | null; // при получении мероприятия
   /** статус */
   status: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   /** дата начала */

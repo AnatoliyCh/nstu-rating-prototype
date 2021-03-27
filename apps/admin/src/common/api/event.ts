@@ -46,6 +46,18 @@ export async function getEvents(
     },
   });
 }
+/** получение мероприятия по id */
+export async function getEventById(
+  accessToken: string,
+  path: string
+): Promise<[OutstudyEvent | undefined, ApiError | undefined]> {
+  return await http.get<OutstudyEvent>(path, {
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
 /** создание мероприятия */
 export async function createEvent(
   accessToken: string,
@@ -60,20 +72,41 @@ export async function createEvent(
     },
   });
 }
+/** удаление мероприятия */
+export async function deleteEvent(
+  accessToken: string,
+  path: string
+): Promise<[any | undefined, ApiError | undefined]> {
+  return await http._delete(path, {
+    headers: {
+      accept: "*/*",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
+
 /** получение списка участников по id мероприятия */
 export async function getMembersEvent(
+  accessToken: string,
   path: string
 ): Promise<[UserObject | undefined, ApiError | undefined]> {
   return await http.get<UserObject>(path, {
-    headers: { accept: "application/json" },
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
   });
 }
 /** получение списка заявок на участие по id мероприятия */
 export async function getRequestsEvent(
+  accessToken: string,
   path: string
 ): Promise<[EventRequestObject | undefined, ApiError | undefined]> {
   return await http.get<EventRequestObject>(path, {
-    headers: { accept: "application/json" },
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
   });
 }
 /** отправка заявки на участие в мероприятии */
@@ -87,6 +120,7 @@ export async function memberEventRegistration(
 }
 /** изменение статуса заявки участиника (принять/тклонить)*/
 export async function memberEventRequestChange(
+  accessToken: string,
   path: string,
   requestBody: { status: number }
 ): Promise<[any | undefined, ApiError | undefined]> {
@@ -94,6 +128,7 @@ export async function memberEventRequestChange(
     headers: {
       accept: "*/*",
       "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
     },
   });
 }

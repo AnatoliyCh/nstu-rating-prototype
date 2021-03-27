@@ -1,14 +1,10 @@
 <template>
   <div class="v-add-event-type">
-    <!-- кнопки -->
-    <div class="v-add-event-type-actions">
-      <a-space :size="24">
-        <h2>Создание: тип мероприятия</h2>
-        <a-button type="primary" @click="routing('event-list')">
-          К списку мероприятий
-        </a-button>
-      </a-space>
-    </div>
+    <a-page-header
+      title="Создание: тип мероприятия"
+      class="header-block"
+      @back="routing('event-list')"
+    />
     <a-row :gutter="16" class="vertical-margin-element-16">
       <!-- основная информация -->
       <a-col :span="6">
@@ -213,11 +209,11 @@ export default class VAddEventType extends mixins(VBaseMixin) {
       this.typeEvent
     );
     if (response && !error) {
+      console.info(response);
       this.$notification.success({
         message: "Тип мероприятия создан",
         description: `Название: ${this.typeEvent.name}`,
       });
-      console.log(response);
     } else if (error) {
       console.warn(error);
       this.$notification.warning({
@@ -232,17 +228,6 @@ export default class VAddEventType extends mixins(VBaseMixin) {
 
 <style lang="scss">
 .v-add-event-type {
-  &-actions {
-    display: flex;
-    height: 64px;
-    padding: 8px;
-    border-block-end: 1px solid #e8e8e8;
-    margin-bottom: 16px;
-    h2 {
-      margin-bottom: 0px;
-    }
-  }
-
   > .ant-row {
     padding: 0px 16px;
     .ant-card-head-title {

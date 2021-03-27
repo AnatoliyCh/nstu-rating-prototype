@@ -64,3 +64,10 @@ export async function put<T, U>(
   const init = { method: "put", body: JSON.stringify(body), ...config };
   return await http<U>(path, init);
 }
+export async function _delete<T>(
+  path: string,
+  config?: RequestInit
+): Promise<[T | undefined, ApiError | undefined]> {
+  const init = { method: "delete", ...config };
+  return await http<T>(path, init);
+}

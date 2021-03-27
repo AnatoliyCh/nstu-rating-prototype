@@ -1,20 +1,27 @@
 <template>
   <div class="v-event-list">
-    <!-- кнопки -->
-    <div class="v-event-list-actions">
-      <a-space :size="24">
-        <h2>Список: мероприятия</h2>
+    <a-page-header title="Список: мероприятия" class="header-block">
+      <template slot="extra">
         <!-- действия для орг. и админа -->
-        <a-button type="primary" @click="routing('event-create')">
-          Создать мероприятие
-        </a-button>
-        <a-button @click="routing('event-create-type')">
+        <a-button key="2" @click="routing('event-create-type')">
           Создать тип мероприятия
         </a-button>
-      </a-space>
-    </div>
+        <a-button key="1" type="primary" @click="routing('event-create')">
+          Создать мероприятие
+        </a-button>
+      </template>
+    </a-page-header>
+    <!-- загрузка -->
+    <a-spin v-if="isLoading" class="spin-width">
+      <a-icon slot="indicator" type="loading" style="font-size: 24px" spin />
+    </a-spin>
+    <!-- пусто -->
+    <a-empty v-else-if="!isLoading && !outstudyEvents.length" />
     <!-- список -->
-    <div class="v-event-list-body">
+    <div
+      v-else-if="!isLoading && outstudyEvents.length"
+      class="v-event-list-body"
+    >
       <a-card
         v-for="(event, index) in viewModel"
         :key="index"
@@ -61,10 +68,10 @@
         </div>
         <div class="vertical-margin-element-24">
           <a-space :size="24">
-            <a-button type="primary" @click="registration(event.id)"
-              >Заявка</a-button
-            >
-            <a-button>Подробнее</a-button>
+            <a-button type="primary" @click="registration(event.id)">
+              {{ event.isNeedMemberConfirmation ? "Заявка" : "Участвовать" }}
+            </a-button>
+            <a-button @click="goEventDetails(event.id)"> Подробнее </a-button>
           </a-space>
         </div>
       </a-card>
@@ -86,6 +93,7 @@ export default class VEventList extends mixins(VBaseMixin) {
   sizeEvents = 0; // для пагинации
 
   async created(): Promise<void> {
+    this.isLoading = true;
     const [response, error] = await api.event.getEvents(
       this.accessToken,
       0,
@@ -102,6 +110,7 @@ export default class VEventList extends mixins(VBaseMixin) {
       });
     }
     await this.getEventTypes();
+    this.isLoading = false;
   }
   // получение типов мероприятия
   async getEventTypes(): Promise<void> {
@@ -131,18 +140,28 @@ export default class VEventList extends mixins(VBaseMixin) {
         dateStart: item.dateStart,
         dateEnd: item.dateEnd,
         address: item.address,
+        isNeedMemberConfirmation: item.isNeedMemberConfirmation,
       };
     });
   }
   // регистрация тек. пользователя в мероприятии
-  async registration(idEvent: number | null) {
+  async registration(idEvent: number | null): Promise<void> {
     if (!idEvent) return;
     const [response, error] = await api.event.memberEventRegistration(
       this.accessToken,
       idEvent
     );
     if (!error && response) {
-      console.log(response);
+      console.info(response);
+      const event = this.outstudyEvents.find((item) => item.id === idEvent);
+      if (!event) return;
+      const label = event.isNeedMemberConfirmation
+        ? "Заявка на участие подана"
+        : "Вы зарегистрированы";
+      this.$notification.success({
+        message: label,
+        description: "",
+      });
     } else if (error) {
       console.warn(error);
       this.$notification.warning({
@@ -151,21 +170,19 @@ export default class VEventList extends mixins(VBaseMixin) {
       });
     } else console.error(error);
   }
+  // переход на страницу просмотра меропрития
+  goEventDetails(idEvent: number | null) {
+    if (!idEvent) return;
+    this.$router.push({
+      name: "event-details",
+      params: { id: idEvent.toString() },
+    });
+  }
 }
 </script>
 
 <style lang="scss">
 .v-event-list {
-  &-actions {
-    display: flex;
-    height: 64px;
-    padding: 8px;
-    border-block-end: 1px solid #e8e8e8;
-    margin-bottom: 16px;
-    h2 {
-      margin-bottom: 0px;
-    }
-  }
   > .v-event-list-body {
     padding-top: 16px;
     width: 40%;

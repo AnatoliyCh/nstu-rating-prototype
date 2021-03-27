@@ -16,6 +16,7 @@ const routes: Array<RouteConfig> = [
     name: "event",
     meta: {
       exact: false,
+      icon: "calendar",
       name: "Мероприятия",
     },
     component: () => import("@/common/components/v-router-parent.vue"),
@@ -49,6 +50,16 @@ const routes: Array<RouteConfig> = [
         },
         component: () =>
           import("@/common/components/event/v-add-event-type.vue"),
+      },
+      // мероприятие: детальное представление
+      {
+        path: "/event/:id",
+        name: "event-details",
+        meta: {
+          exact: false,
+        },
+        component: () =>
+          import("@/common/components/event/v-event-details.vue"),
       },
     ],
   },

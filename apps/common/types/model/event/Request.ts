@@ -3,7 +3,7 @@ import { User } from "../../model";
 export interface Request {
   /** ид в БД */
   id: number | null;
-  /** статус */
+  /** статус: 1: в процессе, 2: принято, 3: отказано */
   status: number | null;
   /** id мероприятия */
   outStudyEventId?: number | null;

@@ -4,7 +4,19 @@
     <div class="app-user-element">Пользователь:</div>
     <div class="app-body">
       <!-- навигационное меню -->
-      <div class="app-body-menu"></div>
+      <a-menu
+        class="app-body-menu"
+        :default-selected-keys="['1']"
+        mode="inline"
+      >
+        <a-menu-item v-for="(link, index) in viewModelLinks" :key="index">
+          <router-link :to="link.path">
+            <a-icon v-if="link.meta.icon" :type="link.meta.icon" />
+            <span>{{ link.meta.name }}</span>
+          </router-link>
+        </a-menu-item>
+      </a-menu>
+      <!-- тело -->
       <div class="app-body-content">
         <a-config-provider :locale="currentLocale">
           <router-view />
@@ -14,7 +26,10 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
+import { mixins } from "vue-class-component";
+import { RouteConfig } from "vue-router";
+import VBaseMixin from "@/common/v-base-mixin";
 // локализация
 import ruRU from "ant-design-vue/es/locale/ru_RU";
 import moment from "moment";
@@ -22,7 +37,7 @@ import "moment/locale/ru";
 moment.locale("ru");
 
 @Component
-export default class App extends Vue {
+export default class App extends mixins(VBaseMixin) {
   created(): void {
     this.$store.commit("setAccessToken", localStorage.getItem("aT"));
     this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
@@ -31,10 +46,11 @@ export default class App extends Vue {
   get currentLocale(): any {
     return ruRU;
   }
-
-  // get layout():string {
-  //   return "v-layout-" + (this.$route.meta.layout || "empty");
-  // }
+  get viewModelLinks(): RouteConfig[] {
+    const routes = this.$router.options.routes;
+    if (!routes) return [];
+    return routes.filter((route) => Boolean(route.meta?.name));
+  }
 }
 </script>
 
@@ -67,7 +83,8 @@ export default class App extends Vue {
     }
     > .app-body-content {
       width: 100%;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
   }
 }

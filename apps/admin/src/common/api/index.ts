@@ -1,4 +1,4 @@
-export { get, post, put } from "./fetch";
+export { get, post, put, _delete } from "./fetch";
 
 import * as auth from "./auth";
 import * as user from "./user";
@@ -54,6 +54,12 @@ export class Api {
           `event/api/v1/outstudy-event?offset=${offset}&limit=${limit}`
       );
     },
+    getEventById: async (accessToken: string, id: number) => {
+      return event.getEventById(
+        accessToken,
+        this.basePath + `event/api/v1/outstudy-event/${id}`
+      );
+    },
     createEvent: async (accessToken: string, requestBody: OutstudyEvent) => {
       return event.createEvent(
         accessToken,
@@ -61,13 +67,22 @@ export class Api {
         requestBody
       );
     },
-    getMembersEvent: async (idEvent: number) => {
-      return event.getMembersEvent(
-        this.basePath + `event/api/v1/outstudy-event/${idEvent}/members`
+    deleteEvent: async (accessToken: string, id: number) => {
+      return event.deleteEvent(
+        accessToken,
+        this.basePath + `event/api/v1/outstudy-event/${id}`
       );
     },
-    getRequestsEvent: async (idEvent: number) => {
+    getMembersEvent: async (accessToken: string, idEvent: number) => {
+      return event.getMembersEvent(
+        accessToken,
+        this.basePath +
+          `event/api/v1/outstudy-event/${idEvent}/members?offset=0&limit=99`
+      );
+    },
+    getRequestsEvent: async (accessToken: string, idEvent: number) => {
       return event.getRequestsEvent(
+        accessToken,
         this.basePath + `event/api/v1/outstudy-event/${idEvent}/request`
       );
     },
@@ -78,11 +93,13 @@ export class Api {
       );
     },
     memberEventRequestChange: async (
+      accessToken: string,
       idEvent: number,
       idRequest: number,
       status: 1 | 2 | 3
     ) => {
       return event.memberEventRequestChange(
+        accessToken,
         this.basePath +
           `event/api/v1/outstudy-event/${idEvent}/request/${idRequest}`,
         { status: status }
