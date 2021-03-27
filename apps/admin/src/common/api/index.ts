@@ -105,6 +105,17 @@ export class Api {
         { status: status }
       );
     },
+    membersReward: async (
+      accessToken: string,
+      idEvent: number,
+      requestBody: Parameters<typeof event.membersReward>[2]
+    ) => {
+      return event.membersReward(
+        accessToken,
+        this.basePath + `event/api/v1/outstudy-event/${idEvent}/reward`,
+        requestBody
+      );
+    },
   };
 }
 const api: Api = new Api();

@@ -280,8 +280,16 @@
         title="Награждение участников"
         v-model="visibleModalReward"
         @ok="handleOkReward"
+        centered
       >
         <p>{{ criteriaReward.name }}</p>
+        <a-table
+          :columns="columnsTableReward"
+          :data-source="dataTableReward"
+          :pagination="{ pageSize: 10 }"
+          :row-selection="rowSelection"
+          size="small"
+        />
       </a-modal>
     </template>
   </div>
@@ -318,7 +326,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   visibleModalReward = false;
   isLoadingRewards = false;
   // критерий по которому награждают
-  criteriaReward = { name: "", type: -1 };
+  criteriaReward = { name: "", type: -1, id: -1, idUsers: [] as number[] };
 
   async created(): Promise<void> {
     this.isLoading = true;
@@ -439,16 +447,16 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   }
   //* модальное окно и таблица (заявки)
   // показать модальное окно
-  async showModalRequest() {
+  async showModalRequest(): Promise<void> {
     this.visibleModalRequest = true;
     this.isLoadingRequests = true;
     await this.getRequestsEvent();
   }
-  handleOkRequest() {
+  handleOkRequest(): void {
     this.visibleModalRequest = false;
     this.requests = [];
   }
-  handleCancelRequest() {
+  handleCancelRequest(): void {
     this.visibleModalRequest = false;
     this.requests = [];
   }
@@ -508,7 +516,10 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     });
   }
   // принятие/отклонение заявок
-  async changeRequest(idRequest: number, status: 1 | 2 | 3 | null) {
+  async changeRequest(
+    idRequest: number,
+    status: 1 | 2 | 3 | null
+  ): Promise<void> {
     if (!this.outstudyEvent?.id || !status) return;
     this.isLoadingRequests = true;
     const [response, error] = await api.event.memberEventRequestChange(
@@ -533,29 +544,136 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   //* модальное окно и таблица (награждение)
   // показать модальное окно
   showModalReward(criteria: Criteria | null) {
-    if (!criteria) return (this.criteriaReward = { name: "", type: -1 });
+    if (!criteria?.id)
+      return (this.criteriaReward = {
+        name: "",
+        type: -1,
+        id: -1,
+        idUsers: [],
+      });
     switch (criteria.typeId) {
       case 2:
         this.criteriaReward = {
           name: this.criteriaTypeTwoName,
           type: criteria.typeId,
+          id: criteria.id,
+          idUsers: [],
         };
         break;
       case 3:
         this.criteriaReward = {
           name: this.criteriaTypeThreeName,
           type: criteria.typeId,
+          id: criteria.id,
+          idUsers: [],
         };
         break;
 
       default:
-        this.criteriaReward = { name: "", type: -1 };
+        this.criteriaReward = { name: "", type: -1, id: -1, idUsers: [] };
         break;
     }
     this.visibleModalReward = true;
   }
-  handleOkReward() {
+  handleOkReward(): void {
     this.visibleModalReward = false;
+  }
+  // колонки таблицы
+  get columnsTableReward() {
+    return [
+      {
+        title: "ФИО",
+        dataIndex: "name",
+        key: "name",
+      },
+    ];
+  }
+  // данные таблицы
+  get dataTableReward() {
+    return this.members.map((item) => {
+      return {
+        key: item.id,
+        name: viewFullName(item.profile ?? null, false),
+      };
+    });
+  }
+  // настройки селекта строк таблицы
+  get rowSelection() {
+    return {
+      onSelect: (
+        record: boolean,
+        selected: {
+          key: number;
+          name: string;
+        }
+      ) => {
+        console.log("onSelect", record, selected);
+        if (record) this.criteriaReward.idUsers.push(selected.key);
+        else {
+          this.criteriaReward.idUsers = this.criteriaReward.idUsers.filter(
+            (item) => item !== selected.key
+          );
+        }
+      },
+      onSelectAll: (
+        selected: boolean,
+        selectedRows: any,
+        changeRows: {
+          key: number;
+          name: string;
+        }[]
+      ) => {
+        console.log("onSelectAll", selected, changeRows);
+        const ids: number[] = [];
+        changeRows.forEach((item) => ids.push(item.key));
+        if (selected) this.criteriaReward.idUsers.push(...ids);
+        else {
+          this.criteriaReward.idUsers = this.criteriaReward.idUsers.filter(
+            (item) => !ids.includes(item)
+          );
+        }
+      },
+    };
+  }
+  // награждение участников
+  async membersReward(): Promise<void> {
+    if (
+      !this.outstudyEvent?.id ||
+      this.criteriaReward.type === -1 ||
+      this.criteriaReward.id === -1 ||
+      this.criteriaReward.idUsers === []
+    )
+      return;
+    const [response, error] = await api.event.membersReward(
+      this.accessToken,
+      this.outstudyEvent.id,
+      {
+        data: [
+          {
+            criterionId: this.criteriaReward.id,
+            usersIds: this.criteriaReward.idUsers,
+          },
+        ],
+      }
+    );
+    if (!error && response) {
+      this.criteriaReward = {
+        name: "",
+        type: -1,
+        id: -1,
+        idUsers: [],
+      };
+      this.$notification.success({
+        message: "Участники награждены",
+        description: "",
+      });
+    } else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "",
+      });
+    } else console.error(error);
   }
 }
 </script>

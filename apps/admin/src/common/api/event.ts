@@ -84,7 +84,6 @@ export async function deleteEvent(
     },
   });
 }
-
 /** получение списка участников по id мероприятия */
 export async function getMembersEvent(
   accessToken: string,
@@ -131,4 +130,29 @@ export async function memberEventRequestChange(
       Authorization: "Bearer " + accessToken,
     },
   });
+}
+/** награждение участников (пользовтелей) по критериям */
+export async function membersReward(
+  accessToken: string,
+  path: string,
+  requestBody: {
+    data: [
+      {
+        criterionId: number;
+        usersIds: number[];
+      }
+    ];
+  }
+): Promise<[any | undefined, ApiError | undefined]> {
+  return await http.put<Parameters<typeof membersReward>[2], any>(
+    path,
+    requestBody,
+    {
+      headers: {
+        accept: "*/*",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
 }
