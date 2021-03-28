@@ -144,7 +144,7 @@ export async function membersReward(
     ];
   }
 ): Promise<[any | undefined, ApiError | undefined]> {
-  return await http.put<Parameters<typeof membersReward>[2], any>(
+  return await http.post<Parameters<typeof membersReward>[2], any>(
     path,
     requestBody,
     {

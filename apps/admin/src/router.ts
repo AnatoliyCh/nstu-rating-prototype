@@ -10,6 +10,29 @@ const routes: Array<RouteConfig> = [
     name: "empty",
     redirect: "/event/list",
   },
+  //* пользовтели
+  {
+    path: "/user",
+    name: "user",
+    meta: {
+      exact: false,
+      icon: "team",
+      name: "Пользователи",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/user/list",
+    children: [
+      // список мероприятий
+      {
+        path: "/user/list",
+        name: "user-list",
+        meta: {
+          exact: true,
+        },
+        component: () => import("@/common/components/user/v-user-list.vue"),
+      },
+    ],
+  },
   //* мероприятия
   {
     path: "/event",

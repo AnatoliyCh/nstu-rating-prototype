@@ -1,30 +1,30 @@
-import { UserRole } from "../types/model";
+import { UserRole } from "../../../../common/types/model";
 
 /** Список ролей и их информации */
 const roles: { [key: number]: UserRole } = {
   1: {
-    color: "",
-    nameRU: "преподаватель",
+    color: "#108ee9",
+    name: "преподаватель",
   },
   2: {
-    color: "#add8e6",
-    nameRU: "студент",
+    color: "#2db7f5",
+    name: "студент",
   },
   3: {
-    color: "",
-    nameRU: "тьютор",
+    color: "#108ee9",
+    name: "тьютор",
   },
   4: {
-    color: "#ffcccb",
-    nameRU: "администратор",
+    color: "#f50",
+    name: "администратор",
   },
   5: {
-    color: "",
-    nameRU: "организатор",
+    color: "#108ee9",
+    name: "организатор",
   },
   6: {
-    color: "",
-    nameRU: "участник",
+    color: "#87d068",
+    name: "участник",
   },
 };
 
@@ -34,7 +34,7 @@ export function getRoleById(id: number): UserRole {
   return (
     roles[id] ?? {
       color: "",
-      nameRU: "?: " + id,
+      name: "?: " + id,
     }
   );
 }

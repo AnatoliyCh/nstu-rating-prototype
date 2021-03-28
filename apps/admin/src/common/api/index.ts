@@ -3,11 +3,13 @@ export { get, post, put, _delete } from "./fetch";
 import * as auth from "./auth";
 import * as user from "./user";
 import * as event from "./event";
+import * as chat from "./chat";
 import {
   Account,
   TypeEvent,
   OutstudyEvent,
 } from "../../../../common/types/model";
+import { CreateChat } from "../../../../common/types/api";
 
 // API
 export const PATH_BASE = "http://";
@@ -32,7 +34,6 @@ export class Api {
       );
     },
   };
-
   public event = {
     getEventTypes: async (accessToken: string) => {
       return event.getTypes(
@@ -113,6 +114,15 @@ export class Api {
       return event.membersReward(
         accessToken,
         this.basePath + `event/api/v1/outstudy-event/${idEvent}/reward`,
+        requestBody
+      );
+    },
+  };
+  public chat = {
+    createChat: async (accessToken: string, requestBody: CreateChat) => {
+      return chat.createChat(
+        accessToken,
+        this.basePath + "chat/api/v1/chat/create",
         requestBody
       );
     },

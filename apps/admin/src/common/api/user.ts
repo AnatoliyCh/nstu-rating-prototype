@@ -1,4 +1,4 @@
-// модуль auth
+//* модуль user
 import { ApiError, UserObject } from "../../../../common/types/api";
 import * as http from "../api";
 

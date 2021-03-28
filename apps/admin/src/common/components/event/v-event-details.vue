@@ -279,7 +279,9 @@
       <a-modal
         title="Награждение участников"
         v-model="visibleModalReward"
+        :confirm-loading="isLoadingReward"
         @ok="handleOkReward"
+        @cancel="handleCancelReward"
         centered
       >
         <p>{{ criteriaReward.name }}</p>
@@ -324,7 +326,9 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   requests: Request[] = []; // заявки на участие
   // модальное окно (награждение)
   visibleModalReward = false;
-  isLoadingRewards = false;
+  isLoadingReward = false;
+  selectedRowKeys: number[] = []; // выделенные строчки
+
   // критерий по которому награждают
   criteriaReward = { name: "", type: -1, id: -1, idUsers: [] as number[] };
 
@@ -378,7 +382,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
       await this.routing("event-list");
     } else console.error(error);
   }
-  // пулчение типа мероприятия
+  // получение типа мероприятия
   async getType(): Promise<void> {
     if (!this.outstudyEvent || !this.outstudyEvent.eventKindId) return;
     const [response, error] = await api.event.getEventTypes(this.accessToken);
@@ -395,7 +399,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
       });
     } else console.error(error);
   }
-  // получение списка учатсников
+  // получение списка участников
   async getMembers(): Promise<void> {
     if (!this.outstudyEvent?.id) return;
     const [response, error] = await api.event.getMembersEvent(
@@ -417,6 +421,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     if (this.members.length > 10) return "510";
     else return (this.members.length * 51).toString();
   }
+
   //* критерий
   // критерий: за участие
   get criteriaTypeOne(): Criteria[] {
@@ -441,10 +446,11 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     const currentTypeCriteria: Criteria[] = this.typeEvent?.criteria ?? [];
     const newArr: Criteria[] = [];
     currentTypeCriteria.forEach(
-      (item) => item.typeId === 2 && newArr.push(item)
+      (item) => item.typeId === 3 && newArr.push(item)
     );
     return newArr;
   }
+
   //* модальное окно и таблица (заявки)
   // показать модальное окно
   async showModalRequest(): Promise<void> {
@@ -541,6 +547,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     } else console.error(error);
     this.isLoadingRequests = false;
   }
+
   //* модальное окно и таблица (награждение)
   // показать модальное окно
   showModalReward(criteria: Criteria | null) {
@@ -575,8 +582,16 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     }
     this.visibleModalReward = true;
   }
-  handleOkReward(): void {
+  async handleOkReward(): Promise<void> {
+    this.isLoadingReward = true;
+    await this.membersReward();
+    this.handleCancelReward();
+    this.isLoadingReward = false;
+  }
+  handleCancelReward(): void {
     this.visibleModalReward = false;
+    this.selectedRowKeys = [];
+    this.showModalReward(null);
   }
   // колонки таблицы
   get columnsTableReward() {
@@ -600,38 +615,10 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   // настройки селекта строк таблицы
   get rowSelection() {
     return {
-      onSelect: (
-        record: boolean,
-        selected: {
-          key: number;
-          name: string;
-        }
-      ) => {
-        console.log("onSelect", record, selected);
-        if (record) this.criteriaReward.idUsers.push(selected.key);
-        else {
-          this.criteriaReward.idUsers = this.criteriaReward.idUsers.filter(
-            (item) => item !== selected.key
-          );
-        }
-      },
-      onSelectAll: (
-        selected: boolean,
-        selectedRows: any,
-        changeRows: {
-          key: number;
-          name: string;
-        }[]
-      ) => {
-        console.log("onSelectAll", selected, changeRows);
-        const ids: number[] = [];
-        changeRows.forEach((item) => ids.push(item.key));
-        if (selected) this.criteriaReward.idUsers.push(...ids);
-        else {
-          this.criteriaReward.idUsers = this.criteriaReward.idUsers.filter(
-            (item) => !ids.includes(item)
-          );
-        }
+      selectedRowKeys: this.selectedRowKeys,
+      onChange: (selectedRowKeys: number[]) => {
+        this.selectedRowKeys = selectedRowKeys;
+        this.criteriaReward.idUsers = [...this.selectedRowKeys];
       },
     };
   }
@@ -665,7 +652,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
       };
       this.$notification.success({
         message: "Участники награждены",
-        description: "",
+        description: this.criteriaReward.name,
       });
     } else if (error) {
       console.warn(error);
