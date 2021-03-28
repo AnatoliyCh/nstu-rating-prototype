@@ -214,6 +214,7 @@
         class="vertical-margin-element-16"
         style="margin-bottom: 16px"
       >
+        <!-- участиники -->
         <a-col :span="12">
           <a-card title="Участники" hoverable>
             <!-- пусто -->
@@ -223,7 +224,7 @@
               v-else-if="!isLoading && members.length"
               item-layout="horizontal"
               :data-source="members"
-              :style="`overflow: auto; height: ${maxHeightMemberList}px`"
+              style="overflow: auto; max-height: 729px"
             >
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
@@ -235,9 +236,49 @@
             </a-list>
           </a-card>
         </a-col>
+        <!-- чат -->
         <a-col :span="12">
           <a-card title="Чат" hoverable>
-            <p>card content</p>
+            <!-- создание сообщения -->
+            <a-comment>
+              <div slot="content">
+                <a-form-item>
+                  <a-textarea
+                    :auto-size="{ minRows: 4, maxRows: 4 }"
+                    v-model="message"
+                  />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    html-type="submit"
+                    :loading="isLoadingMessage"
+                    type="primary"
+                    @click="sendMessage"
+                  >
+                    Отправить
+                  </a-button>
+                </a-form-item>
+              </div>
+            </a-comment>
+            <!-- сообщения -->
+            <a-list
+              id="list"
+              :data-source="messageList"
+              :loading="isLoading"
+              size="small"
+              item-layout="horizontal"
+              class="v-chat-details-body-list"
+              style="overflow: auto; max-height: 510px"
+            >
+              <a-list-item slot="renderItem" slot-scope="item">
+                <a-comment
+                  :author="item.sender"
+                  :content="item.text"
+                  :datetime="item.dateTime"
+                  size="small"
+                />
+              </a-list-item>
+            </a-list>
           </a-card>
         </a-col>
       </a-row>
@@ -276,6 +317,7 @@
           </span>
         </a-table>
       </a-modal>
+      <!-- модальное окно награждения -->
       <a-modal
         title="Награждение участников"
         v-model="visibleModalReward"
@@ -297,18 +339,19 @@
   </div>
 </template>
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import { mixins } from "vue-class-component";
-import VBaseMixin from "@/common/v-base-mixin";
-import {
-  OutstudyEvent,
-  TypeEvent,
-  User,
-  Criteria,
-  Request,
-} from "../../../../../common/types/model";
 import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
+import VBaseMixin from "@/common/v-base-mixin";
+import { mixins } from "vue-class-component";
+import { Component } from "vue-property-decorator";
+import {
+  Criteria,
+  Message,
+  OutstudyEvent,
+  Request,
+  TypeEvent,
+  User,
+} from "../../../../../common/types/model";
 
 @Component
 export default class VEventDetails extends mixins(VBaseMixin) {
@@ -328,9 +371,13 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   visibleModalReward = false;
   isLoadingReward = false;
   selectedRowKeys: number[] = []; // выделенные строчки
-
   // критерий по которому награждают
   criteriaReward = { name: "", type: -1, id: -1, idUsers: [] as number[] };
+  // чат
+  messageList: Message[] = []; // список сообщений
+  message = ""; // сообщение
+  isLoadingMessage = false; // анимация кнопки отправки сообщения
+  timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
 
   async created(): Promise<void> {
     this.isLoading = true;
@@ -338,8 +385,14 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     if (this.outstudyEvent) {
       await this.getType();
       await this.getMembers();
+      await this.getMessages();
+      this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
     }
     this.isLoading = false;
+  }
+  beforeDestroy() {
+    // отписка от прослушивания получения сообщений
+    this.timerId && clearTimeout(this.timerId);
   }
   //* данные о мероприятии
   // удаление мероприятия
@@ -415,11 +468,6 @@ export default class VEventDetails extends mixins(VBaseMixin) {
         description: "",
       });
     } else console.error(error);
-  }
-  get maxHeightMemberList(): string {
-    if (!this.members.length) return "51";
-    if (this.members.length > 10) return "510";
-    else return (this.members.length * 51).toString();
   }
 
   //* критерий
@@ -661,6 +709,69 @@ export default class VEventDetails extends mixins(VBaseMixin) {
         description: "",
       });
     } else console.error(error);
+  }
+
+  //* чат
+  // id чата
+  get chatId(): number {
+    return this.outstudyEvent?.chat?.id ?? -1;
+  }
+  // элемент списка, для прокрутки
+  get elementList(): Element | null {
+    return this.$el.querySelector("#list");
+  }
+  // parent элемент для прокрутки (из-за чата)
+  get elementParent() {
+    return document.querySelector(".app-body-content");
+  }
+  // получение списка сообщений
+  async getMessages() {
+    this.isLoading = true;
+    const scroll = this.elementParent?.scrollTop; // сохранение тек. скролла на странице
+    const [response, error] = await api.chat.getMessages(
+      this.accessToken,
+      this.chatId,
+      0,
+      999
+    );
+    if (!error && response && response.data) {
+      this.messageList = response.data;
+    } else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "",
+      });
+    } else console.error(error);
+    this.isLoading = false;
+    // возвращение скролла
+    this.$nextTick(() => {
+      scroll && this.elementParent && (this.elementParent.scrollTop = scroll);
+    });
+  }
+  /** отправка сообщений */
+  async sendMessage() {
+    const newMessage = this.message;
+    this.isLoading = this.isLoadingMessage = true;
+    const [response, error] = await api.chat.sendMessage(
+      this.accessToken,
+      this.chatId,
+      newMessage
+    );
+    if (!error && response) {
+      this.message = "";
+      await this.getMessages();
+    } else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "",
+      });
+    } else console.error(error);
+    this.isLoading = this.isLoadingMessage = false;
+    // прокрутка вниз, после отпраки сообщения
+    this.elementList &&
+      (this.elementList.scrollTop = this.elementList.scrollHeight);
   }
 }
 </script>

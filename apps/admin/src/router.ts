@@ -86,6 +86,38 @@ const routes: Array<RouteConfig> = [
       },
     ],
   },
+  //* чаты
+  {
+    path: "/chat",
+    name: "chat",
+    meta: {
+      exact: false,
+      icon: "wechat",
+      name: "Чаты",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/chat/list",
+    children: [
+      // список чатов
+      {
+        path: "/chat/list",
+        name: "chat-list",
+        meta: {
+          exact: true,
+        },
+        component: () => import("@/common/components/chat/v-chat-list.vue"),
+      },
+      // чат: детальное представление
+      {
+        path: "/chat/:id",
+        name: "chat-details",
+        meta: {
+          exact: false,
+        },
+        component: () => import("@/common/components/chat/v-chat-details.vue"),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({

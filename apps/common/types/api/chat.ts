@@ -1,3 +1,14 @@
+import { Chat, Message } from "../model";
+/** Список чатов */
+export interface ChatObject {
+  data: Chat[] | null;
+  size?: number | number;
+}
+/** Список сообщений */
+export interface MessageObject {
+  data: Message[] | null;
+  size?: number | number;
+}
 /** Объект для создания чата (тело запроса) */
 export interface CreateChat {
   /** название чата */

@@ -11,7 +11,9 @@ export default class VBaseMixin extends Vue {
   get refreshToken() {
     return this.$store.state.accessKeys.refreshToken;
   }
-
+  get currentUserId() {
+    return this.$store.state.user.id ?? null;
+  }
   // перенаправление
   async routing(namePath: string | null) {
     if (!namePath || this.$router.currentRoute.name === namePath) return;

@@ -126,6 +126,35 @@ export class Api {
         requestBody
       );
     },
+    getChats: async (accessToken: string, offset: number, limit: number) => {
+      return chat.getChats(
+        accessToken,
+        this.basePath + `chat/api/v1/chat?offset=${offset}&limit=${limit}`
+      );
+    },
+    getMessages: async (
+      accessToken: string,
+      idChat: number,
+      offset: number,
+      limit: number
+    ) => {
+      return chat.getMessages(
+        accessToken,
+        this.basePath +
+          `chat/api/v1/chat/${idChat}/messages?offset=${offset}&limit=${limit}`
+      );
+    },
+    sendMessage: async (
+      accessToken: string,
+      chatId: number,
+      message: string
+    ) => {
+      return chat.sendMessage(
+        accessToken,
+        this.basePath + `chat/api/v1/chat/${chatId}/user/message`,
+        { text: message }
+      );
+    },
   };
 }
 const api: Api = new Api();

@@ -79,12 +79,12 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { mixins } from "vue-class-component";
-import VBaseMixin from "@/common/v-base-mixin";
-import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
-import { viewFullName } from "@/common/filters";
 import api from "@/common/api";
+import { viewFullName } from "@/common/filters";
+import VBaseMixin from "@/common/v-base-mixin";
+import { mixins } from "vue-class-component";
+import { Component } from "vue-property-decorator";
+import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
 
 @Component
 export default class VEventList extends mixins(VBaseMixin) {

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- тек. пользователь -->
-    <div class="app-user-element">Пользователь:</div>
+    <div class="app-user-element">{{ `Пользователь: ${currentUserId}` }}</div>
     <div class="app-body">
       <!-- навигационное меню -->
       <a-menu
@@ -35,12 +35,31 @@ import ruRU from "ant-design-vue/es/locale/ru_RU";
 import moment from "moment";
 import "moment/locale/ru";
 moment.locale("ru");
+// JWT
+import jwt from "jsonwebtoken";
 
 @Component
 export default class App extends mixins(VBaseMixin) {
   created(): void {
+    // токены
     this.$store.commit("setAccessToken", localStorage.getItem("aT"));
     this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
+    // текущий пользователь
+    const decodeToken = jwt.decode(this.accessToken);
+    if (
+      decodeToken &&
+      typeof decodeToken !== "string" &&
+      "userId" in decodeToken
+    )
+      this.$store.commit("setUser", {
+        id: decodeToken.userId,
+        roles: [],
+        profile: {
+          lastName: null, // ф
+          firstName: null, // и
+          middleName: null, // о
+        },
+      });
   }
   // eslint-disable-next-line
   get currentLocale(): any {

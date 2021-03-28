@@ -10,3 +10,6 @@ export { Criteria } from "./event/Criteria";
 export { TypeEvent } from "./event/TypeEvent";
 export { OutstudyEvent } from "./event/OutstudyEvent";
 export { Request } from "./event/Request";
+// типы модуля chat
+export { Message } from "./chat/Message";
+export { Chat } from "./chat/Chat";

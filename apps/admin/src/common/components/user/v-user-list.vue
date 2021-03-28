@@ -33,13 +33,13 @@
   </div>
 </template>
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import { mixins } from "vue-class-component";
-import VBaseMixin from "@/common/v-base-mixin";
-import { User } from "../../../../../common/types/model";
-import { CreateChat } from "../../../../../common/types/api";
-import { getRolesByArrId } from "@/common/services/user";
 import api from "@/common/api";
+import { getRolesByArrId } from "@/common/services/user";
+import VBaseMixin from "@/common/v-base-mixin";
+import { mixins } from "vue-class-component";
+import { Component } from "vue-property-decorator";
+import { CreateChat } from "../../../../../common/types/api";
+import { User } from "../../../../../common/types/model";
 
 @Component
 export default class VEventList extends mixins(VBaseMixin) {
@@ -116,19 +116,22 @@ export default class VEventList extends mixins(VBaseMixin) {
   }
   // создание чата
   async createChat(idSubUser: number | null) {
-    if (!idSubUser) return;
-    const newChat: CreateChat = { users: [2, idSubUser], chatType: 1 };
+    if (!idSubUser || !this.currentUserId) return;
+    const newChat: CreateChat = {
+      users: [idSubUser],
+      chatType: 1,
+    };
     this.isLoading = true;
     const [response, error] = await api.chat.createChat(
       this.accessToken,
       newChat
     );
     if (!error && response) {
-      console.log(response);
+      console.log(response, "добавить переадрисацию");
     } else if (error) {
       console.warn(error);
       this.$notification.warning({
-        message: error?.message ?? "",
+        message: error.message ?? "",
         description: "",
       });
     } else console.error(error);
