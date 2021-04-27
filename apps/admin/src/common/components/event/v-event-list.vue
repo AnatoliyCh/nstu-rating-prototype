@@ -11,71 +11,75 @@
         </a-button>
       </template>
     </a-page-header>
-    <!-- загрузка -->
-    <a-spin v-if="isLoading" class="spin-width">
-      <a-icon slot="indicator" type="loading" style="font-size: 24px" spin />
-    </a-spin>
-    <!-- пусто -->
-    <a-empty v-else-if="!isLoading && !outstudyEvents.length" />
     <!-- список -->
-    <div
-      v-else-if="!isLoading && outstudyEvents.length"
+    <a-list
+      :grid="{
+        gutter: 16,
+        xs: 1,
+        sm: 1,
+        md: 2,
+        lg: 2,
+        xl: 3,
+        xxl: 4,
+      }"
+      :data-source="viewModel"
+      :loading="isLoading"
       class="v-event-list-body"
     >
-      <a-card
-        v-for="(event, index) in viewModel"
-        :key="index"
-        :title="event.name"
-        class="vertical-margin-element-24"
-        hoverable
-      >
-        <div class="vertical-margin-element-24">
-          <label>Организатор </label>
-          <a-input :value="event.organizer" disabled />
-        </div>
-        <div class="vertical-margin-element-24">
-          <label>Тип мероприятия </label>
-          <a-input :value="event.type" disabled />
-        </div>
-        <div class="vertical-margin-element-24">
-          <label>Дата начала </label>
-          <a-date-picker
-            :value="event.dateStart"
-            show-time
-            format="YYYY-MM-DD HH:mm"
-            style="width: 100%"
-            disabled
-          />
-        </div>
-        <div class="vertical-margin-element-24">
-          <label>Дата окончания </label>
-          <a-date-picker
-            :value="event.dateEnd"
-            show-time
-            format="YYYY-MM-DD HH:mm"
-            style="width: 100%"
-            disabled
-          />
-        </div>
-        <div class="vertical-margin-element-24">
-          <label>Адрес </label>
-          <a-textarea
-            :value="event.address"
-            placeholder="Адрес мероприятия"
-            :auto-size="{ minRows: 2, maxRows: 2 }"
-            disabled
-          />
-        </div>
-        <div class="vertical-margin-element-24">
-          <a-space :size="24">
-            <a-button type="primary" @click="registration(event.id)">
-              {{ event.isNeedMemberConfirmation ? "Заявка" : "Участвовать" }}
-            </a-button>
-            <a-button @click="goEventDetails(event.id)"> Подробнее </a-button>
-          </a-space>
-        </div>
-      </a-card>
-    </div>
+      <a-list-item slot="renderItem" slot-scope="event">
+        <a-card
+          :title="event.name"
+          class="vertical-margin-element-16 v-event-list-card"
+          hoverable
+        >
+          <div class="vertical-margin-element-16">
+            <label>Организатор </label>
+            <a-input :value="event.organizer" disabled />
+          </div>
+          <div class="vertical-margin-element-16">
+            <label>Тип мероприятия </label>
+            <a-input :value="event.type" disabled />
+          </div>
+          <div class="vertical-margin-element-16">
+            <label>Дата начала </label>
+            <a-date-picker
+              :value="event.dateStart"
+              show-time
+              format="YYYY-MM-DD HH:mm"
+              style="width: 100%"
+              disabled
+            />
+          </div>
+          <div class="vertical-margin-element-16">
+            <label>Дата окончания </label>
+            <a-date-picker
+              :value="event.dateEnd"
+              show-time
+              format="YYYY-MM-DD HH:mm"
+              style="width: 100%"
+              disabled
+            />
+          </div>
+          <div class="vertical-margin-element-16">
+            <label>Адрес </label>
+            <a-textarea
+              :value="event.address"
+              placeholder="Адрес мероприятия"
+              :auto-size="{ minRows: 2, maxRows: 2 }"
+              disabled
+            />
+          </div>
+          <div class="vertical-margin-element-16">
+            <a-space :size="24">
+              <a-button type="primary" @click="registration(event.id)">
+                {{ event.isNeedMemberConfirmation ? "Заявка" : "Участвовать" }}
+              </a-button>
+              <a-button @click="goEventDetails(event.id)"> Подробнее </a-button>
+            </a-space>
+          </div>
+        </a-card>
+      </a-list-item>
+    </a-list>
   </div>
 </template>
 <script lang="ts">
@@ -97,7 +101,7 @@ export default class VEventList extends mixins(VBaseMixin) {
     const [response, error] = await api.event.getEvents(
       this.accessToken,
       0,
-      20
+      999
     );
     if (!error && response) {
       this.outstudyEvents = response.data ?? [];
@@ -184,9 +188,10 @@ export default class VEventList extends mixins(VBaseMixin) {
 <style lang="scss">
 .v-event-list {
   > .v-event-list-body {
-    padding-top: 16px;
-    width: 40%;
-    margin: auto;
+    margin: 0px 16px;
+    .v-event-list-card {
+      cursor: default;
+    }
   }
 }
 </style>

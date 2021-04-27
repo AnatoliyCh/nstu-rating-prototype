@@ -20,7 +20,11 @@ export const PATH_PROXY_HOST = PATH_PROXY + PATH_HOST; // прокси + хос�
 export class Api {
   basePath: string;
   public constructor() {
-    this.basePath = PATH_BASE + PATH_HOST;
+    // eslint-disable-next-line
+    const pathHost = (window as any).PATH_HOST;
+    if (pathHost && typeof pathHost === "string")
+      this.basePath = PATH_BASE + pathHost;
+    else this.basePath = PATH_BASE + PATH_HOST;
   }
   public auth = {
     login: async (requestBody: Account) => {

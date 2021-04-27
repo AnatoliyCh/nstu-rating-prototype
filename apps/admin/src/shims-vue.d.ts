@@ -2,7 +2,7 @@ declare module "*.vue" {
   import Vue from "vue";
   export default Vue;
 }
-// длч локализации
+// для локализации
 interface ruRU {
   [key: string]: any;
 }
