@@ -13,19 +13,26 @@
     </a-page-header>
     <!-- список -->
     <a-list
-      :grid="{
-        gutter: 16,
-        xs: 1,
-        sm: 1,
-        md: 2,
-        lg: 2,
-        xl: 3,
-        xxl: 4,
-      }"
+      :grid="gridList"
       :data-source="viewModel"
       :loading="isLoading"
       class="v-event-list-body"
     >
+      <!-- кнопка загрузить ещё -->
+      <div
+        v-if="!isLoading"
+        slot="loadMore"
+        :style="{
+          textAlign: 'center',
+          marginBottom: '12px',
+          height: '32px',
+          lineHeight: '32px',
+        }"
+      >
+        <a-spin v-if="isLoadingMore" />
+        <a-button v-else @click="getMoreEvents"> Загрузить ещё... </a-button>
+      </div>
+      <!-- элемент -->
       <a-list-item slot="renderItem" slot-scope="event">
         <a-card
           :title="event.name"
@@ -94,18 +101,29 @@ import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
 export default class VEventList extends mixins(VBaseMixin) {
   outstudyEvents: OutstudyEvent[] = []; // массив мероприятий
   typesEvent: TypeEvent[] = []; // типы мероприятий
-  sizeEvents = 0; // для пагинации
+  sizeEvents = 0; // кол-во эл. в запросе
+  // загрузка доп. элементов мероприятий
+  isLoadingMore = false; // загрузка новых элементов
+  filters = { offset: 0, limit: 8 }; // фильтры и шаг для запроса
 
   async created(): Promise<void> {
     this.isLoading = true;
+    await this.getEvents();
+    await this.getEventTypes();
+    this.isLoading = false;
+  }
+  // получение мероприятий
+  async getEvents(): Promise<void> {
     const [response, error] = await api.event.getEvents(
       this.accessToken,
-      0,
-      999
+      this.filters.offset,
+      this.filters.limit
     );
     if (!error && response) {
-      this.outstudyEvents = response.data ?? [];
+      const newEvents = response.data ?? [];
+      this.outstudyEvents = this.outstudyEvents.concat(newEvents);
       response.size && (this.sizeEvents = response.size);
+      newEvents.length && newEvents.length && this.filtersNextStep();
     } else {
       console.error(error);
       this.$notification.error({
@@ -113,8 +131,6 @@ export default class VEventList extends mixins(VBaseMixin) {
         description: "",
       });
     }
-    await this.getEventTypes();
-    this.isLoading = false;
   }
   // получение типов мероприятия
   async getEventTypes(): Promise<void> {
@@ -129,7 +145,18 @@ export default class VEventList extends mixins(VBaseMixin) {
       });
     }
   }
+  // получение доп. типов мероприятия
+  async getMoreEvents(): Promise<void> {
+    this.isLoadingMore = true;
+    await this.getEvents();
+    this.isLoadingMore = false;
+  }
+  // увелечение шага фильтра
+  filtersNextStep(): void {
+    this.filters.offset = this.filters.offset + (this.filters.limit + 1);
+  }
   // модель для отображения
+  // eslint-disable-next-line
   get viewModel() {
     return this.outstudyEvents.map((item) => {
       const findType = this.typesEvent.find(
@@ -147,6 +174,19 @@ export default class VEventList extends mixins(VBaseMixin) {
         isNeedMemberConfirmation: item.isNeedMemberConfirmation,
       };
     });
+  }
+  // грид
+  // eslint-disable-next-line
+  get gridList() {
+    return {
+      gutter: 16,
+      xs: 1,
+      sm: 1,
+      md: 2,
+      lg: 2,
+      xl: 3,
+      xxl: 4,
+    };
   }
   // регистрация тек. пользователя в мероприятии
   async registration(idEvent: number | null): Promise<void> {
@@ -175,7 +215,7 @@ export default class VEventList extends mixins(VBaseMixin) {
     } else console.error(error);
   }
   // переход на страницу просмотра меропрития
-  goEventDetails(idEvent: number | null) {
+  goEventDetails(idEvent: number | null): void {
     if (!idEvent) return;
     this.$router.push({
       name: "event-details",

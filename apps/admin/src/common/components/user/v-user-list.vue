@@ -46,11 +46,11 @@ export default class VEventList extends mixins(VBaseMixin) {
   users: User[] = [];
   size = 0;
 
-  async created() {
+  async created(): Promise<void> {
     await this.getUsers();
   }
   // получение списка пользователей
-  async getUsers() {
+  async getUsers(): Promise<void> {
     this.isLoading = true;
     const [response, error] = await api.user.getUsers(0, 999);
     if (!error && response && response.data) {
@@ -66,6 +66,7 @@ export default class VEventList extends mixins(VBaseMixin) {
     this.isLoading = false;
   }
   // колонки таблицы
+  // eslint-disable-next-line
   get columnsTableUser() {
     return [
       {
@@ -103,6 +104,7 @@ export default class VEventList extends mixins(VBaseMixin) {
     ];
   }
   // данные для таблицы
+  // eslint-disable-next-line
   get dataTableUser() {
     return this.users.map((item) => {
       return {
@@ -115,7 +117,7 @@ export default class VEventList extends mixins(VBaseMixin) {
     });
   }
   // создание чата
-  async createChat(idSubUser: number | null) {
+  async createChat(idSubUser: number | null): Promise<void> {
     if (!idSubUser || !this.currentUserId) return;
     const newChat: CreateChat = {
       users: [idSubUser],

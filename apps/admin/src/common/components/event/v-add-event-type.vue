@@ -162,7 +162,7 @@ export default class VAddEventType extends mixins(VBaseMixin) {
   }
 
   // добавление критерия
-  addNewCriteria(typeId: number | null) {
+  addNewCriteria(typeId: number | null): void {
     if (!typeId) return;
     switch (typeId) {
       case 1:
@@ -189,14 +189,14 @@ export default class VAddEventType extends mixins(VBaseMixin) {
     }
   }
   // удаление критерия
-  removeCriteria(typeId: number | null, id: number | null) {
+  removeCriteria(typeId: number | null, id: number | null): void {
     if (!typeId || (id !== 0 && !id)) return;
     if (typeId === 1) this.criteriaTypeOne.splice(id, 1);
     else if (typeId === 2) this.criteriaTypeTwo.splice(id, 1);
     else if (typeId === 3) this.criteriaTypeThree.splice(id, 1);
   }
   // создание типа мероприятия
-  async createEventType() {
+  async createEventType(): Promise<void> {
     this.isLoading = true;
     // объеденение списков критериев
     this.typeEvent.criteria = [

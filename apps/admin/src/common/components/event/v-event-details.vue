@@ -390,13 +390,13 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     }
     this.isLoading = false;
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     // отписка от прослушивания получения сообщений
     this.timerId && clearTimeout(this.timerId);
   }
   //* данные о мероприятии
   // удаление мероприятия
-  async deleteEvent() {
+  async deleteEvent(): Promise<void> {
     this.$confirm({
       title: "Удаление мероприятия",
       content: "Вы точно хотите удалить данное мероприятие?",
@@ -532,6 +532,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     this.isLoadingRequests = false;
   }
   // колонки таблицы
+  // eslint-disable-next-line
   get columnsTableRequests() {
     return [
       {
@@ -556,6 +557,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     ];
   }
   // данные для таблицы
+  // eslint-disable-next-line
   get dataTableRequests() {
     return this.requests.map((item) => {
       let newStatus = "";
@@ -598,6 +600,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
 
   //* модальное окно и таблица (награждение)
   // показать модальное окно
+  // eslint-disable-next-line
   showModalReward(criteria: Criteria | null) {
     if (!criteria?.id)
       return (this.criteriaReward = {
@@ -642,6 +645,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     this.showModalReward(null);
   }
   // колонки таблицы
+  // eslint-disable-next-line
   get columnsTableReward() {
     return [
       {
@@ -652,6 +656,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     ];
   }
   // данные таблицы
+  // eslint-disable-next-line
   get dataTableReward() {
     return this.members.map((item) => {
       return {
@@ -661,6 +666,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     });
   }
   // настройки селекта строк таблицы
+  // eslint-disable-next-line
   get rowSelection() {
     return {
       selectedRowKeys: this.selectedRowKeys,
@@ -721,11 +727,11 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     return this.$el.querySelector("#list");
   }
   // parent элемент для прокрутки (из-за чата)
-  get elementParent() {
+  get elementParent(): Element | null {
     return document.querySelector(".app-body-content");
   }
   // получение списка сообщений
-  async getMessages() {
+  async getMessages(): Promise<void> {
     this.isLoading = true;
     const scroll = this.elementParent?.scrollTop; // сохранение тек. скролла на странице
     const [response, error] = await api.chat.getMessages(
@@ -750,7 +756,7 @@ export default class VEventDetails extends mixins(VBaseMixin) {
     });
   }
   /** отправка сообщений */
-  async sendMessage() {
+  async sendMessage(): Promise<void> {
     const newMessage = this.message;
     this.isLoading = this.isLoadingMessage = true;
     const [response, error] = await api.chat.sendMessage(

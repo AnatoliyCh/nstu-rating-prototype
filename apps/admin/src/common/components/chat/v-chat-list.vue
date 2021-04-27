@@ -32,11 +32,11 @@ import api from "@/common/api";
 export default class VChatList extends mixins(VBaseMixin) {
   chatList: Chat[] = [];
   totalSize = 0;
-  async created() {
+  async created(): Promise<void> {
     await this.getChats();
   }
   // получение списка чатов
-  async getChats() {
+  async getChats(): Promise<void> {
     this.isLoading = true;
     const [response, error] = await api.chat.getChats(this.accessToken, 0, 999);
     if (!error && response && response.data) {
@@ -66,7 +66,7 @@ export default class VChatList extends mixins(VBaseMixin) {
       : 0;
   }
   // переход на страницу чата
-  goChatDetails(chat: Chat | null) {
+  goChatDetails(chat: Chat | null): void {
     if (!chat?.id) return;
     this.$router.push({
       name: "chat-details",

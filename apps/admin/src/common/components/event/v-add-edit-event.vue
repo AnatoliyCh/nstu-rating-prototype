@@ -182,13 +182,13 @@ export default class VAddEditEvent extends mixins(VBaseMixin) {
       : null;
   }
   // дата окончания
-  endDateChange(date: any, dateString: string) {
+  endDateChange(date: any, dateString: string): void {
     this.outstudyEvent.dateEnd = dateString
       ? new Date(dateString).toISOString()
       : null;
   }
   // дата окончания регистрации
-  endRegistrationDateChange(date: any, dateString: string) {
+  endRegistrationDateChange(date: any, dateString: string): void {
     this.outstudyEvent.dateRegistrationEnd = dateString
       ? new Date(dateString).toISOString()
       : null;

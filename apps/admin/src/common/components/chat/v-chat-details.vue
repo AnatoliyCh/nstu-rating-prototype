@@ -63,11 +63,11 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   isLoadingMessage = false; // анимация кнопки отправки сообщения
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
 
-  async created() {
+  async created(): Promise<void> {
     await this.getMessages();
     this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
   }
-  beforeDestroy() {
+  beforeDestroy(): void {
     // отписка от прослушивания получения сообщений
     this.timerId && clearTimeout(this.timerId);
   }
@@ -76,7 +76,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     return this.$el.querySelector("#list");
   }
   // получение списка сообщений
-  async getMessages() {
+  async getMessages(): Promise<void> {
     this.isLoading = true;
     const [response, error] = await api.chat.getMessages(
       this.accessToken,
@@ -95,7 +95,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     this.isLoading = false;
   }
   /** отправка сообщений */
-  async sendMessage() {
+  async sendMessage(): Promise<void> {
     const newMessage = this.message;
     this.isLoading = this.isLoadingMessage = true;
     const [response, error] = await api.chat.sendMessage(
@@ -115,7 +115,6 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     } else console.error(error);
     this.isLoading = this.isLoadingMessage = false;
     // прокрутка вниз, после отпраки сообщения
-    const list = this.$el.querySelector("#list");
     this.elementList &&
       (this.elementList.scrollTop = this.elementList.scrollHeight);
   }

@@ -15,7 +15,7 @@ export default class VBaseMixin extends Vue {
     return this.$store.state.user.id ?? null;
   }
   // перенаправление
-  async routing(namePath: string | null) {
+  async routing(namePath: string | null): Promise<void> {
     if (!namePath || this.$router.currentRoute.name === namePath) return;
     await this.$router.push({ name: namePath });
   }
