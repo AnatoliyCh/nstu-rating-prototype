@@ -58,8 +58,8 @@ export default class VEventList extends mixins(VBaseMixin) {
       response.size && (this.size = response.size);
     } else if (error) {
       console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
+      this.$notification.error({
+        message: "Не удалось загрузить пользователей",
         description: "",
       });
     } else console.error(error);

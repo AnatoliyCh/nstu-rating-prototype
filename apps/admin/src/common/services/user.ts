@@ -1,7 +1,7 @@
 import { UserRole } from "../../../../common/types/model";
 
 /** Список ролей и их информации */
-const roles: { [key: number]: UserRole } = {
+export const roles: { [key: number]: UserRole } = {
   1: {
     color: "#108ee9",
     name: "преподаватель",
@@ -33,6 +33,7 @@ const roles: { [key: number]: UserRole } = {
 export function getRoleById(id: number): UserRole {
   return (
     roles[id] ?? {
+      id: id,
       color: "",
       name: "?: " + id,
     }

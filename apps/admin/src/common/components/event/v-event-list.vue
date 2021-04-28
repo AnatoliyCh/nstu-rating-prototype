@@ -124,26 +124,25 @@ export default class VEventList extends mixins(VBaseMixin) {
       this.outstudyEvents = this.outstudyEvents.concat(newEvents);
       response.size && (this.sizeEvents = response.size);
       newEvents.length && newEvents.length && this.filtersNextStep();
-    } else {
-      console.error(error);
+    } else if (error) {
+      console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить мероприятия",
         description: "",
       });
-    }
+    } else console.error(error);
   }
   // получение типов мероприятия
   async getEventTypes(): Promise<void> {
     const [response, error] = await api.event.getEventTypes(this.accessToken);
-    if (response && !error) {
-      this.typesEvent = response;
-    } else {
-      console.error(error);
+    if (response && !error) this.typesEvent = response;
+    else if (error) {
+      console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить типы мероприятия",
         description: "",
       });
-    }
+    } else console.error(error);
   }
   // получение доп. типов мероприятия
   async getMoreEvents(): Promise<void> {
