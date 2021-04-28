@@ -1,5 +1,6 @@
 //* модуль user
 import { ApiError, UserObject, CreateUser } from "../../../../common/types/api";
+import { User } from "../../../../common/types/model";
 import * as http from "../api";
 
 export async function getUsers(
@@ -19,6 +20,18 @@ export async function createUser(
     headers: {
       accept: "application/json",
       "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
+/** получение пользователя по id */
+export async function getUserById(
+  accessToken: string,
+  path: string
+): Promise<[User | undefined, ApiError | undefined]> {
+  return await http.get<User>(path, {
+    headers: {
+      accept: "application/json",
       Authorization: "Bearer " + accessToken,
     },
   });

@@ -1,7 +1,20 @@
 <template>
   <div id="app">
     <!-- тек. пользователь -->
-    <div class="app-user-element">{{ `Пользователь: ${currentUserId}` }}</div>
+    <div class="app-user-element">
+      <label>Пользователь: </label>
+      <a-button type="link"> {{ viewCurrentUser }} </a-button>
+      <!-- теги -->
+      <label style="margin-right: 16px">Роли: </label>
+      <template v-for="(role, index) in viewCurrentUserRoles">
+        <a-tooltip v-if="role.name.length > 15" :key="index" :title="role.name">
+          <a-tag :key="index" :color="role.color">
+            {{ `${role.name.slice(0, 20)}...` }}
+          </a-tag>
+        </a-tooltip>
+        <a-tag v-else :key="index" :color="role.color"> {{ role.name }} </a-tag>
+      </template>
+    </div>
     <div class="app-body">
       <!-- навигационное меню -->
       <a-menu
@@ -26,10 +39,13 @@
   </div>
 </template>
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import { mixins } from "vue-class-component";
-import { RouteConfig } from "vue-router";
+import api from "@/common/api";
+import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
+import { mixins } from "vue-class-component";
+import { Component } from "vue-property-decorator";
+import { RouteConfig } from "vue-router";
+import { UserRole } from "../../common/types/model";
 // локализация
 import ruRU from "ant-design-vue/es/locale/ru_RU";
 import moment from "moment";
@@ -40,30 +56,29 @@ import jwt from "jsonwebtoken";
 
 @Component
 export default class App extends mixins(VBaseMixin) {
-  created(): void {
+  async created(): Promise<void> {
     // токены
     this.$store.commit("setAccessToken", localStorage.getItem("aT"));
     this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
     // текущий пользователь
     const decodeToken = jwt.decode(this.accessToken);
-    if (
-      decodeToken &&
-      typeof decodeToken !== "string" &&
-      "userId" in decodeToken
-    )
-      this.$store.commit("setUser", {
-        id: decodeToken.userId,
-        roles: [],
-        profile: {
-          lastName: null, // ф
-          firstName: null, // и
-          middleName: null, // о
-        },
-      });
+    if (decodeToken && typeof decodeToken !== "string" && decodeToken.userId) {
+      const user = await this.getUserById(decodeToken.userId);
+      user && this.$store.commit("setUser", user);
+    }
+    // не авторизировались
+    !this.currentUser && (document.location.href = api.pathAuthorization);
   }
   // eslint-disable-next-line
   get currentLocale(): any {
     return ruRU;
+  }
+  get viewCurrentUser(): string {
+    if (!this.currentUser) return "-";
+    return `${viewFullName(this.currentUser.profile, false)}`;
+  }
+  get viewCurrentUserRoles(): UserRole[] {
+    return this.currentUser?.roles ?? [];
   }
   get viewModelLinks(): RouteConfig[] {
     const routes = this.$router.options.routes;
@@ -89,6 +104,9 @@ export default class App extends mixins(VBaseMixin) {
   > .app-user-element {
     border-block-end: 1px solid #e8e8e8;
     height: 32px;
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
   }
   > .app-body {
     height: calc(100% - 32px);

@@ -43,7 +43,7 @@ import { CreateChat } from "../../../../../common/types/api";
 import { User } from "../../../../../common/types/model";
 
 @Component
-export default class VEventList extends mixins(VBaseMixin) {
+export default class VUserList extends mixins(VBaseMixin) {
   users: User[] = [];
   size = 0;
 
@@ -119,7 +119,7 @@ export default class VEventList extends mixins(VBaseMixin) {
   }
   // создание чата
   async createChat(idSubUser: number | null): Promise<void> {
-    if (!idSubUser || !this.currentUserId) return;
+    if (!idSubUser || !this.currentUser) return;
     const newChat: CreateChat = {
       users: [idSubUser],
       chatType: 1,
@@ -129,9 +129,8 @@ export default class VEventList extends mixins(VBaseMixin) {
       this.accessToken,
       newChat
     );
-    if (!error && response) {
-      console.log(response, "добавить переадрисацию");
-    } else if (error) {
+    if (!error && response) console.log(response, "добавить переадрисацию");
+    else if (error) {
       console.warn(error);
       this.$notification.warning({
         message: error.message ?? "",

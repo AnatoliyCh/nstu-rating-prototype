@@ -18,30 +18,44 @@ export const PATH_HOST = "5.130.14.37:8080/"; // сервер для запро�
 export const PATH_PROXY_HOST = PATH_PROXY + PATH_HOST; // прокси + хост
 
 export class Api {
-  basePath: string;
+  pathBase: string;
+  /** путь к приложению авторизации */
+  pathAuthorization: string;
+
   public constructor() {
     // eslint-disable-next-line
-    const pathHost = (window as any).PATH_HOST;
-    if (pathHost && typeof pathHost === "string")
-      this.basePath = PATH_BASE + pathHost;
-    else this.basePath = PATH_BASE + PATH_HOST;
+    const pathOrigin: string = (window as any).PATH_APP.origin;
+    if (pathOrigin && typeof pathOrigin === "string") {
+      this.pathBase = PATH_BASE + pathOrigin;
+      this.pathAuthorization =
+        this.pathBase + (window as any).PATH_APP.authorization;
+    } else {
+      this.pathBase = PATH_BASE + PATH_HOST;
+      this.pathAuthorization = PATH_BASE + PATH_HOST + "authorization";
+    }
   }
   public auth = {
     login: async (requestBody: Account) => {
-      return auth.login(this.basePath + "auth/api/v1/login", requestBody);
+      return auth.login(this.pathBase + "auth/api/v1/login", requestBody);
     },
   };
   public user = {
     getUsers: async (offset: number, limit: number) => {
       return user.getUsers(
-        this.basePath + `user/api/v1/user?offset=${offset}&limit=${limit}`
+        this.pathBase + `user/api/v1/user?offset=${offset}&limit=${limit}`
       );
     },
     createUser: async (accessToken: string, requestBody: CreateUser) => {
       return user.createUser(
         accessToken,
-        this.basePath + "user/api/v1/user",
+        this.pathBase + "user/api/v1/user",
         requestBody
+      );
+    },
+    getUserById: async (accessToken: string, id: number) => {
+      return user.getUserById(
+        accessToken,
+        this.pathBase + `user/api/v1/user/${id}`
       );
     },
   };
@@ -49,59 +63,59 @@ export class Api {
     getEventTypes: async (accessToken: string) => {
       return event.getTypes(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-eventkind`
+        this.pathBase + `event/api/v1/outstudy-eventkind`
       );
     },
     createEventType: async (accessToken: string, requestBody: TypeEvent) => {
       return event.createType(
         accessToken,
-        this.basePath + "event/api/v1/outstudy-eventkind",
+        this.pathBase + "event/api/v1/outstudy-eventkind",
         requestBody
       );
     },
     getEvents: async (accessToken: string, offset: number, limit: number) => {
       return event.getEvents(
         accessToken,
-        this.basePath +
+        this.pathBase +
           `event/api/v1/outstudy-event?offset=${offset}&limit=${limit}`
       );
     },
     getEventById: async (accessToken: string, id: number) => {
       return event.getEventById(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-event/${id}`
+        this.pathBase + `event/api/v1/outstudy-event/${id}`
       );
     },
     createEvent: async (accessToken: string, requestBody: OutstudyEvent) => {
       return event.createEvent(
         accessToken,
-        this.basePath + "event/api/v1/outstudy-event",
+        this.pathBase + "event/api/v1/outstudy-event",
         requestBody
       );
     },
     deleteEvent: async (accessToken: string, id: number) => {
       return event.deleteEvent(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-event/${id}`
+        this.pathBase + `event/api/v1/outstudy-event/${id}`
       );
     },
     getMembersEvent: async (accessToken: string, idEvent: number) => {
       return event.getMembersEvent(
         accessToken,
-        this.basePath +
+        this.pathBase +
           `event/api/v1/outstudy-event/${idEvent}/members?offset=0&limit=99`
       );
     },
     getRequestsEvent: async (accessToken: string, idEvent: number) => {
       return event.getRequestsEvent(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-event/${idEvent}/request`
+        this.pathBase + `event/api/v1/outstudy-event/${idEvent}/request`
       );
     },
     memberEventRegistration: async (accessToken: string, idEvent: number) => {
       return event.memberEventRegistration(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-event/${idEvent}/registration`
+        this.pathBase + `event/api/v1/outstudy-event/${idEvent}/registration`
       );
     },
     memberEventRequestChange: async (
@@ -112,7 +126,7 @@ export class Api {
     ) => {
       return event.memberEventRequestChange(
         accessToken,
-        this.basePath +
+        this.pathBase +
           `event/api/v1/outstudy-event/${idEvent}/request/${idRequest}`,
         { status: status }
       );
@@ -124,7 +138,7 @@ export class Api {
     ) => {
       return event.membersReward(
         accessToken,
-        this.basePath + `event/api/v1/outstudy-event/${idEvent}/reward`,
+        this.pathBase + `event/api/v1/outstudy-event/${idEvent}/reward`,
         requestBody
       );
     },
@@ -133,14 +147,14 @@ export class Api {
     createChat: async (accessToken: string, requestBody: CreateChat) => {
       return chat.createChat(
         accessToken,
-        this.basePath + "chat/api/v1/chat/create",
+        this.pathBase + "chat/api/v1/chat/create",
         requestBody
       );
     },
     getChats: async (accessToken: string, offset: number, limit: number) => {
       return chat.getChats(
         accessToken,
-        this.basePath + `chat/api/v1/chat?offset=${offset}&limit=${limit}`
+        this.pathBase + `chat/api/v1/chat?offset=${offset}&limit=${limit}`
       );
     },
     getMessages: async (
@@ -151,7 +165,7 @@ export class Api {
     ) => {
       return chat.getMessages(
         accessToken,
-        this.basePath +
+        this.pathBase +
           `chat/api/v1/chat/${idChat}/messages?offset=${offset}&limit=${limit}`
       );
     },
@@ -162,7 +176,7 @@ export class Api {
     ) => {
       return chat.sendMessage(
         accessToken,
-        this.basePath + `chat/api/v1/chat/${chatId}/user/message`,
+        this.pathBase + `chat/api/v1/chat/${chatId}/user/message`,
         { text: message }
       );
     },

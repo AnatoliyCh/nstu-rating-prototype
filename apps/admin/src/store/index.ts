@@ -9,15 +9,7 @@ export default new Vuex.Store({
     // токены
     accessKeys: { accessToken: "", refreshToken: "" } as AccessKeys,
     // пользователь
-    user: {
-      id: -1,
-      roles: [] as number[],
-      profile: {
-        lastName: null, // ф
-        firstName: null, // и
-        middleName: null, // о
-      } as Profile,
-    },
+    user: null as User | null,
   },
   mutations: {
     // установка токенов
@@ -28,8 +20,10 @@ export default new Vuex.Store({
       state.accessKeys.refreshToken = newRefreshToken;
     },
     // установка пользователя
-    setUser(state, user: User) {
-      state.user = user;
+    setUser(state, user: User | null) {
+      if (user && "id" in user && "roles" in user && "profile" in user)
+        state.user = user;
+      else state.user = null;
     },
   },
   actions: {},

@@ -2,7 +2,7 @@ import { Profile } from "../../../../common/types/model";
 
 /** фильтр для полного имени
  * @param profile профиль пользователя
- * @param reduction сокращение ИО */
+ * @param reduction сокращение до: И.О. */
 export function viewFullName(
   profile: Profile | null,
   reduction: boolean | undefined
