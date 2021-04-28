@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { AccessKeys, User, Profile } from "../../../common/types/model";
+import { AccessKeys, User } from "../../../common/types/model";
 
 Vue.use(Vuex);
 
