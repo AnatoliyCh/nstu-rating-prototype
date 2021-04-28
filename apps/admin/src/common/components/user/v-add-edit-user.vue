@@ -102,7 +102,7 @@ export default class VAddEditUser extends mixins(VBaseMixin) {
       firstName: "", // и
       middleName: "", // о
     },
-    roles: [],
+    roles: [], // роли
     account: {
       password: "",
       repeatPassword: "",
