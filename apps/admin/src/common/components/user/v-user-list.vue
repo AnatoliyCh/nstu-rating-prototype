@@ -16,6 +16,7 @@
       :data-source="dataTableUser"
       :loading="isLoading"
       :pagination="{ pageSize: 20 }"
+      :scroll="{ y: 'calc(100vh - 16em)' }"
     >
       <span slot="roles" slot-scope="item">
         <a-tag

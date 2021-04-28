@@ -22,7 +22,7 @@ const routes: Array<RouteConfig> = [
     component: () => import("@/common/components/v-router-parent.vue"),
     redirect: "/user/list",
     children: [
-      // список мероприятий
+      // список пользователей
       {
         path: "/user/list",
         name: "user-list",
@@ -70,6 +70,7 @@ const routes: Array<RouteConfig> = [
         name: "event-create",
         meta: {
           exact: true,
+          roles: ["администратор", "тьютор", "организатор"],
         },
         component: () =>
           import("@/common/components/event/v-add-edit-event.vue"),
@@ -80,6 +81,7 @@ const routes: Array<RouteConfig> = [
         name: "event-create-type",
         meta: {
           exact: true,
+          roles: ["администратор", "тьютор", "организатор"],
         },
         component: () =>
           import("@/common/components/event/v-add-event-type.vue"),

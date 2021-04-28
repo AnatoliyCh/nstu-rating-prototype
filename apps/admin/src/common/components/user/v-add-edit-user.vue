@@ -115,6 +115,7 @@ export default class VAddEditUser extends mixins(VBaseMixin) {
       Boolean(this.newUser.profile.lastName) &&
       Boolean(this.newUser.profile.firstName) &&
       Boolean(this.newUser.profile.middleName) &&
+      this.newUser.roles.length > 0 &&
       Boolean(this.newUser.account.password) &&
       this.newUser.account.password.length >= 6 &&
       Boolean(this.newUser.account.repeatPassword) &&
