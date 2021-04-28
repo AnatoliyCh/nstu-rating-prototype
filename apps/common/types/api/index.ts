@@ -1,5 +1,5 @@
 export { ApiError } from "./ApiError"; // ошибка сервера
-export { UserObject } from "./user";
+export { CreateUser, UserObject } from "./user";
 export { EventObject, EventRequestObject } from "./event";
 export { ChatObject, MessageObject, CreateChat } from "./chat";
 

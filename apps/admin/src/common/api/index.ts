@@ -9,7 +9,7 @@ import {
   TypeEvent,
   OutstudyEvent,
 } from "../../../../common/types/model";
-import { CreateChat } from "../../../../common/types/api";
+import { CreateChat, CreateUser } from "../../../../common/types/api";
 
 // API
 export const PATH_BASE = "http://";
@@ -35,6 +35,13 @@ export class Api {
     getUsers: async (offset: number, limit: number) => {
       return user.getUsers(
         this.basePath + `user/api/v1/user?offset=${offset}&limit=${limit}`
+      );
+    },
+    createUser: async (accessToken: string, requestBody: CreateUser) => {
+      return user.createUser(
+        accessToken,
+        this.basePath + "user/api/v1/user",
+        requestBody
       );
     },
   };

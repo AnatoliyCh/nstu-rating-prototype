@@ -5,11 +5,11 @@
       class="v-user-list-header-block"
     >
       <!-- действия для орг. и админа -->
-      <!-- <template slot="extra">
-        <a-button key="1" type="primary" @click="routing('event-create')">
+      <template slot="extra">
+        <a-button key="1" type="primary" @click="routing('user-create')">
           Создать пользователя
         </a-button>
-      </template> -->
+      </template>
     </a-page-header>
     <a-table
       :columns="columnsTableUser"

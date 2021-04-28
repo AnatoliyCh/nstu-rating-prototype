@@ -31,6 +31,16 @@ const routes: Array<RouteConfig> = [
         },
         component: () => import("@/common/components/user/v-user-list.vue"),
       },
+      // создание пользователя
+      {
+        path: "/user/create",
+        name: "user-create",
+        meta: {
+          exact: true,
+          roles: ["администратор", "тьютор"],
+        },
+        component: () => import("@/common/components/user/v-add-edit-user.vue"),
+      },
     ],
   },
   //* мероприятия
