@@ -170,18 +170,21 @@ export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
   }
   //* даты
   // дата начала
+  // eslint-disable-next-line
   startDateChange(date: any, dateString: string): void {
     this.outstudyEvent.dateStart = dateString
       ? new Date(dateString).toISOString()
       : null;
   }
   // дата окончания
+  // eslint-disable-next-line
   endDateChange(date: any, dateString: string): void {
     this.outstudyEvent.dateEnd = dateString
       ? new Date(dateString).toISOString()
       : null;
   }
   // дата окончания регистрации
+  // eslint-disable-next-line
   endRegistrationDateChange(date: any, dateString: string): void {
     this.outstudyEvent.dateRegistrationEnd = dateString
       ? new Date(dateString).toISOString()

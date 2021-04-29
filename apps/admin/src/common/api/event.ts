@@ -1,3 +1,4 @@
+/* eslint-disable */
 //* модуль event
 import {
   ApiError,
@@ -5,7 +6,7 @@ import {
   EventRequestObject,
   UserObject,
 } from "../../../../common/types/api";
-import { TypeEvent, OutstudyEvent } from "../../../../common/types/model";
+import { OutstudyEvent, TypeEvent } from "../../../../common/types/model";
 import * as http from "../api";
 
 /** получение типов мероприятия */

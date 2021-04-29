@@ -1,5 +1,5 @@
 //* модуль user
-import { ApiError, UserObject, CreateUser } from "../../../../common/types/api";
+import { ApiError, CreateUser, UserObject } from "../../../../common/types/api";
 import { User } from "../../../../common/types/model";
 import * as http from "../api";
 

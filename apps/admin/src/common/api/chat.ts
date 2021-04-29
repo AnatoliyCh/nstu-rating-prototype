@@ -1,11 +1,10 @@
 //* модуль chat
 import {
   ApiError,
-  CreateChat,
   ChatObject,
+  CreateChat,
   MessageObject,
 } from "../../../../common/types/api";
-import { Message } from "../../../../common/types/model";
 import * as http from "../api";
 
 /** создание чата */

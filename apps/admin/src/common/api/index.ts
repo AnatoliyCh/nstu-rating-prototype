@@ -1,15 +1,15 @@
 export { get, post, put, _delete } from "./fetch";
 
-import * as auth from "./auth";
-import * as user from "./user";
-import * as event from "./event";
-import * as chat from "./chat";
+import { CreateChat, CreateUser } from "../../../../common/types/api";
 import {
   Account,
-  TypeEvent,
   OutstudyEvent,
+  TypeEvent,
 } from "../../../../common/types/model";
-import { CreateChat, CreateUser } from "../../../../common/types/api";
+import * as auth from "./auth";
+import * as chat from "./chat";
+import * as event from "./event";
+import * as user from "./user";
 
 // API
 export const PATH_BASE = "http://";

@@ -1,6 +1,6 @@
 // модуль auth
 import { ApiError } from "../../../../common/types/api";
-import { Account, AccessKeys } from "../../../../common/types/model";
+import { AccessKeys, Account } from "../../../../common/types/model";
 import * as http from "../api";
 
 export async function login(
