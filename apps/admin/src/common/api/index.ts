@@ -1,3 +1,4 @@
+/* eslint-disable */
 export { get, post, put, _delete } from "./fetch";
 
 import { CreateChat, CreateUser } from "../../../../common/types/api";
