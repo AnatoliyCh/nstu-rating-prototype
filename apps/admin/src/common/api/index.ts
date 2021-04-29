@@ -24,7 +24,6 @@ export class Api {
   pathAuthorization: string;
 
   public constructor() {
-    // eslint-disable-next-line
     const pathOrigin: string = (window as any).PATH_APP.origin;
     if (pathOrigin && typeof pathOrigin === "string") {
       this.pathBase = PATH_BASE + pathOrigin;
