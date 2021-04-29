@@ -75,17 +75,6 @@ const routes: Array<RouteConfig> = [
         component: () =>
           import("@/common/components/event/v-add-edit-event.vue"),
       },
-      // создание типа мероприятия
-      {
-        path: "/event/create/type",
-        name: "event-create-type",
-        meta: {
-          exact: true,
-          roles: ["администратор", "тьютор", "организатор"],
-        },
-        component: () =>
-          import("@/common/components/event/v-add-event-type.vue"),
-      },
       // мероприятие: детальное представление
       {
         path: "/event/:id",
@@ -95,6 +84,41 @@ const routes: Array<RouteConfig> = [
         },
         component: () =>
           import("@/common/components/event/v-event-details.vue"),
+      },
+    ],
+  },
+  //* типы мероприятий
+  {
+    path: "/event-type",
+    name: "event-type",
+    meta: {
+      exact: false,
+      icon: "ordered-list",
+      name: "Типы мероприятий",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/event-type/list",
+    children: [
+      // список типов мероприятия
+      {
+        path: "/event-type/list",
+        name: "event-type-list",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/event/event-type/v-event-type-list.vue"),
+      },
+      // создание типа мероприятия
+      {
+        path: "/event-type/create",
+        name: "event-type-create",
+        meta: {
+          exact: true,
+          roles: ["администратор", "тьютор", "организатор"],
+        },
+        component: () =>
+          import("@/common/components/event/event-type/v-add-event-type.vue"),
       },
     ],
   },
@@ -132,8 +156,6 @@ const routes: Array<RouteConfig> = [
   },
 ];
 
-const router = new VueRouter({
-  routes,
-});
+const router = new VueRouter({ routes });
 
 export default router;

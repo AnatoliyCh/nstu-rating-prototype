@@ -34,6 +34,19 @@ export async function createType(
     },
   });
 }
+/** удаление типа мероприятия */
+export async function deleteEventType(
+  accessToken: string,
+  path: string
+): Promise<[boolean | undefined, ApiError | undefined]> {
+  const [response, error] = await http._delete(path, {
+    headers: {
+      accept: "*/*",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+  return [!response ? true : undefined, error];
+}
 /** получение списка мероприятий */
 export async function getEvents(
   accessToken: string,

@@ -22,11 +22,11 @@
   </div>
 </template>
 <script lang="ts">
-import { Component } from "vue-property-decorator";
-import { mixins } from "vue-class-component";
-import VBaseMixin from "@/common/v-base-mixin";
-import { Chat } from "../../../../../common/types/model";
 import api from "@/common/api";
+import VBaseMixin from "@/common/v-base-mixin";
+import { mixins } from "vue-class-component";
+import { Component } from "vue-property-decorator";
+import { Chat } from "../../../../../common/types/model";
 
 @Component
 export default class VChatList extends mixins(VBaseMixin) {

@@ -342,6 +342,7 @@
 import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
+import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import {
@@ -354,7 +355,7 @@ import {
 } from "../../../../../common/types/model";
 
 @Component
-export default class VEventDetails extends mixins(VBaseMixin) {
+export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   outstudyEvent: OutstudyEvent | null = null; // массив мероприятий
   members: User[] = []; // участники
   // всё что касается типа
@@ -438,19 +439,11 @@ export default class VEventDetails extends mixins(VBaseMixin) {
   // получение типа мероприятия
   async getType(): Promise<void> {
     if (!this.outstudyEvent || !this.outstudyEvent.eventKindId) return;
-    const [response, error] = await api.event.getEventTypes(this.accessToken);
-    if (!error && response) {
-      const findTypeEvent = response.find(
-        (item) => item.id === this.outstudyEvent?.eventKindId
-      );
-      findTypeEvent && (this.typeEvent = findTypeEvent);
-    } else if (error) {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
+    const types = await this.getEventTypes();
+    types.forEach(
+      (item) =>
+        item.id === this.outstudyEvent?.eventKindId && (this.typeEvent = item)
+    );
   }
   // получение списка участников
   async getMembers(): Promise<void> {

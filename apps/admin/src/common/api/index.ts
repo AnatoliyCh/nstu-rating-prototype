@@ -73,6 +73,12 @@ export class Api {
         requestBody
       );
     },
+    deleteEventType: async (accessToken: string, id: number) => {
+      return event.deleteEventType(
+        accessToken,
+        this.pathBase + `event/api/v1/outstudy-eventkind/${id}`
+      );
+    },
     getEvents: async (accessToken: string, offset: number, limit: number) => {
       return event.getEvents(
         accessToken,

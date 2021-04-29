@@ -28,15 +28,15 @@ async function http<T>(
     const newError: ApiError = {
       status: null,
       statusText: null,
-      message: null,
+      message: "Не удалось выполнить действие",
     };
     // 503 Service Unavailable («сервис недоступен»)
-    if (error === "TypeError: Failed to fetch") {
+    if (error == "TypeError: Failed to fetch") {
       newError.status = 503;
       newError.statusText = "Сервис недоступен";
       return [undefined, newError];
     }
-    console.error(error);
+    console.error("fetch-error: ", error);
     return [undefined, undefined];
   }
 }

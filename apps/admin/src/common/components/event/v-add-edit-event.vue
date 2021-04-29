@@ -125,12 +125,13 @@
 <script lang="ts">
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
+import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
 
 @Component
-export default class VAddEditEvent extends mixins(VBaseMixin) {
+export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
   // типы мероприятия
   typesEvent: TypeEvent[] = [];
   // мероприятие
@@ -148,19 +149,12 @@ export default class VAddEditEvent extends mixins(VBaseMixin) {
     dateRegistrationEnd: null,
   };
 
-  isLoading = false;
-
   async created(): Promise<void> {
-    await this.getEventTypes();
+    this.isLoading = true;
+    this.typesEvent = await this.getEventTypes();
+    this.isLoading = true;
   }
   //* типы мероприятия
-  // получение типов мероприятия
-  async getEventTypes(): Promise<void> {
-    const [response, error] = await api.event.getEventTypes(this.accessToken);
-    if (response && !error) {
-      this.typesEvent = response;
-    } else console.error(error);
-  }
   // изменение типа мероприятия
   typesEventChange(value: number | null): void {
     if (!value) return;

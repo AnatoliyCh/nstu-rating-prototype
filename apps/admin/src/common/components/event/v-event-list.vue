@@ -3,7 +3,7 @@
     <a-page-header title="Список: мероприятия" class="header-block">
       <template slot="extra">
         <!-- действия для орг. и админа -->
-        <a-button key="2" @click="routing('event-create-type')">
+        <a-button key="2" @click="routing('event-type-create')">
           Создать тип мероприятия
         </a-button>
         <a-button key="1" type="primary" @click="routing('event-create')">
@@ -93,12 +93,13 @@
 import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
+import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
 
 @Component
-export default class VEventList extends mixins(VBaseMixin) {
+export default class VEventList extends mixins(VBaseMixin, VEventApiMixin) {
   outstudyEvents: OutstudyEvent[] = []; // массив мероприятий
   typesEvent: TypeEvent[] = []; // типы мероприятий
   sizeEvents = 0; // кол-во эл. в запросе
@@ -109,7 +110,7 @@ export default class VEventList extends mixins(VBaseMixin) {
   async created(): Promise<void> {
     this.isLoading = true;
     await this.getEvents();
-    await this.getEventTypes();
+    this.typesEvent = await this.getEventTypes();
     this.isLoading = false;
   }
   // получение мероприятий
@@ -128,18 +129,6 @@ export default class VEventList extends mixins(VBaseMixin) {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить мероприятия",
-        description: "",
-      });
-    } else console.error(error);
-  }
-  // получение типов мероприятия
-  async getEventTypes(): Promise<void> {
-    const [response, error] = await api.event.getEventTypes(this.accessToken);
-    if (response && !error) this.typesEvent = response;
-    else if (error) {
-      console.warn(error);
-      this.$notification.error({
-        message: "Не удалось загрузить типы мероприятия",
         description: "",
       });
     } else console.error(error);

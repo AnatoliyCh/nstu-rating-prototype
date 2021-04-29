@@ -45,7 +45,7 @@ export default class VBaseMixin extends Vue {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
-        description: "",
+        description: error?.statusText ?? "",
       });
     } else console.error(error);
     return null;
