@@ -4,9 +4,13 @@
       title="Список: пользователи"
       class="v-user-list-header-block"
     >
-      <!-- действия для орг. и админа -->
       <template slot="extra">
-        <a-button key="1" type="primary" @click="routing('user-create')">
+        <a-button
+          v-if="userAccess.user.create"
+          key="1"
+          type="primary"
+          @click="routing('user-create')"
+        >
           Создать пользователя
         </a-button>
       </template>
@@ -48,10 +52,12 @@ export default class VUserList extends mixins(VBaseMixin) {
   size = 0;
 
   async created(): Promise<void> {
+    this.menuKey = [0];
     await this.getUsers();
   }
   // получение списка пользователей
   async getUsers(): Promise<void> {
+    if (!this.userAccess.user.viewList) return;
     this.isLoading = true;
     const [response, error] = await api.user.getUsers(0, 999);
     if (!error && response && response.data) {
@@ -61,6 +67,28 @@ export default class VUserList extends mixins(VBaseMixin) {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить пользователей",
+        description: "",
+      });
+    } else console.error(error);
+    this.isLoading = false;
+  }
+  // создание чата
+  async createChat(idSubUser: number | null): Promise<void> {
+    if (!idSubUser || !this.currentUser) return;
+    const newChat: CreateChat = {
+      users: [idSubUser],
+      chatType: 1,
+    };
+    this.isLoading = true;
+    const [response, error] = await api.chat.createChat(
+      this.accessToken,
+      newChat
+    );
+    if (!error && response) console.log(response, "добавить переадрисацию");
+    else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error.message ?? "",
         description: "",
       });
     } else console.error(error);
@@ -107,37 +135,13 @@ export default class VUserList extends mixins(VBaseMixin) {
   // данные для таблицы
   // eslint-disable-next-line
   get dataTableUser() {
-    return this.users.map((item) => {
-      return {
-        key: item.id,
-        lastName: item.profile.lastName,
-        firstName: item.profile.firstName,
-        middleName: item.profile.middleName,
-        roles: getRolesByArrId(item.roles ?? []),
-      };
-    });
-  }
-  // создание чата
-  async createChat(idSubUser: number | null): Promise<void> {
-    if (!idSubUser || !this.currentUser) return;
-    const newChat: CreateChat = {
-      users: [idSubUser],
-      chatType: 1,
-    };
-    this.isLoading = true;
-    const [response, error] = await api.chat.createChat(
-      this.accessToken,
-      newChat
-    );
-    if (!error && response) console.log(response, "добавить переадрисацию");
-    else if (error) {
-      console.warn(error);
-      this.$notification.warning({
-        message: error.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoading = false;
+    return this.users.map((item) => ({
+      key: item.id,
+      lastName: item.profile.lastName,
+      firstName: item.profile.firstName,
+      middleName: item.profile.middleName,
+      roles: getRolesByArrId(item.roles ?? []),
+    }));
   }
 }
 </script>

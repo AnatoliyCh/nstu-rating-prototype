@@ -109,6 +109,9 @@ export default class VAddEditUser extends mixins(VBaseMixin) {
       login: "",
     },
   };
+  created() {
+    this.menuKey = [0];
+  }
   // блокировка кнопки
   get disabledButton(): boolean {
     return (
@@ -121,6 +124,7 @@ export default class VAddEditUser extends mixins(VBaseMixin) {
       Boolean(this.newUser.account.repeatPassword) &&
       Boolean(this.newUser.account.login) &&
       this.identicalPassword &&
+      this.userAccess.user.create &&
       this.isLoading === false
     );
   }

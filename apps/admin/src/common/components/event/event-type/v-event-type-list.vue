@@ -4,9 +4,13 @@
       title="Список: типы мероприятия"
       class="v-event-type-list-header-block"
     >
-      <!-- действия для орг. и админа -->
       <template slot="extra">
-        <a-button key="1" type="primary" @click="routing('event-type-create')">
+        <a-button
+          v-if="userAccess.eventType.create"
+          key="1"
+          type="primary"
+          @click="routing('event-type-create')"
+        >
           Создать тип мероприятия
         </a-button>
       </template>
@@ -21,7 +25,7 @@
     >
       <a slot="name" slot-scope="name">{{ name }}</a>
       <a
-        v-if="deleteAccess"
+        v-if="userAccess.eventType.delete"
         slot="action"
         slot-scope="type"
         @click="deleteEventType(type)"
@@ -45,6 +49,7 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
   size = 0;
 
   async created(): Promise<void> {
+    this.menuKey = [2];
     this.isLoading = true;
     this.typesEvent = await this.getEventTypes();
     this.isLoading = false;
@@ -52,7 +57,7 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
 
   // удаление мероприятия
   async deleteEventType(type: TypeEvent | null): Promise<void> {
-    if (!type) return;
+    if (!type || !this.userAccess.eventType.delete) return;
     this.$confirm({
       title: "Удаление типы мероприятия",
       content: `Вы точно хотите тип мероприятия: ${type.name}`,
@@ -98,16 +103,8 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
         scopedSlots: { customRender: "action" },
       },
     ];
-    if (!this.deleteAccess) return [columns[0]];
+    if (!this.userAccess.eventType.delete) return [columns[0]];
     return columns;
-  }
-  /** возможность удалять типы мероприятий*/
-  get deleteAccess(): boolean {
-    for (const role of this.currentUser?.roles ?? []) {
-      if (["администратор", "тьютор", "организатор"].includes(role.name))
-        return true;
-    }
-    return false;
   }
 }
 </script>

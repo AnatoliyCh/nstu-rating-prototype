@@ -2,11 +2,19 @@
   <div class="v-event-list">
     <a-page-header title="Список: мероприятия" class="header-block">
       <template slot="extra">
-        <!-- действия для орг. и админа -->
-        <a-button key="2" @click="routing('event-type-create')">
+        <a-button
+          v-if="userAccess.eventType.create"
+          key="2"
+          @click="routing('event-type-create')"
+        >
           Создать тип мероприятия
         </a-button>
-        <a-button key="1" type="primary" @click="routing('event-create')">
+        <a-button
+          v-if="userAccess.event.create"
+          key="1"
+          type="primary"
+          @click="routing('event-create')"
+        >
           Создать мероприятие
         </a-button>
       </template>
@@ -108,13 +116,17 @@ export default class VEventList extends mixins(VBaseMixin, VEventApiMixin) {
   filters = { offset: 0, limit: 8 }; // фильтры и шаг для запроса
 
   async created(): Promise<void> {
+    this.menuKey = [1];
     this.isLoading = true;
-    await this.getEvents();
-    this.typesEvent = await this.getEventTypes();
+    if (this.userAccess.event.viewList) {
+      await this.getEvents();
+      this.typesEvent = await this.getEventTypes();
+    }
     this.isLoading = false;
   }
   // получение мероприятий
   async getEvents(): Promise<void> {
+    if (!this.userAccess.event.viewList) return;
     const [response, error] = await api.event.getEvents(
       this.accessToken,
       this.filters.offset,
@@ -124,7 +136,7 @@ export default class VEventList extends mixins(VBaseMixin, VEventApiMixin) {
       const newEvents = response.data ?? [];
       this.outstudyEvents = this.outstudyEvents.concat(newEvents);
       response.size && (this.sizeEvents = response.size);
-      newEvents.length && newEvents.length && this.filtersNextStep();
+      newEvents.length && this.filtersNextStep();
     } else if (error) {
       console.warn(error);
       this.$notification.error({

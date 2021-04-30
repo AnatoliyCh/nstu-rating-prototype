@@ -17,11 +17,7 @@
     </div>
     <div class="app-body">
       <!-- навигационное меню -->
-      <a-menu
-        class="app-body-menu"
-        :default-selected-keys="['1']"
-        mode="inline"
-      >
+      <a-menu class="app-body-menu" v-model="menuKey" mode="inline">
         <a-menu-item v-for="(link, index) in viewModelLinks" :key="index">
           <router-link :to="link.path">
             <a-icon v-if="link.meta.icon" :type="link.meta.icon" />
@@ -43,7 +39,7 @@ import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
-import { Component } from "vue-property-decorator";
+import { Component, Watch } from "vue-property-decorator";
 import { RouteConfig } from "vue-router";
 import { UserRole } from "../../common/types/model";
 // локализация
@@ -63,11 +59,11 @@ export default class App extends mixins(VBaseMixin) {
     // текущий пользователь
     const decodeToken = jwt.decode(this.accessToken);
     if (decodeToken && typeof decodeToken !== "string" && decodeToken.userId) {
-      const user = await this.getUserById(decodeToken.userId);
+      const user = await this.getUserById(decodeToken.userId, false);
       user && this.$store.commit("setUser", user);
     }
     // не авторизировались
-    !this.currentUser && (document.location.href = api.pathAuthorization);
+    // !this.currentUser && (document.location.href = api.pathAuthorization);
   }
   // eslint-disable-next-line
   get currentLocale(): any {

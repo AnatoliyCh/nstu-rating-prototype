@@ -3,7 +3,7 @@
     <a-page-header
       title="Создание: тип мероприятия"
       class="header-block"
-      @back="routing('event-list')"
+      @back="routing('event-type-list')"
     />
     <a-row :gutter="16" class="vertical-margin-element-16">
       <!-- основная информация -->
@@ -155,6 +155,10 @@ export default class VAddEventType extends mixins(VBaseMixin) {
 
   readonly criteriaTypeThreeName = "Критерий: По набранному баллу";
   criteriaTypeThree: Criteria[] = []; // по набранному баллу
+
+  created() {
+    this.menuKey = [2];
+  }
 
   // блокировка кнопки
   get disabledButton(): boolean {

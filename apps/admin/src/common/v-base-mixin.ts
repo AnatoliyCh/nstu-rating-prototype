@@ -30,24 +30,93 @@ export default class VBaseMixin extends Vue {
       };
     return null;
   }
+  get menuKey(): number[] {
+    const key = this.$store.state.menuKey;
+    if (typeof key === "number") return [key];
+    return [-1];
+  }
+  set menuKey(value: number[]) {
+    this.$store.commit("setMenuKey", value[0]);
+  }
+
+  /** доступы к фунциям приложения */
+  // eslint-disable-next-line
+  get userAccess() {
+    return {
+      user: {
+        viewList: true,
+        create: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+        view: true,
+        delete: false,
+      },
+      event: {
+        viewList: true,
+        create: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+        view: true,
+        delete: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+        membersConfirmation: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+      },
+      eventType: {
+        viewList: true,
+        create: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+        view: true,
+        delete: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+      },
+    };
+  }
   // перенаправление
   async routing(namePath: string | null): Promise<void> {
     if (!namePath || this.$router.currentRoute.name === namePath) return;
     await this.$router.push({ name: namePath });
   }
-
   // получение пользователя по id
-  async getUserById(id: number): Promise<User | null> {
+  async getUserById(id: number, isNotification: boolean): Promise<User | null> {
     const [response, error] = await api.user.getUserById(this.accessToken, id);
     if (response && !error) {
       return response;
     } else if (error) {
       console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: error?.statusText ?? "",
-      });
+      isNotification &&
+        this.$notification.warning({
+          message: error?.message ?? "",
+          description: error?.statusText ?? "",
+        });
     } else console.error(error);
     return null;
+  }
+  /** имеется ли роль доступа */
+  getIsContainsAccessRole(accessRoles: string[] | null): boolean {
+    if (!accessRoles) return false;
+    if (this.isAdmin) return true;
+    for (const role of this.currentUser?.roles ?? []) {
+      if (accessRoles.includes(role.name)) return true;
+    }
+    return false;
+  }
+  get isAdmin(): boolean {
+    return (
+      process.env.NODE_ENV === "development" &&
+      this.currentUser?.profile.firstName === "admin__"
+    );
   }
 }

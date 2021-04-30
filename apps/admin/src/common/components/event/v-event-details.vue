@@ -12,11 +12,16 @@
       >
         <template slot="extra">
           <!-- действия для орг. и админа -->
-          <a-button key="2" type="danger" @click="deleteEvent">
+          <a-button
+            v-if="userAccess.event.delete"
+            key="2"
+            type="danger"
+            @click="deleteEvent"
+          >
             Удалить
           </a-button>
           <a-button
-            v-if="outstudyEvent.isNeedMemberConfirmation"
+            v-if="membersConfirmationAcces"
             key="1"
             type="primary"
             @click="showModalRequest"
@@ -381,6 +386,8 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
 
   async created(): Promise<void> {
+    this.menuKey = [1];
+    if (!this.userAccess.event.view) this.routing("event-list");
     this.isLoading = true;
     await this.getEvent();
     if (this.outstudyEvent) {
@@ -398,6 +405,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   //* данные о мероприятии
   // удаление мероприятия
   async deleteEvent(): Promise<void> {
+    if (!this.userAccess.event.delete) return;
     this.$confirm({
       title: "Удаление мероприятия",
       content: "Вы точно хотите удалить данное мероприятие?",
@@ -509,6 +517,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   }
   // список заявок на участие (все: принятые, не принятые)
   async getRequestsEvent(): Promise<void> {
+    if (!this.userAccess.event.membersConfirmation) return;
     if (!this.outstudyEvent?.id) return;
     const [response, error] = await api.event.getRequestsEvent(
       this.accessToken,
@@ -523,6 +532,13 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       });
     } else console.error(error);
     this.isLoadingRequests = false;
+  }
+  // рахрешение на принятие участников
+  get membersConfirmationAcces(): boolean {
+    return (
+      Boolean(this.outstudyEvent?.isNeedMemberConfirmation) &&
+      this.userAccess.event.membersConfirmation
+    );
   }
   // колонки таблицы
   // eslint-disable-next-line

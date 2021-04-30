@@ -37,7 +37,6 @@ const routes: Array<RouteConfig> = [
         name: "user-create",
         meta: {
           exact: true,
-          roles: ["администратор", "тьютор"],
         },
         component: () => import("@/common/components/user/v-add-edit-user.vue"),
       },
@@ -70,7 +69,6 @@ const routes: Array<RouteConfig> = [
         name: "event-create",
         meta: {
           exact: true,
-          roles: ["администратор", "тьютор", "организатор"],
         },
         component: () =>
           import("@/common/components/event/v-add-edit-event.vue"),
@@ -115,7 +113,6 @@ const routes: Array<RouteConfig> = [
         name: "event-type-create",
         meta: {
           exact: true,
-          roles: ["администратор", "тьютор", "организатор"],
         },
         component: () =>
           import("@/common/components/event/event-type/v-add-event-type.vue"),

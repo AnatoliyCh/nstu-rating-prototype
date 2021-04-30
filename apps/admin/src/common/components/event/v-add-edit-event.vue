@@ -150,6 +150,7 @@ export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
   };
 
   async created(): Promise<void> {
+    this.menuKey = [1];
     this.isLoading = true;
     this.typesEvent = await this.getEventTypes();
     this.isLoading = true;

@@ -64,6 +64,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
 
   async created(): Promise<void> {
+    this.menuKey = [3];
     await this.getMessages();
     this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
   }

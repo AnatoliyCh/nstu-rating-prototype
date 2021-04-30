@@ -33,6 +33,7 @@ export default class VChatList extends mixins(VBaseMixin) {
   chatList: Chat[] = [];
   totalSize = 0;
   async created(): Promise<void> {
+    this.menuKey = [3];
     await this.getChats();
   }
   // получение списка чатов
