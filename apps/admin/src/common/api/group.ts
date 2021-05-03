@@ -1,3 +1,4 @@
+/* eslint-disable */
 //* модуль group
 import {
   GroupObject,

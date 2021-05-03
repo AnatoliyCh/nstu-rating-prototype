@@ -78,7 +78,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   };
   users: User[] = [];
 
-  async created() {
+  async created(): Promise<void> {
     this.isLoading = true;
     this.menuKey = [4];
     const id = Number(this.$route.params["id"]); // id тек. группы
@@ -113,7 +113,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     this.isLoading = false;
   }
   // обновление группы
-  async updateGroup() {
+  async updateGroup(): Promise<void> {
     if (!this.isEdit || !this.group.name) return;
     if (this.group.id === null || this.group.id === undefined) return;
     // обновление параметров группы
@@ -170,6 +170,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     return this.userAccess.group.create || this.userAccess.group.update;
   }
   // данные для таблицы
+  // eslint-disable-next-line
   get tableData() {
     return this.users.map((item) => ({
       key: item.id,
@@ -178,6 +179,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
       isModerator: this.isArrUsersIncludeUserById(item.id),
     }));
   }
+  // eslint-disable-next-line
   get tableColumn() {
     return [
       {

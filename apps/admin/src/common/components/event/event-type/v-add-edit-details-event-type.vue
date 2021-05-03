@@ -286,7 +286,7 @@ export default class VAddEditDetailsEventType extends mixins(
       ? `Просмотр типа мероприятия: ${this.typeEvent.name}`
       : "Создание: тип мероприятия";
   }
-  get isEdit() {
+  get isEdit(): boolean {
     return this.userAccess.eventType.create || this.userAccess.eventType.update;
   }
 }
