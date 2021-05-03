@@ -23,7 +23,12 @@
       :scroll="{ y: 'calc(100vh - 16em)' }"
       rowKey="id"
     >
-      <a slot="name" slot-scope="name">{{ name }}</a>
+      <a
+        slot="name"
+        slot-scope="name, item"
+        @click="goEventTypeDetails(item.id)"
+        >{{ name }}</a
+      >
       <a
         v-if="userAccess.eventType.delete"
         slot="action"
@@ -55,7 +60,7 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
     this.isLoading = false;
   }
 
-  // удаление мероприятия
+  // удаление типа мероприятия
   async deleteEventType(type: TypeEvent | null): Promise<void> {
     if (!type || !this.userAccess.eventType.delete) return;
     this.$confirm({
@@ -83,7 +88,14 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
       },
     });
   }
-
+  // переход на страницу просмотра типа мероприятия
+  goEventTypeDetails(idEventType: number | null | undefined): void {
+    if (!idEventType) return;
+    this.$router.push({
+      name: "event-type-details",
+      params: { id: idEventType.toString(), mode: "details" },
+    });
+  }
   // колонки таблицы
   // eslint-disable-next-line
   get columnsTable() {

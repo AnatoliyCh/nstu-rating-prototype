@@ -14,7 +14,6 @@ export default class VEventApiMixin extends Vue {
   // получение типов мероприятия
   async getEventTypes(): Promise<TypeEvent[]> {
     const [eventTypes, error] = await api.event.getEventTypes(this.accessToken);
-    console.warn([eventTypes, error]);
     if (eventTypes && !error) return eventTypes;
     else if (error) {
       console.warn(error);

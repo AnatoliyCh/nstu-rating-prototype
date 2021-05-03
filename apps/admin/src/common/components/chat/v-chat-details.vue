@@ -18,10 +18,11 @@
         <a-list-item slot="renderItem" slot-scope="item">
           <a-comment
             :author="item.sender"
-            :content="item.text"
             :datetime="item.dateTime"
             size="small"
-          />
+          >
+            <p slot="content">{{ item.text }}</p>
+          </a-comment>
         </a-list-item>
       </a-list>
       <!-- создание сообщения -->
@@ -29,7 +30,7 @@
         <div slot="content">
           <a-form-item>
             <a-textarea
-              :auto-size="{ minRows: 4, maxRows: 8 }"
+              :auto-size="{ minRows: 4, maxRows: 4 }"
               v-model="message"
             />
           </a-form-item>
@@ -121,6 +122,15 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   }
   // показываемые сообщения
   get ViewModelMessges(): Message[] {
+    this.messageList.forEach(
+      (item) =>
+        item.dateTime &&
+        (item.dateTime = `${new Date(
+          item.dateTime
+        ).toLocaleDateString()} ${new Date(
+          item.dateTime
+        ).toLocaleTimeString()}`)
+    );
     return this.messageList.reverse();
   }
 }

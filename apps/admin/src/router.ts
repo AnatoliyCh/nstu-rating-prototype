@@ -115,7 +115,21 @@ const routes: Array<RouteConfig> = [
           exact: true,
         },
         component: () =>
-          import("@/common/components/event/event-type/v-add-event-type.vue"),
+          import(
+            "@/common/components/event/event-type/v-add-edit-details-event-type.vue"
+          ),
+      },
+      // детальное представление типа мероприятия
+      {
+        path: "/event-type/:id",
+        name: "event-type-details",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import(
+            "@/common/components/event/event-type/v-add-edit-details-event-type.vue"
+          ),
       },
     ],
   },

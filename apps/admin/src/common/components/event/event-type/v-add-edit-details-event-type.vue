@@ -1,7 +1,7 @@
 <template>
   <div class="v-add-event-type">
     <a-page-header
-      title="Создание: тип мероприятия"
+      :title="headerName"
       class="header-block"
       @back="routing('event-type-list')"
     />
@@ -10,13 +10,15 @@
       <a-col :span="6">
         <a-card title="Основная информация" hoverable>
           <div class="vertical-margin-element-24">
-            <label class="required-label">Название </label>
+            <label :class="[mode === 'add' ? 'required-label' : '']">
+              Название
+            </label>
             <a-input v-model="typeEvent.name" allowClear />
           </div>
           <div class="vertical-margin-element-24">
             <a-checkbox default-checked disabled>Видно всем </a-checkbox>
           </div>
-          <div class="vertical-margin-element-24">
+          <div v-if="mode === 'add'" class="vertical-margin-element-24">
             <a-button
               type="primary"
               :disabled="!disabledButton"
@@ -138,12 +140,13 @@
 <script lang="ts">
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
+import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { Criteria, TypeEvent } from "../../../../../../common/types/model";
 
 @Component
-export default class VAddEventType extends mixins(VBaseMixin) {
+export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
   typeEvent: TypeEvent = { name: null, criteria: null }; // модель типа критерия
 
   readonly criteriaTypeOneName =
@@ -156,8 +159,35 @@ export default class VAddEventType extends mixins(VBaseMixin) {
   readonly criteriaTypeThreeName = "Критерий: По набранному баллу";
   criteriaTypeThree: Criteria[] = []; // по набранному баллу
 
-  created() {
+  async created(): Promise<void> {
+    this.isLoading = true;
     this.menuKey = [2];
+    // если просто детальное представление
+    if (this.mode === "details") {
+      const eventTypeId = Number(this.$route.params["id"]); // id тек. типа
+      const eventTypes = await this.getEventTypes();
+      const find = eventTypes.find((item) => item.id === eventTypeId);
+      if (find) {
+        this.typeEvent.id = eventTypeId;
+        this.typeEvent.name = find.name;
+        this.typeEvent.criteria?.forEach((item) => {
+          switch (item.typeId) {
+            case 1:
+              this.criteriaTypeOne.push(item);
+              break;
+            case 2:
+              this.criteriaTypeTwo.push(item);
+              break;
+            case 3:
+              this.criteriaTypeThree.push(item);
+              break;
+            default:
+              break;
+          }
+        });
+      }
+    }
+    this.isLoading = false;
   }
 
   // блокировка кнопки
@@ -226,6 +256,19 @@ export default class VAddEventType extends mixins(VBaseMixin) {
       });
     } else console.error(error);
     this.isLoading = false;
+  }
+  // определение типа страницы (редакторование/добавление)
+  get mode(): "add" | "edit" | "details" {
+    const paramMode = this.$route.params["details"];
+    if (["add", "edit", "details"].includes(paramMode))
+      return paramMode as "add" | "edit" | "details";
+    return "add";
+  }
+  // название хедера
+  get headerName(): string {
+    return this.mode === "details"
+      ? `Просмотр типа мероприятия: ${this.typeEvent.name}`
+      : "Создание: тип мероприятия";
   }
 }
 </script>

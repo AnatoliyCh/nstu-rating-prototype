@@ -750,6 +750,16 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       999
     );
     if (!error && response && response.data) {
+      // изменение времени
+      response.data.forEach(
+        (item) =>
+          item.dateTime &&
+          (item.dateTime = `${new Date(
+            item.dateTime
+          ).toLocaleDateString()} ${new Date(
+            item.dateTime
+          ).toLocaleTimeString()}`)
+      );
       this.messageList = response.data;
     } else if (error) {
       console.warn(error);

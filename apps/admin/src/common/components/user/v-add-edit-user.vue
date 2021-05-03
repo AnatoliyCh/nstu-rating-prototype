@@ -109,7 +109,7 @@ export default class VAddEditUser extends mixins(VBaseMixin) {
       login: "",
     },
   };
-  created() {
+  created(): void {
     this.menuKey = [0];
   }
   // блокировка кнопки

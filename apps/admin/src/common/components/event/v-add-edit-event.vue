@@ -153,7 +153,7 @@ export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
     this.menuKey = [1];
     this.isLoading = true;
     this.typesEvent = await this.getEventTypes();
-    this.isLoading = true;
+    this.isLoading = false;
   }
   //* типы мероприятия
   // изменение типа мероприятия

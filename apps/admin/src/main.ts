@@ -9,6 +9,10 @@ import "ant-design-vue/dist/antd.css";
 import Antd, { notification, message } from "ant-design-vue";
 Vue.use(Antd);
 
+// регистрация компонентов
+import vLoading from "@/common/components/v-loading.vue";
+Vue.component("v-loading", vLoading);
+
 new Vue({
   router,
   store,

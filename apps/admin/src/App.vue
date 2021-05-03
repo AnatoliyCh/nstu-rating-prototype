@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- тек. пользователь -->
-    <div class="app-user-element">
+    <div v-if="!isLoading" class="app-user-element">
       <label>Пользователь: </label>
       <a-button type="link"> {{ viewCurrentUser }} </a-button>
       <!-- теги -->
@@ -15,7 +15,7 @@
         <a-tag v-else :key="index" :color="role.color"> {{ role.name }} </a-tag>
       </template>
     </div>
-    <div class="app-body">
+    <div v-if="!isLoading" class="app-body">
       <!-- навигационное меню -->
       <a-menu class="app-body-menu" v-model="menuKey" mode="inline">
         <a-menu-item v-for="(link, index) in viewModelLinks" :key="index">
@@ -32,6 +32,7 @@
         </a-config-provider>
       </div>
     </div>
+    <v-loading v-else />
   </div>
 </template>
 <script lang="ts">
@@ -39,7 +40,7 @@ import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
-import { Component, Watch } from "vue-property-decorator";
+import { Component } from "vue-property-decorator";
 import { RouteConfig } from "vue-router";
 import { UserRole } from "../../common/types/model";
 // локализация
@@ -53,6 +54,7 @@ import jwt from "jsonwebtoken";
 @Component
 export default class App extends mixins(VBaseMixin) {
   async created(): Promise<void> {
+    this.isLoading = true;
     // токены
     this.$store.commit("setAccessToken", localStorage.getItem("aT"));
     this.$store.commit("setRefreshToken", localStorage.getItem("rT"));
@@ -63,7 +65,9 @@ export default class App extends mixins(VBaseMixin) {
       user && this.$store.commit("setUser", user);
     }
     // не авторизировались
-    // !this.currentUser && (document.location.href = api.pathAuthorization);
+    if (process.env.NODE_ENV !== "development" && !this.currentUser)
+      document.location.href = api.pathAuthorization;
+    this.isLoading = false;
   }
   // eslint-disable-next-line
   get currentLocale(): any {
