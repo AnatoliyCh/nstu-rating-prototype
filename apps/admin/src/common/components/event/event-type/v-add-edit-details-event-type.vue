@@ -32,7 +32,7 @@
       <!-- 1 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeOneName" hoverable>
-          <div class="vertical-margin-element-24">
+          <div v-if="isEdit" class="vertical-margin-element-24">
             <a-button @click="addNewCriteria(1)" block>
               Добавить критерий
             </a-button>
@@ -51,7 +51,11 @@
                 allowClear
                 style="width: 100%"
               />
-              <a-button @click="removeCriteria(1, index)" type="danger">
+              <a-button
+                v-if="isEdit"
+                @click="removeCriteria(1, index)"
+                type="danger"
+              >
                 X
               </a-button>
             </a-space>
@@ -61,7 +65,7 @@
       <!-- 2 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeTwoName" hoverable>
-          <div class="vertical-margin-element-24">
+          <div v-if="isEdit" class="vertical-margin-element-24">
             <a-button @click="addNewCriteria(2)" block>
               Добавить критерий
             </a-button>
@@ -91,7 +95,11 @@
                 :min="criteria.topPlace"
                 style="width: 100%"
               />
-              <a-button @click="removeCriteria(2, index)" type="danger">
+              <a-button
+                v-if="isEdit"
+                @click="removeCriteria(2, index)"
+                type="danger"
+              >
                 X
               </a-button>
             </a-space>
@@ -101,7 +109,7 @@
       <!-- 3 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeThreeName" hoverable>
-          <div class="vertical-margin-element-24">
+          <div v-if="isEdit" class="vertical-margin-element-24">
             <a-button @click="addNewCriteria(3)" block>
               Добавить критерий
             </a-button>
@@ -127,7 +135,12 @@
                 :min="0"
                 style="width: 100%"
               />
-              <a-button @click="removeCriteria(3, index)" type="danger" block>
+              <a-button
+                v-if="isEdit"
+                @click="removeCriteria(3, index)"
+                type="danger"
+                block
+              >
                 X
               </a-button>
             </a-space>
@@ -146,7 +159,10 @@ import { Component } from "vue-property-decorator";
 import { Criteria, TypeEvent } from "../../../../../../common/types/model";
 
 @Component
-export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
+export default class VAddEditDetailsEventType extends mixins(
+  VBaseMixin,
+  VEventApiMixin
+) {
   typeEvent: TypeEvent = { name: null, criteria: null }; // модель типа критерия
 
   readonly criteriaTypeOneName =
@@ -163,14 +179,14 @@ export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
     this.isLoading = true;
     this.menuKey = [2];
     // если просто детальное представление
-    if (this.mode === "details") {
+    if (["edit", "details"].includes(this.mode)) {
       const eventTypeId = Number(this.$route.params["id"]); // id тек. типа
       const eventTypes = await this.getEventTypes();
       const find = eventTypes.find((item) => item.id === eventTypeId);
       if (find) {
         this.typeEvent.id = eventTypeId;
         this.typeEvent.name = find.name;
-        this.typeEvent.criteria?.forEach((item) => {
+        find.criteria?.forEach((item) => {
           switch (item.typeId) {
             case 1:
               this.criteriaTypeOne.push(item);
@@ -186,7 +202,7 @@ export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
           }
         });
       }
-    }
+    } else this.routing("event-type-list");
     this.isLoading = false;
   }
 
@@ -259,7 +275,7 @@ export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
   }
   // определение типа страницы (редакторование/добавление)
   get mode(): "add" | "edit" | "details" {
-    const paramMode = this.$route.params["details"];
+    const paramMode = this.$route.params["mode"];
     if (["add", "edit", "details"].includes(paramMode))
       return paramMode as "add" | "edit" | "details";
     return "add";
@@ -269,6 +285,9 @@ export default class VAddEventType extends mixins(VBaseMixin, VEventApiMixin) {
     return this.mode === "details"
       ? `Просмотр типа мероприятия: ${this.typeEvent.name}`
       : "Создание: тип мероприятия";
+  }
+  get isEdit() {
+    return this.userAccess.eventType.create || this.userAccess.eventType.update;
   }
 }
 </script>

@@ -165,6 +165,39 @@ const routes: Array<RouteConfig> = [
       },
     ],
   },
+  //* группы
+  {
+    path: "/group",
+    name: "group",
+    meta: {
+      exact: false,
+      icon: "team",
+      name: "Группы",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/group/list",
+    children: [
+      // список групп
+      {
+        path: "/group/list",
+        name: "group-list",
+        meta: {
+          exact: true,
+        },
+        component: () => import("@/common/components/group/v-group-list.vue"),
+      },
+      // детальное представление группы (+ возможность редактировать)
+      {
+        path: "/group/:id",
+        name: "group-details",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/group/v-edit-details-group.vue"),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({ routes });

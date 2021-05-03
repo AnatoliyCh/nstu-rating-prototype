@@ -13,3 +13,5 @@ export { Request } from "./event/Request";
 // типы модуля chat
 export { Message } from "./chat/Message";
 export { Chat } from "./chat/Chat";
+// типы модуля group
+export { Group } from "./group/Group";

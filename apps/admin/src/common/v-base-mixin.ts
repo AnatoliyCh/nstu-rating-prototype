@@ -25,7 +25,7 @@ export default class VBaseMixin extends Vue {
     if (user)
       return {
         id: user.id,
-        roles: getRolesByArrId(user.roles),
+        roles: getRolesByArrId(user.roles ?? []),
         profile: user.profile,
       };
     return null;
@@ -76,6 +76,30 @@ export default class VBaseMixin extends Vue {
           "организатор",
         ]),
         view: true,
+        delete: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+        update: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+      },
+      group: {
+        viewList: true,
+        view: true,
+        create: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
+        update: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+        ]),
         delete: this.getIsContainsAccessRole([
           "администратор",
           "тьютор",

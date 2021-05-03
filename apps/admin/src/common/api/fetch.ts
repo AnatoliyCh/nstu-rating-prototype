@@ -66,8 +66,13 @@ export async function put<T, U>(
 }
 export async function _delete<T>(
   path: string,
+  body?: T,
   config?: RequestInit
 ): Promise<[T | undefined, ApiError | undefined]> {
-  const init = { method: "delete", ...config };
+  const init = {
+    method: "delete",
+    body: body ? JSON.stringify(body) : null,
+    ...config,
+  };
   return await http<T>(path, init);
 }

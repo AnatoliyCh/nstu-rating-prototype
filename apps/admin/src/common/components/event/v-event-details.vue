@@ -11,7 +11,6 @@
         @back="routing('event-list')"
       >
         <template slot="extra">
-          <!-- действия для орг. и админа -->
           <a-button
             v-if="userAccess.event.delete"
             key="2"

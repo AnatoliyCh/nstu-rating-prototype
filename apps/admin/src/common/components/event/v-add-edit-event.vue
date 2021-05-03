@@ -214,7 +214,6 @@ export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
         message: "Мероприятие создано",
         description: `Название: ${this.outstudyEvent.name}`,
       });
-      console.info(response);
     } else if (error) {
       console.warn(error);
       this.$notification.warning({

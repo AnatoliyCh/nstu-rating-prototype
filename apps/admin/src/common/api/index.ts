@@ -1,7 +1,11 @@
 /* eslint-disable */
 export { get, post, put, _delete } from "./fetch";
 
-import { CreateChat, CreateUser } from "../../../../common/types/api";
+import {
+  CreateChat,
+  CreateUser,
+  GroupCreate,
+} from "../../../../common/types/api";
 import {
   Account,
   OutstudyEvent,
@@ -11,6 +15,7 @@ import * as auth from "./auth";
 import * as chat from "./chat";
 import * as event from "./event";
 import * as user from "./user";
+import * as group from "./group";
 
 // API
 export const PATH_BASE = "http://";
@@ -184,6 +189,66 @@ export class Api {
         accessToken,
         this.pathBase + `chat/api/v1/chat/${chatId}/user/message`,
         { text: message }
+      );
+    },
+  };
+  public group = {
+    getGroups: async (accessToken: string, offset: number, limit: number) => {
+      return group.getGroups(
+        accessToken,
+        this.pathBase + `group/api/v1/group?offset=${offset}&limit=${limit}`
+      );
+    },
+    createGroup: async (accessToken: string, requestBody: GroupCreate) => {
+      return group.createGroup(
+        accessToken,
+        this.pathBase + "group/api/v1/group",
+        requestBody
+      );
+    },
+    getGroupById: async (accessToken: string, id: number) => {
+      return group.getGroupById(
+        accessToken,
+        this.pathBase + `group/api/v1/group/${id}`
+      );
+    },
+    сhangeGroup: async (
+      accessToken: string,
+      id: number,
+      requestBody: GroupCreate
+    ) => {
+      return group.сhangeGroup(
+        accessToken,
+        this.pathBase + `group/api/v1/group/${id}`,
+        requestBody
+      );
+    },
+    deleteGroup: async (accessToken: string, id: number) => {
+      return group.deleteGroup(
+        accessToken,
+        this.pathBase + `group/api/v1/group/${id}`
+      );
+    },
+    addMembers: async (
+      accessToken: string,
+      id: number,
+      requestBody: { users: number[]; moderators: number[] }
+    ) => {
+      return group.addMembers(
+        accessToken,
+        this.pathBase + `group/api/v1/group/${id}/members/`,
+        requestBody
+      );
+    },
+    deleteMembers: async (
+      accessToken: string,
+      id: number,
+      requestBody: { users: number[]; moderators: number[] }
+    ) => {
+      return group.deleteMembers(
+        accessToken,
+        this.pathBase + `group/api/v1/group/${id}/members/`,
+        requestBody
       );
     },
   };
