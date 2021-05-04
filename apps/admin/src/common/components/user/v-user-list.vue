@@ -5,6 +5,13 @@
       class="v-user-list-header-block"
     >
       <template slot="extra">
+        <a-input-search
+          v-model="filterName"
+          key="2"
+          placeholder="поиск ФИО..."
+          allowClear
+          style="width: 200px"
+        />
         <a-button
           v-if="userAccess.user.create"
           key="1"
@@ -50,6 +57,7 @@ import { User } from "../../../../../common/types/model";
 export default class VUserList extends mixins(VBaseMixin) {
   users: User[] = [];
   size = 0;
+  filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
     this.menuKey = [0];
@@ -135,13 +143,19 @@ export default class VUserList extends mixins(VBaseMixin) {
   // данные для таблицы
   // eslint-disable-next-line
   get dataTableUser() {
-    return this.users.map((item) => ({
+    let data = this.users.map((item) => ({
       key: item.id,
       lastName: item.profile.lastName,
       firstName: item.profile.firstName,
       middleName: item.profile.middleName,
       roles: getRolesByArrId(item.roles ?? []),
     }));
+    if (this.filterName)
+      return data.filter((item) => {
+        const fullName = `${item.lastName} ${item.firstName} ${item.middleName}`.toLowerCase();
+        return fullName.includes(this.filterName.toLowerCase());
+      });
+    return data;
   }
 }
 </script>

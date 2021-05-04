@@ -46,7 +46,7 @@ export async function deleteEventType(
       Authorization: "Bearer " + accessToken,
     },
   });
-  return [!response ? true : undefined, error];
+  return [response ? true : undefined, error];
 }
 /** получение списка мероприятий */
 export async function getEvents(

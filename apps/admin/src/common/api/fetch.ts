@@ -69,10 +69,18 @@ export async function _delete<T>(
   body?: T,
   config?: RequestInit
 ): Promise<[T | undefined, ApiError | undefined]> {
-  const init = {
-    method: "delete",
-    body: body ? JSON.stringify(body) : null,
-    ...config,
-  };
-  return await http<T>(path, init);
+  if (body) {
+    const init = {
+      method: "delete",
+      body: JSON.stringify(body),
+      ...config,
+    };
+    return await http<T>(path, init);
+  } else {
+    const init = {
+      method: "delete",
+      ...config,
+    };
+    return await http<T>(path, init);
+  }
 }

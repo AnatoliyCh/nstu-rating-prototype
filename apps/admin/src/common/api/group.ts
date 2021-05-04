@@ -11,8 +11,8 @@ import * as http from "../api";
 export async function getGroups(
   accessToken: string,
   path: string
-): Promise<[GroupObject | undefined, ApiError | undefined]> {
-  return await http.get<GroupObject>(path, {
+): Promise<[Group[] | undefined, ApiError | undefined]> {
+  return await http.get<Group[]>(path, {
     headers: {
       accept: "application/json",
       Authorization: "Bearer " + accessToken,
@@ -62,7 +62,7 @@ export async function сhangeGroup(
       },
     }
   );
-  return [!response ? true : undefined, error];
+  return [response ? true : undefined, error];
 }
 /** удаление группы */
 export async function deleteGroup(
@@ -75,7 +75,7 @@ export async function deleteGroup(
       Authorization: "Bearer " + accessToken,
     },
   });
-  return [!response ? true : undefined, error];
+  return [response ? true : undefined, error];
 }
 //* участники
 
@@ -95,7 +95,7 @@ export async function addMembers(
       Authorization: "Bearer " + accessToken,
     },
   });
-  return [!response ? true : undefined, error];
+  return [response ? true : undefined, error];
 }
 /** удаление*/
 export async function deleteMembers(
@@ -109,8 +109,9 @@ export async function deleteMembers(
   }>(path, requestBody, {
     headers: {
       accept: "*/*",
+      "Content-Type": "application/json;charset=UTF-8",
       Authorization: "Bearer " + accessToken,
     },
   });
-  return [!response ? true : undefined, error];
+  return [response ? true : undefined, error];
 }

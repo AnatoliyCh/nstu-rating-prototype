@@ -2,6 +2,13 @@
   <div class="v-group-list">
     <a-page-header title="Список: группы" class="v-group-list-header-block">
       <template slot="extra">
+        <a-input-search
+          v-model="filterName"
+          key="2"
+          placeholder="поиск поназванию..."
+          allowClear
+          style="width: 200px"
+        />
         <a-button
           v-if="userAccess.group.create"
           key="1"
@@ -14,7 +21,7 @@
     </a-page-header>
     <a-table
       :columns="columnsTable"
-      :data-source="groups"
+      :data-source="tableData"
       :loading="isLoading"
       :pagination="{ pageSize: 20 }"
       :scroll="{ y: 'calc(100vh - 16em)' }"
@@ -61,6 +68,7 @@ import { Group } from "../../../../../common/types/model";
 export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
   groups: Group[] = [];
   size = 0;
+  filterName = ""; // фильтр названия
   // модальное окно создания группы
   visibleModalCreateGroup = false;
   isLoadingCreate = false;
@@ -80,8 +88,8 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       999
     );
     if (response && !error) {
-      this.groups = response.data ?? [];
-      this.size = response.size ?? 0;
+      this.groups = response ?? [];
+      this.size = response.length ?? 0;
     } else if (error) {
       console.warn(error);
       this.$notification.error({
@@ -123,6 +131,15 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       name: "group-details",
       params: { id: groupId.toString() },
     });
+  }
+  // данные для таблицы
+  // eslint-disable-next-line
+  get tableData() {
+    if (this.filterName)
+      return this.groups.filter((item) =>
+        item.name?.toLowerCase().includes(this.filterName.toLowerCase())
+      );
+    else return this.groups;
   }
   // колонки таблицы
   // eslint-disable-next-line

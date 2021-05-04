@@ -5,6 +5,13 @@
       class="v-event-type-list-header-block"
     >
       <template slot="extra">
+        <a-input-search
+          v-model="filterName"
+          key="2"
+          placeholder="поиск поназванию..."
+          allowClear
+          style="width: 200px"
+        />
         <a-button
           v-if="userAccess.eventType.create"
           key="1"
@@ -17,7 +24,7 @@
     </a-page-header>
     <a-table
       :columns="columnsTable"
-      :data-source="typesEvent"
+      :data-source="tableData"
       :loading="isLoading"
       :pagination="{ pageSize: 20 }"
       :scroll="{ y: 'calc(100vh - 16em)' }"
@@ -52,6 +59,7 @@ import { TypeEvent } from "../../../../../../common/types/model";
 export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
   typesEvent: TypeEvent[] = [];
   size = 0;
+  filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
     this.menuKey = [2];
@@ -95,6 +103,15 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
       name: "event-type-details",
       params: { id: idEventType.toString(), mode: "details" },
     });
+  }
+  // данные для таблицы
+  // eslint-disable-next-line
+  get tableData() {
+    if (this.filterName)
+      return this.typesEvent.filter((item) =>
+        item.name?.toLowerCase().includes(this.filterName.toLowerCase())
+      );
+    else return this.typesEvent;
   }
   // колонки таблицы
   // eslint-disable-next-line
