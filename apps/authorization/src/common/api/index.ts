@@ -24,6 +24,9 @@ export class Api {
     login: async (requestBody: Account) => {
       return auth.login(this.basePath + "auth/api/v1/login", requestBody);
     },
+    redirect: async (accessToken: string) => {
+      return auth.redirect(accessToken, this.basePath + "app/by/role");
+    },
   };
   public user = {
     getUsers: async (offset: number, limit: number) => {

@@ -14,3 +14,17 @@ export async function login(
     },
   });
 }
+/** получение пути переадрисации */
+export async function redirect(
+  accessToken: string,
+  path: string
+): Promise<[boolean | undefined, ApiError | undefined]> {
+  const [response, error] = await http.get<any>(path, {
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+  return [response ? true : undefined, error];
+}

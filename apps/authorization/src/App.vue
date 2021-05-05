@@ -67,6 +67,7 @@ export default class App extends Vue {
         localStorage.setItem("rT", this.accessKeys.refreshToken);
       // уведомление пользователей
       this.$message.loading("Переадресация..", 10);
+      await api.auth.redirect(this.accessKeys.accessToken ?? "");
     } else this.showError(error);
     this.isLoading = false;
   }
@@ -112,6 +113,7 @@ export default class App extends Vue {
   .card-authorization {
     width: 500px;
     margin: auto;
+    cursor: default;
 
     .ant-card-head-title {
       text-align: center;
