@@ -204,7 +204,7 @@ const routes: Array<RouteConfig> = [
     name: "discipline",
     meta: {
       exact: false,
-      icon: "unordered-list",
+      icon: "read",
       name: "Дисциплины",
     },
     component: () => import("@/common/components/v-router-parent.vue"),

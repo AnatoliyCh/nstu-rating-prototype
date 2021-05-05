@@ -16,7 +16,7 @@
           v-if="userAccess.discipline.create"
           key="1"
           type="primary"
-          @click="visibleModalCreateDiscipline = true"
+          @click="showModal('create')"
         >
           Создать дисциплину
         </a-button>
@@ -30,21 +30,25 @@
       :scroll="{ y: 'calc(100vh - 16em)' }"
       rowKey="id"
     >
-      <a slot="name" slot-scope="name, group" @click="goGroupDetails(group.id)">
-        {{ name }}
-      </a>
-      <a
-        v-if="userAccess.discipline.delete"
-        slot="action"
-        slot-scope="group"
-        @click="deleteGroup(group)"
-      >
-        Удалить
-      </a>
+      <div slot="action" slot-scope="discipline">
+        <a
+          v-if="userAccess.discipline.delete"
+          @click="showModal('update', discipline)"
+        >
+          Редактировать
+        </a>
+        <a-divider type="vertical" />
+        <a
+          v-if="userAccess.discipline.update"
+          @click="deleteDiscipline(discipline)"
+        >
+          Удалить
+        </a>
+      </div>
     </a-table>
-    <!-- модальное окно создания группы -->
+    <!-- модальное окно создания дисциплины -->
     <a-modal
-      title="Название новой группы"
+      :title="titleModal"
       v-model="visibleModalCreateDiscipline"
       :confirm-loading="isLoadingCreate"
       :ok-button-props="{ props: { disabled: !Boolean(newDisciplineName) } }"
@@ -65,17 +69,19 @@ import VBaseMixin from "@/common/v-base-mixin";
 import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { Group } from "../../../../../common/types/model";
+import { Discipline } from "../../../../../common/types/model";
 
 @Component
 export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
-  groups: Group[] = [];
+  disciplines: Discipline[] = [];
   size = 0;
   filterName = ""; // фильтр названия
-  // модальное окно создания группы
+  // модальное окно создания дисциплины
   visibleModalCreateDiscipline = false;
   isLoadingCreate = false;
   newDisciplineName = "";
+  mode: "create" | "update" = "create"; // для модального окна
+  changeDiscipline: Discipline | null = null; // изменяемая дисциплина
 
   async created(): Promise<void> {
     this.menuKey = [5];
@@ -83,16 +89,16 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
     await this.getDisciplines();
     this.isLoading = false;
   }
-  /** получение списка групп */
+  /** получение списка дисциплин */
   async getDisciplines(): Promise<void> {
-    const [response, error] = await api.group.getGroups(
+    const [response, error] = await api.discipline.getDisciplines(
       this.accessToken,
       0,
-      999
+      9999
     );
     if (response && !error) {
-      this.groups = response ?? [];
-      this.size = response.length ?? 0;
+      this.disciplines = response.data ?? [];
+      this.size = response.size ?? 0;
     } else if (error) {
       console.warn(error);
       this.$notification.error({
@@ -101,22 +107,117 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       });
     } else console.error(error);
   }
-  // удаление группы
-  async deleteGroup(group: Group | null): Promise<void> {
-    if (!group || !this.userAccess.discipline.delete) return;
+  //* модальное окно создания/редактирования дисциплины
+  showModal(
+    mode: "create" | "update" | null,
+    value: Discipline | null | undefined
+  ): void {
+    switch (mode) {
+      case null:
+        return;
+      case "create":
+        if (this.userAccess.discipline.create) {
+          this.visibleModalCreateDiscipline = true;
+          this.mode = "create";
+        }
+        break;
+      case "update":
+        if (this.userAccess.discipline.update && value) {
+          this.visibleModalCreateDiscipline = true;
+          this.newDisciplineName = value.name ?? "";
+          this.changeDiscipline = value;
+          this.mode = "update";
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+  /** название модального окна */
+  get titleModal(): string {
+    if (this.mode === "update")
+      return `Редактирование дисциплины: ${this.changeDiscipline?.name}`;
+    return "Название новой дисциплины";
+  }
+  async handleOkCreate(): Promise<void> {
+    this.isLoadingCreate = true;
+    this.visibleModalCreateDiscipline = false;
+    if (this.mode === "create") await this.createDiscipline();
+    if (this.mode === "update") await this.updateDiscipline();
+    this.newDisciplineName = "";
+    this.changeDiscipline = null;
+    this.isLoadingCreate = false;
+  }
+  handleCancelCreate(): void {
+    this.visibleModalCreateDiscipline = false;
+    this.newDisciplineName = "";
+  }
+  async createDiscipline(): Promise<void> {
+    if (!this.userAccess.discipline.create) return;
+    const [response, error] = await api.discipline.createDiscipline(
+      this.accessToken,
+      {
+        name: this.newDisciplineName,
+      }
+    );
+    if (response && !error) {
+      this.$notification.success({
+        message: "Дисциплина создана",
+        description: `Название: ${this.newDisciplineName}`,
+      });
+      this.disciplines.push({ id: response.id, name: this.newDisciplineName });
+    } else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "Создание дисциплины",
+      });
+    } else console.error(error);
+  }
+  async updateDiscipline(): Promise<void> {
+    if (
+      !this.userAccess.discipline.update ||
+      this.changeDiscipline?.id === null ||
+      this.changeDiscipline?.id === undefined
+    )
+      return;
+    const [response, error] = await api.discipline.сhangeDiscipline(
+      this.accessToken,
+      this.changeDiscipline.id,
+      { name: this.newDisciplineName }
+    );
+    if (response && !error)
+      this.$notification.success({
+        message: "Дисциплина обновлена",
+        description: ``,
+      });
+    else if (error) {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "Обновление дисциплины",
+      });
+    } else console.error(error);
+  }
+  // удаление дисциплины
+  async deleteDiscipline(discipline: Discipline | null): Promise<void> {
+    if (!discipline || !this.userAccess.discipline.delete) return;
     this.$confirm({
       title: "Удаление дисциплины",
-      content: `Вы точно хотите удалить дисциплину: ${group.name}`,
+      content: `Вы точно хотите удалить дисциплину: ${discipline.name}`,
       onOk: async () => {
-        if (group?.id === null || group?.id === undefined) return;
-        const [response, error] = await api.group.deleteGroup(
+        if (discipline?.id === null || discipline?.id === undefined) return;
+        const [response, error] = await api.discipline.deleteDiscipline(
           this.accessToken,
-          group.id
+          discipline.id
         );
         if (response && !error) {
           // удаление по id
-          const findId = this.groups.findIndex((item) => item.id === group.id);
-          findId > -1 && this.groups.splice(findId, 1);
+          const findId = this.disciplines.findIndex(
+            (item) => item.id === discipline.id
+          );
+          findId > -1 && this.disciplines.splice(findId, 1);
         } else if (error) {
           console.warn(error);
           this.$notification.warning({
@@ -127,22 +228,14 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       },
     });
   }
-  // переход на страницу просмотра группы
-  goGroupDetails(groupId: number | null | undefined): void {
-    if (groupId === null || groupId === undefined) return;
-    this.$router.push({
-      name: "group-details",
-      params: { id: groupId.toString() },
-    });
-  }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
     if (this.filterName)
-      return this.groups.filter((item) =>
+      return this.disciplines.filter((item) =>
         item.name?.toLowerCase().includes(this.filterName.toLowerCase())
       );
-    else return this.groups;
+    else return this.disciplines;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -166,37 +259,6 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
     if (this.userAccess.discipline.update || this.userAccess.discipline.delete)
       return columns;
     else return [columns[0]];
-  }
-  //* модальное окно создания группы
-  async handleOkCreate(): Promise<void> {
-    if (!this.userAccess.discipline.create) {
-      this.visibleModalCreateDiscipline = false;
-      return;
-    }
-    this.isLoadingCreate = true;
-    const [response, error] = await api.group.createGroup(this.accessToken, {
-      name: this.newDisciplineName,
-    });
-    if (response && !error) {
-      this.$notification.success({
-        message: "Дисциплина создана",
-        description: `Название: ${this.newDisciplineName}`,
-      });
-      this.groups.push({ id: response.id, name: this.newDisciplineName });
-    } else if (error) {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "Создание дисциплины",
-      });
-    } else console.error(error);
-    this.visibleModalCreateDiscipline = false;
-    this.isLoadingCreate = false;
-    this.newDisciplineName = "";
-  }
-  handleCancelCreate(): void {
-    this.visibleModalCreateDiscipline = false;
-    this.newDisciplineName = "";
   }
 }
 </script>

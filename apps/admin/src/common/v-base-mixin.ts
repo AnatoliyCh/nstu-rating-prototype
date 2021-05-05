@@ -90,21 +90,9 @@ export default class VBaseMixin extends Vue {
       group: {
         viewList: true,
         view: true,
-        create: this.getIsContainsAccessRole([
-          "администратор",
-          "тьютор",
-          "организатор",
-        ]),
-        update: this.getIsContainsAccessRole([
-          "администратор",
-          "тьютор",
-          "организатор",
-        ]),
-        delete: this.getIsContainsAccessRole([
-          "администратор",
-          "тьютор",
-          "организатор",
-        ]),
+        create: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+        update: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+        delete: this.getIsContainsAccessRole(["администратор", "тьютор"]),
       },
       discipline: {
         viewList: true,

@@ -95,6 +95,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
         message: error?.message ?? "",
         description: "",
       });
+      if (!this.messageList.length) this.routing("chat-list");
     } else console.error(error);
     this.isLoading = false;
   }

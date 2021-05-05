@@ -5,6 +5,7 @@ import {
   CreateChat,
   CreateUser,
   GroupCreate,
+  DisciplineCreate,
 } from "../../../../common/types/api";
 import {
   Account,
@@ -16,6 +17,7 @@ import * as chat from "./chat";
 import * as event from "./event";
 import * as user from "./user";
 import * as group from "./group";
+import * as discipline from "./discipline";
 
 // API
 export const PATH_BASE = "http://";
@@ -249,6 +251,52 @@ export class Api {
         accessToken,
         this.pathBase + `group/api/v1/group/${id}/members/`,
         requestBody
+      );
+    },
+  };
+  public discipline = {
+    getDisciplines: async (
+      accessToken: string,
+      offset: number,
+      limit: number
+    ) => {
+      return discipline.getDisciplines(
+        accessToken,
+        this.pathBase +
+          `discipline/api/v1/discipline?offset=${offset}&limit=${limit}`
+      );
+    },
+    createDiscipline: async (
+      accessToken: string,
+      requestBody: DisciplineCreate
+    ) => {
+      return discipline.createDiscipline(
+        accessToken,
+        this.pathBase + "discipline/api/v1/discipline",
+        requestBody
+      );
+    },
+    getDisciplineById: async (accessToken: string, id: number) => {
+      return discipline.getDisciplineById(
+        accessToken,
+        this.pathBase + `discipline/api/v1/discipline/${id}`
+      );
+    },
+    сhangeDiscipline: async (
+      accessToken: string,
+      id: number,
+      requestBody: DisciplineCreate
+    ) => {
+      return discipline.сhangeDiscipline(
+        accessToken,
+        this.pathBase + `discipline/api/v1/discipline/${id}`,
+        requestBody
+      );
+    },
+    deleteDiscipline: async (accessToken: string, id: number) => {
+      return discipline.deleteDiscipline(
+        accessToken,
+        this.pathBase + `discipline/api/v1/discipline/${id}`
       );
     },
   };
