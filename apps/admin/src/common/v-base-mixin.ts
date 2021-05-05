@@ -106,6 +106,13 @@ export default class VBaseMixin extends Vue {
           "организатор",
         ]),
       },
+      discipline: {
+        viewList: true,
+        view: true,
+        create: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+        update: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+        delete: this.getIsContainsAccessRole(["администратор", "тьютор"]),
+      },
     };
   }
   // перенаправление

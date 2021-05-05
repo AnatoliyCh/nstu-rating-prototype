@@ -15,3 +15,5 @@ export { Message } from "./chat/Message";
 export { Chat } from "./chat/Chat";
 // типы модуля group
 export { Group } from "./group/Group";
+// типы модуля discipline
+export { Discipline } from "./discipline/Discipline";

@@ -1,5 +1,5 @@
 import { User } from "../index";
-/** Профиль пользователя */
+/** Группа */
 export interface Group {
   /** ид в БД */
   id?: number | null;

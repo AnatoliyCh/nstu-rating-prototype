@@ -1,6 +1,9 @@
 <template>
-  <div class="v-group-list">
-    <a-page-header title="Список: группы" class="v-group-list-header-block">
+  <div class="v-discipline-list">
+    <a-page-header
+      title="Список: дисциплины"
+      class="v-discipline-list-header-block"
+    >
       <template slot="extra">
         <a-input-search
           v-model="filterName"
@@ -10,12 +13,12 @@
           style="width: 200px"
         />
         <a-button
-          v-if="userAccess.group.create"
+          v-if="userAccess.discipline.create"
           key="1"
           type="primary"
-          @click="visibleModalCreateGroup = true"
+          @click="visibleModalCreateDiscipline = true"
         >
-          Создать группу
+          Создать дисциплину
         </a-button>
       </template>
     </a-page-header>
@@ -31,7 +34,7 @@
         {{ name }}
       </a>
       <a
-        v-if="userAccess.group.delete"
+        v-if="userAccess.discipline.delete"
         slot="action"
         slot-scope="group"
         @click="deleteGroup(group)"
@@ -42,16 +45,16 @@
     <!-- модальное окно создания группы -->
     <a-modal
       title="Название новой группы"
-      v-model="visibleModalCreateGroup"
+      v-model="visibleModalCreateDiscipline"
       :confirm-loading="isLoadingCreate"
-      :ok-button-props="{ props: { disabled: !Boolean(newGroupName) } }"
+      :ok-button-props="{ props: { disabled: !Boolean(newDisciplineName) } }"
       @ok="handleOkCreate"
       @cancel="handleCancelCreate"
       centered
     >
       <div class="vertical-margin-element-24">
         <label class="required-label">Название </label>
-        <a-input v-model="newGroupName" />
+        <a-input v-model="newDisciplineName" />
       </div>
     </a-modal>
   </div>
@@ -70,18 +73,18 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
   size = 0;
   filterName = ""; // фильтр названия
   // модальное окно создания группы
-  visibleModalCreateGroup = false;
+  visibleModalCreateDiscipline = false;
   isLoadingCreate = false;
-  newGroupName = "";
+  newDisciplineName = "";
 
   async created(): Promise<void> {
-    this.menuKey = [4];
+    this.menuKey = [5];
     this.isLoading = true;
-    await this.getGroups();
+    await this.getDisciplines();
     this.isLoading = false;
   }
   /** получение списка групп */
-  async getGroups(): Promise<void> {
+  async getDisciplines(): Promise<void> {
     const [response, error] = await api.group.getGroups(
       this.accessToken,
       0,
@@ -93,17 +96,17 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
     } else if (error) {
       console.warn(error);
       this.$notification.error({
-        message: "Не удалось загрузить группы",
+        message: "Не удалось загрузить дисциплины",
         description: "",
       });
     } else console.error(error);
   }
   // удаление группы
   async deleteGroup(group: Group | null): Promise<void> {
-    if (!group || !this.userAccess.group.delete) return;
+    if (!group || !this.userAccess.discipline.delete) return;
     this.$confirm({
-      title: "Удаление группы",
-      content: `Вы точно хотите удалить группу: ${group.name}`,
+      title: "Удаление дисциплины",
+      content: `Вы точно хотите удалить дисциплину: ${group.name}`,
       onOk: async () => {
         if (group?.id === null || group?.id === undefined) return;
         const [response, error] = await api.group.deleteGroup(
@@ -118,7 +121,7 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
           console.warn(error);
           this.$notification.warning({
             message: error?.message ?? "",
-            description: "Удаление группы",
+            description: "Удаление дисциплины",
           });
         } else console.error(error);
       },
@@ -146,7 +149,7 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
   get columnsTable() {
     const columns = [
       {
-        title: "Название группы",
+        title: "Название дисциплины",
         dataIndex: "name",
         key: "name",
         ellipsis: true,
@@ -160,46 +163,46 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
         scopedSlots: { customRender: "action" },
       },
     ];
-    if (this.userAccess.group.update || this.userAccess.group.delete)
+    if (this.userAccess.discipline.update || this.userAccess.discipline.delete)
       return columns;
     else return [columns[0]];
   }
   //* модальное окно создания группы
   async handleOkCreate(): Promise<void> {
-    if (!this.userAccess.group.create) {
-      this.visibleModalCreateGroup = false;
+    if (!this.userAccess.discipline.create) {
+      this.visibleModalCreateDiscipline = false;
       return;
     }
     this.isLoadingCreate = true;
     const [response, error] = await api.group.createGroup(this.accessToken, {
-      name: this.newGroupName,
+      name: this.newDisciplineName,
     });
     if (response && !error) {
       this.$notification.success({
-        message: "Группа создана",
-        description: `Название: ${this.newGroupName}`,
+        message: "Дисциплина создана",
+        description: `Название: ${this.newDisciplineName}`,
       });
-      this.groups.push({ id: response.id, name: this.newGroupName });
+      this.groups.push({ id: response.id, name: this.newDisciplineName });
     } else if (error) {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
-        description: "Создание группы",
+        description: "Создание дисциплины",
       });
     } else console.error(error);
-    this.visibleModalCreateGroup = false;
+    this.visibleModalCreateDiscipline = false;
     this.isLoadingCreate = false;
-    this.newGroupName = "";
+    this.newDisciplineName = "";
   }
   handleCancelCreate(): void {
-    this.visibleModalCreateGroup = false;
-    this.newGroupName = "";
+    this.visibleModalCreateDiscipline = false;
+    this.newDisciplineName = "";
   }
 }
 </script>
 
 <style lang="scss">
-.v-group-list {
+.v-discipline-list {
   &-header-block {
     border-block-end: 1px solid rgb(235, 237, 240);
     margin-bottom: 0px;

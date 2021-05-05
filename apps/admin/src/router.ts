@@ -198,6 +198,30 @@ const routes: Array<RouteConfig> = [
       },
     ],
   },
+  //* дисциплины
+  {
+    path: "/discipline",
+    name: "discipline",
+    meta: {
+      exact: false,
+      icon: "unordered-list",
+      name: "Дисциплины",
+    },
+    component: () => import("@/common/components/v-router-parent.vue"),
+    redirect: "/discipline/list",
+    children: [
+      // список дисциплин
+      {
+        path: "/discipline/list",
+        name: "discipline-list",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/discipline/v-discipline-list.vue"),
+      },
+    ],
+  },
 ];
 
 const router = new VueRouter({ routes });
