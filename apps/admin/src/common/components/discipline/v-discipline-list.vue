@@ -160,13 +160,13 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       }
     );
     if (response && !error) {
-      this.visibleModalCreateDiscipline = false;
-      this.newDisciplineName = "";
       this.$notification.success({
         message: "Дисциплина создана",
         description: `Название: ${this.newDisciplineName}`,
       });
       this.disciplines.push({ id: response.id, name: this.newDisciplineName });
+      this.visibleModalCreateDiscipline = false;
+      this.newDisciplineName = "";
     } else if (error) {
       console.warn(error);
       this.$notification.warning({
@@ -189,13 +189,14 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       { name: this.newDisciplineName }
     );
     if (response && !error) {
-      this.visibleModalCreateDiscipline = false;
-      this.newDisciplineName = "";
-      this.changeDiscipline = null;
+      this.changeDiscipline.name = this.newDisciplineName;
       this.$notification.success({
         message: "Дисциплина обновлена",
         description: ``,
       });
+      this.changeDiscipline = null;
+      this.visibleModalCreateDiscipline = false;
+      this.newDisciplineName = "";
     } else if (error) {
       console.warn(error);
       this.$notification.warning({

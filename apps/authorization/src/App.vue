@@ -67,7 +67,8 @@ export default class App extends Vue {
         localStorage.setItem("rT", this.accessKeys.refreshToken);
       // уведомление пользователей
       this.$message.loading("Переадресация..", 10);
-      await api.auth.redirect(this.accessKeys.accessToken ?? "");
+      process.env.NODE_ENV !== "development" &&
+        (document.location.href = location.origin + "/app/by/role");
     } else this.showError(error);
     this.isLoading = false;
   }
