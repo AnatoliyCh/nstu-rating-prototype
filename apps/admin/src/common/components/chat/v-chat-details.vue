@@ -1,9 +1,9 @@
 <template>
   <div class="v-chat-details">
     <a-page-header
-      title="Чат"
+      :title="headerChat"
       class="v-chat-details-header-block"
-      @back="routing('chat-list')"
+      @back="backRouting"
     />
     <div class="v-chat-details-body">
       <!-- сообщения -->
@@ -59,6 +59,8 @@ import { Message } from "../../../../../common/types/model";
 @Component
 export default class VChatDetails extends mixins(VBaseMixin) {
   chatId = Number(this.$route.params["id"]); // id тек. чата
+  eventName = this.$route.params["eventName"]; // чат меропрития
+  eventId = Number(this.$route.params["eventId"]); // id меропрития
   messageList: Message[] = []; // список сообщений
   message = ""; // сообщение
   isLoadingMessage = false; // анимация кнопки отправки сообщения
@@ -132,6 +134,23 @@ export default class VChatDetails extends mixins(VBaseMixin) {
         ).toLocaleTimeString()}`)
     );
     return this.messageList.reverse();
+  }
+  /** название чата в зависимости от типа */
+  get headerChat(): string {
+    if (this.eventName) return `Чат меропрития: ${this.eventName}`;
+    return "Чат";
+  }
+  /** возвращение к списку четов или меропрития */
+  backRouting(): void {
+    if (this.eventName) {
+      this.$router.push({
+        name: "event-details",
+        params: { id: this.eventId.toString() },
+      });
+      return;
+    }
+
+    this.routing("chat-list");
   }
 }
 </script>

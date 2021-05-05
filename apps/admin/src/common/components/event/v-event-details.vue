@@ -11,6 +11,7 @@
         @back="routing('event-list')"
       >
         <template slot="extra">
+          <a-button key="3" @click="goChatDetails"> Чат мероприятия </a-button>
           <a-button
             v-if="userAccess.event.delete"
             key="2"
@@ -241,9 +242,8 @@
           </a-card>
         </a-col>
         <!-- чат -->
-        <a-col :span="12">
+        <!-- <a-col :span="12">
           <a-card title="Чат" hoverable>
-            <!-- создание сообщения -->
             <a-comment>
               <div slot="content">
                 <a-form-item>
@@ -264,7 +264,6 @@
                 </a-form-item>
               </div>
             </a-comment>
-            <!-- сообщения -->
             <a-list
               id="list"
               :data-source="messageList"
@@ -284,7 +283,7 @@
               </a-list-item>
             </a-list>
           </a-card>
-        </a-col>
+        </a-col> -->
       </a-row>
       <!-- модальное окно принятия заявок -->
       <a-modal
@@ -392,8 +391,8 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     if (this.outstudyEvent) {
       await this.getType();
       await this.getMembers();
-      await this.getMessages();
-      this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
+      // await this.getMessages();
+      // this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
     }
     this.isLoading = false;
   }
@@ -796,6 +795,19 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     // прокрутка вниз, после отпраки сообщения
     this.elementList &&
       (this.elementList.scrollTop = this.elementList.scrollHeight);
+  }
+  // переход на страницу чата
+  goChatDetails(): void {
+    if (!this.chatId || !this.outstudyEvent?.name || !this.outstudyEvent?.id)
+      return;
+    this.$router.push({
+      name: "chat-details",
+      params: {
+        id: this.chatId.toString(),
+        eventName: this.outstudyEvent.name,
+        eventId: this.outstudyEvent.id?.toString(),
+      },
+    });
   }
 }
 </script>

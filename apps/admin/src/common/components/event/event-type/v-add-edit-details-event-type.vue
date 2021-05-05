@@ -13,10 +13,11 @@
             <label :class="[mode === 'add' ? 'required-label' : '']">
               Название
             </label>
-            <a-input v-model="typeEvent.name" allowClear />
-          </div>
-          <div class="vertical-margin-element-24">
-            <a-checkbox default-checked disabled>Видно всем </a-checkbox>
+            <a-input
+              v-model="typeEvent.name"
+              :disabled="!(mode === 'add')"
+              allowClear
+            />
           </div>
           <div v-if="mode === 'add'" class="vertical-margin-element-24">
             <a-button
@@ -32,7 +33,10 @@
       <!-- 1 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeOneName" hoverable>
-          <div v-if="isEdit" class="vertical-margin-element-24">
+          <div
+            v-if="isEdit && mode === 'add'"
+            class="vertical-margin-element-24"
+          >
             <a-button @click="addNewCriteria(1)" block>
               Добавить критерий
             </a-button>
@@ -50,9 +54,10 @@
                 :min="0"
                 allowClear
                 style="width: 100%"
+                :disabled="!(mode === 'add')"
               />
               <a-button
-                v-if="isEdit"
+                v-if="isEdit && mode === 'add'"
                 @click="removeCriteria(1, index)"
                 type="danger"
               >
@@ -65,7 +70,10 @@
       <!-- 2 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeTwoName" hoverable>
-          <div v-if="isEdit" class="vertical-margin-element-24">
+          <div
+            v-if="isEdit && mode === 'add'"
+            class="vertical-margin-element-24"
+          >
             <a-button @click="addNewCriteria(2)" block>
               Добавить критерий
             </a-button>
@@ -82,21 +90,24 @@
                 v-model="criteria.value"
                 :min="0"
                 style="width: 100%"
+                :disabled="!(mode === 'add')"
               />
               <label style="white-space: nowrap">места c </label>
               <a-input-number
                 v-model="criteria.topPlace"
                 :min="1"
                 style="width: 100%"
+                :disabled="!(mode === 'add')"
               />
               <label style="white-space: nowrap">по </label>
               <a-input-number
                 v-model="criteria.bottomPlace"
                 :min="criteria.topPlace"
                 style="width: 100%"
+                :disabled="!(mode === 'add')"
               />
               <a-button
-                v-if="isEdit"
+                v-if="isEdit && mode === 'add'"
                 @click="removeCriteria(2, index)"
                 type="danger"
               >
@@ -109,7 +120,10 @@
       <!-- 3 критерий -->
       <a-col :span="6">
         <a-card :title="criteriaTypeThreeName" hoverable>
-          <div v-if="isEdit" class="vertical-margin-element-24">
+          <div
+            v-if="isEdit && mode === 'add'"
+            class="vertical-margin-element-24"
+          >
             <a-button @click="addNewCriteria(3)" block>
               Добавить критерий
             </a-button>
@@ -128,15 +142,17 @@
                 v-model="criteria.name"
                 placeholder="задание"
                 allowClear
+                :disabled="!(mode === 'add')"
               />
               <a-input-number
                 v-model="criteria.value"
                 placeholder="балл"
                 :min="0"
                 style="width: 100%"
+                :disabled="!(mode === 'add')"
               />
               <a-button
-                v-if="isEdit"
+                v-if="isEdit && mode === 'add'"
                 @click="removeCriteria(3, index)"
                 type="danger"
                 block
@@ -202,7 +218,12 @@ export default class VAddEditDetailsEventType extends mixins(
           }
         });
       }
-    } else this.routing("event-type-list");
+    }
+    if (
+      this.$router.currentRoute.name === "event-type-details" &&
+      this.mode === "add"
+    )
+      this.routing("event-type-list");
     this.isLoading = false;
   }
 
@@ -298,6 +319,9 @@ export default class VAddEditDetailsEventType extends mixins(
     padding: 0px 16px;
     .ant-card-head-title {
       text-align: center;
+    }
+    .ant-card {
+      cursor: default;
     }
   }
 }

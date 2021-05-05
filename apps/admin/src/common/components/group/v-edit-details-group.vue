@@ -38,6 +38,13 @@
         <a-col :span="9">
           <a-card title="Участники" class="v-edit-details-group-card" hoverable>
             <div slot="extra">
+              <a-input-search
+                v-model="filterName"
+                key="2"
+                placeholder="поиск ФИО..."
+                allowClear
+                style="width: 200px"
+              />
               <label> Только участники </label>
               <a-checkbox v-model="membersOnly" />
             </div>
@@ -90,6 +97,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   };
   users: User[] = [];
   membersOnly = false; // фильтр только участники
+  filterName = ""; // фильтр названия
   // изменение состава участников
   isLoadingMember = false;
 
@@ -114,7 +122,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
         this.routing("group-list");
       } else console.error(error);
       //   пользователи
-      const [responseUsers, errorUsers] = await api.user.getUsers(0, 999);
+      const [responseUsers, errorUsers] = await api.user.getUsers(0, 9999);
       if (!errorUsers && responseUsers && responseUsers.data)
         this.users = responseUsers.data;
       else if (errorUsers) {
@@ -244,6 +252,10 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     }));
     this.membersOnly &&
       (data = data.filter((item) => item.isUser || item.isModerator));
+    this.filterName &&
+      (data = data.filter((item) =>
+        item.name.toLowerCase().includes(this.filterName.toLowerCase())
+      ));
     return data;
   }
   /** есть ли в массиве пользователь с данным id */

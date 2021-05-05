@@ -43,6 +43,7 @@ export async function deleteEventType(
   const [response, error] = await http._delete(path, {
     headers: {
       accept: "*/*",
+      "Content-Type": "application/json;charset=UTF-8",
       Authorization: "Bearer " + accessToken,
     },
   });
@@ -94,6 +95,7 @@ export async function deleteEvent(
   return await http._delete(path, {
     headers: {
       accept: "*/*",
+      "Content-Type": "application/json;charset=UTF-8",
       Authorization: "Bearer " + accessToken,
     },
   });
