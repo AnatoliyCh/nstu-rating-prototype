@@ -4,8 +4,8 @@ export { get, post, put, _delete } from "./fetch";
 import {
   CreateChat,
   CreateUser,
-  GroupCreate,
   DisciplineCreate,
+  GroupCreate,
 } from "../../../../common/types/api";
 import {
   Account,
@@ -14,10 +14,10 @@ import {
 } from "../../../../common/types/model";
 import * as auth from "./auth";
 import * as chat from "./chat";
-import * as event from "./event";
-import * as user from "./user";
-import * as group from "./group";
 import * as discipline from "./discipline";
+import * as event from "./event";
+import * as group from "./group";
+import * as user from "./user";
 
 // API
 export const PATH_BASE = "http://";

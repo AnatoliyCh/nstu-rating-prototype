@@ -88,8 +88,8 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       999
     );
     if (response && !error) {
-      this.groups = response ?? [];
-      this.size = response.length ?? 0;
+      this.groups = response.data ?? [];
+      this.size = response.size ?? 0;
     } else if (error) {
       console.warn(error);
       this.$notification.error({

@@ -1,9 +1,9 @@
 /* eslint-disable */
 //* модуль group
 import {
-  GroupObject,
-  GroupCreate,
   ApiError,
+  GroupCreate,
+  GroupObject,
 } from "../../../../common/types/api";
 import { Group } from "../../../../common/types/model";
 import * as http from "../api";
@@ -11,8 +11,8 @@ import * as http from "../api";
 export async function getGroups(
   accessToken: string,
   path: string
-): Promise<[Group[] | undefined, ApiError | undefined]> {
-  return await http.get<Group[]>(path, {
+): Promise<[GroupObject | undefined, ApiError | undefined]> {
+  return await http.get<GroupObject>(path, {
     headers: {
       accept: "application/json",
       Authorization: "Bearer " + accessToken,

@@ -142,17 +142,15 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
   }
   async handleOkCreate(): Promise<void> {
     this.isLoadingCreate = true;
-    this.visibleModalCreateDiscipline = false;
     if (this.mode === "create") await this.createDiscipline();
     if (this.mode === "update") await this.updateDiscipline();
-    this.newDisciplineName = "";
-    this.changeDiscipline = null;
     this.isLoadingCreate = false;
   }
   handleCancelCreate(): void {
     this.visibleModalCreateDiscipline = false;
     this.newDisciplineName = "";
   }
+  /** создание дисциплины */
   async createDiscipline(): Promise<void> {
     if (!this.userAccess.discipline.create) return;
     const [response, error] = await api.discipline.createDiscipline(
@@ -162,6 +160,8 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       }
     );
     if (response && !error) {
+      this.visibleModalCreateDiscipline = false;
+      this.newDisciplineName = "";
       this.$notification.success({
         message: "Дисциплина создана",
         description: `Название: ${this.newDisciplineName}`,
@@ -175,6 +175,7 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       });
     } else console.error(error);
   }
+  /** обновление дисциплины */
   async updateDiscipline(): Promise<void> {
     if (
       !this.userAccess.discipline.update ||
@@ -187,12 +188,15 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
       this.changeDiscipline.id,
       { name: this.newDisciplineName }
     );
-    if (response && !error)
+    if (response && !error) {
+      this.visibleModalCreateDiscipline = false;
+      this.newDisciplineName = "";
+      this.changeDiscipline = null;
       this.$notification.success({
         message: "Дисциплина обновлена",
         description: ``,
       });
-    else if (error) {
+    } else if (error) {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
