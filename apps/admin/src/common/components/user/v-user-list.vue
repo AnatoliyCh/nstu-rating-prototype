@@ -25,9 +25,10 @@
     <a-table
       :columns="columnsTableUser"
       :data-source="dataTableUser"
-      :loading="isLoading"
-      :pagination="{ pageSize: 20 }"
+      :loading="isDataLoading"
+      :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 16em)' }"
+      @change="changePagination"
     >
       <span slot="roles" slot-scope="item">
         <a-tag
@@ -48,15 +49,15 @@
 import api from "@/common/api";
 import { getRolesByArrId } from "@/common/services/user";
 import VBaseMixin from "@/common/v-base-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { CreateChat } from "../../../../../common/types/api";
 import { User } from "../../../../../common/types/model";
 
 @Component
-export default class VUserList extends mixins(VBaseMixin) {
+export default class VUserList extends mixins(VBaseMixin, VPaginationMixin) {
   users: User[] = [];
-  size = 0;
   filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
@@ -66,19 +67,22 @@ export default class VUserList extends mixins(VBaseMixin) {
   // получение списка пользователей
   async getUsers(): Promise<void> {
     if (!this.userAccess.user.viewList) return;
-    this.isLoading = true;
-    const [response, error] = await api.user.getUsers(0, 999);
-    if (!error && response && response.data) {
+    this.isDataLoading = true;
+    const [response, error] = await api.user.getUsers(
+      this.offset,
+      this.pagination.pageSize
+    );
+    if (!error && response?.data) {
       this.users = response.data;
-      response.size && (this.size = response.size);
-    } else if (error) {
+      this.pagination.total = response.size ?? 0;
+    } else if (error && this.$router.currentRoute.name === "user-list") {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить пользователей",
         description: "",
       });
-    } else console.error(error);
-    this.isLoading = false;
+    }
+    this.isDataLoading = false;
   }
   // создание чата
   async createChat(idSubUser: number | null): Promise<void> {
@@ -92,14 +96,15 @@ export default class VUserList extends mixins(VBaseMixin) {
       this.accessToken,
       newChat
     );
-    if (!error && response) console.log(response, "добавить переадрисацию");
+    if (!error && response?.id)
+      this.routing("chat-details", { id: response.id.toString() });
     else if (error) {
       console.warn(error);
       this.$notification.warning({
         message: error.message ?? "",
         description: "",
       });
-    } else console.error(error);
+    }
     this.isLoading = false;
   }
   // колонки таблицы
@@ -156,6 +161,13 @@ export default class VUserList extends mixins(VBaseMixin) {
         return fullName.includes(this.filterName.toLowerCase());
       });
     return data;
+  }
+  /** переключение страниц */
+  async changePagination(
+    pagination: VPaginationMixin["pagination"]
+  ): Promise<void> {
+    this.pagination.current = pagination.current;
+    await this.getUsers();
   }
 }
 </script>

@@ -1,6 +1,7 @@
 import { getRolesByArrId } from "@/common/services/user";
 import Component from "vue-class-component";
 import { Vue } from "vue-property-decorator";
+import { Dictionary } from "vue-router/types/router";
 import { Profile, User, UserRole } from "../../../common/types/model";
 import api from "./api";
 
@@ -104,9 +105,12 @@ export default class VBaseMixin extends Vue {
     };
   }
   // перенаправление
-  async routing(namePath: string | null): Promise<void> {
+  async routing(
+    namePath: string | null,
+    params: Dictionary<string> | undefined = undefined
+  ): Promise<void> {
     if (!namePath || this.$router.currentRoute.name === namePath) return;
-    await this.$router.push({ name: namePath });
+    await this.$router.push({ name: namePath, params: params });
   }
   // получение пользователя по id
   async getUserById(id: number, isNotification: boolean): Promise<User | null> {

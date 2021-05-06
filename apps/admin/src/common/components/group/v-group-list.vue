@@ -7,6 +7,8 @@
           key="2"
           placeholder="поиск по названию..."
           allowClear
+          enter-button
+          @search="(pagination.current = 1) && getGroups()"
           style="width: 200px"
         />
         <a-button
@@ -22,10 +24,11 @@
     <a-table
       :columns="columnsTable"
       :data-source="tableData"
-      :loading="isLoading"
-      :pagination="{ pageSize: 20 }"
+      :loading="isDataLoading"
+      :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 16em)' }"
       rowKey="id"
+      @change="changePagination"
     >
       <a slot="name" slot-scope="name, group" @click="goGroupDetails(group.id)">
         {{ name }}
@@ -59,15 +62,14 @@
 <script lang="ts">
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
-import VEventApiMixin from "@/common/v-event-api-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { Group } from "../../../../../common/types/model";
 
 @Component
-export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
+export default class VGroupList extends mixins(VBaseMixin, VPaginationMixin) {
   groups: Group[] = [];
-  size = 0;
   filterName = ""; // фильтр названия
   // модальное окно создания группы
   visibleModalCreateGroup = false;
@@ -76,27 +78,28 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
 
   async created(): Promise<void> {
     this.menuKey = [4];
-    this.isLoading = true;
     await this.getGroups();
-    this.isLoading = false;
   }
   /** получение списка групп */
   async getGroups(): Promise<void> {
+    this.isDataLoading = true;
     const [response, error] = await api.group.getGroups(
       this.accessToken,
-      0,
-      999
+      this.offset,
+      this.pagination.pageSize,
+      this.filterName
     );
     if (response && !error) {
       this.groups = response.data ?? [];
-      this.size = response.size ?? 0;
-    } else if (error) {
+      this.pagination.total = response.size ?? 0;
+    } else if (error && this.$router.currentRoute.name === "group-list") {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить группы",
         description: "",
       });
-    } else console.error(error);
+    }
+    this.isDataLoading = false;
   }
   // удаление группы
   async deleteGroup(group: Group | null): Promise<void> {
@@ -110,36 +113,26 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
           this.accessToken,
           group.id
         );
-        if (response && !error) {
-          // удаление по id
-          const findId = this.groups.findIndex((item) => item.id === group.id);
-          findId > -1 && this.groups.splice(findId, 1);
-        } else if (error) {
+        if (response && !error) await this.changePagination(this.pagination);
+        else if (error && this.$router.currentRoute.name === "group-list") {
           console.warn(error);
           this.$notification.warning({
             message: error?.message ?? "",
             description: "Удаление группы",
           });
-        } else console.error(error);
+        }
       },
     });
   }
   // переход на страницу просмотра группы
   goGroupDetails(groupId: number | null | undefined): void {
     if (groupId === null || groupId === undefined) return;
-    this.$router.push({
-      name: "group-details",
-      params: { id: groupId.toString() },
-    });
+    this.routing("group-details", { id: groupId.toString() });
   }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    if (this.filterName)
-      return this.groups.filter((item) =>
-        item.name?.toLowerCase().includes(this.filterName.toLowerCase())
-      );
-    else return this.groups;
+    return this.groups;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -180,20 +173,27 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
         description: `Название: ${this.newGroupName}`,
       });
       this.groups.push({ id: response.id, name: this.newGroupName });
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "group-list") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
         description: "Создание группы",
       });
-    } else console.error(error);
+    }
+    this.changePagination(this.pagination);
+    this.handleCancelCreate();
+  }
+  handleCancelCreate(): void {
     this.visibleModalCreateGroup = false;
     this.isLoadingCreate = false;
     this.newGroupName = "";
   }
-  handleCancelCreate(): void {
-    this.visibleModalCreateGroup = false;
-    this.newGroupName = "";
+  /** переключение страниц */
+  async changePagination(
+    pagination: VPaginationMixin["pagination"]
+  ): Promise<void> {
+    this.pagination.current = pagination.current;
+    await this.getGroups();
   }
 }
 </script>

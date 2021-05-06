@@ -13,9 +13,10 @@ export default class VEventApiMixin extends Vue {
   }
   // получение типов мероприятия
   async getEventTypes(): Promise<TypeEvent[]> {
+    const currentRouter = this.$router.currentRoute.name;
     const [eventTypes, error] = await api.event.getEventTypes(this.accessToken);
     if (eventTypes && !error) return eventTypes;
-    else if (error) {
+    else if (error && this.$router.currentRoute.name === currentRouter) {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить типы мероприятия",

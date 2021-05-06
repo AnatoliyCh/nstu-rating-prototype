@@ -10,6 +10,8 @@
           key="2"
           placeholder="поиск по названию..."
           allowClear
+          enter-button
+          @search="(pagination.current = 1) && getDisciplines()"
           style="width: 200px"
         />
         <a-button
@@ -25,10 +27,11 @@
     <a-table
       :columns="columnsTable"
       :data-source="tableData"
-      :loading="isLoading"
-      :pagination="{ pageSize: 20 }"
+      :loading="isDataLoading"
+      :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 16em)' }"
       rowKey="id"
+      @change="changePagination"
     >
       <div slot="action" slot-scope="discipline">
         <a
@@ -66,15 +69,14 @@
 <script lang="ts">
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
-import VEventApiMixin from "@/common/v-event-api-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { Discipline } from "../../../../../common/types/model";
 
 @Component
-export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
+export default class VGroupList extends mixins(VBaseMixin, VPaginationMixin) {
   disciplines: Discipline[] = [];
-  size = 0;
   filterName = ""; // фильтр названия
   // модальное окно создания дисциплины
   visibleModalCreateDiscipline = false;
@@ -85,27 +87,28 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
 
   async created(): Promise<void> {
     this.menuKey = [5];
-    this.isLoading = true;
     await this.getDisciplines();
-    this.isLoading = false;
   }
   /** получение списка дисциплин */
   async getDisciplines(): Promise<void> {
+    this.isDataLoading = true;
     const [response, error] = await api.discipline.getDisciplines(
       this.accessToken,
-      0,
-      9999
+      this.offset,
+      this.pagination.pageSize,
+      this.filterName
     );
     if (response && !error) {
       this.disciplines = response.data ?? [];
-      this.size = response.size ?? 0;
-    } else if (error) {
+      this.pagination.total = response.size ?? 0;
+    } else if (error && this.$router.currentRoute.name === "discipline-list") {
       console.warn(error);
       this.$notification.error({
         message: "Не удалось загрузить дисциплины",
         description: "",
       });
-    } else console.error(error);
+    }
+    this.isDataLoading = false;
   }
   //* модальное окно создания/редактирования дисциплины
   showModal(
@@ -144,11 +147,14 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
     this.isLoadingCreate = true;
     if (this.mode === "create") await this.createDiscipline();
     if (this.mode === "update") await this.updateDiscipline();
+    this.handleCancelCreate();
+    this.changePagination(this.pagination);
     this.isLoadingCreate = false;
   }
   handleCancelCreate(): void {
     this.visibleModalCreateDiscipline = false;
     this.newDisciplineName = "";
+    this.changeDiscipline = null;
   }
   /** создание дисциплины */
   async createDiscipline(): Promise<void> {
@@ -164,16 +170,13 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
         message: "Дисциплина создана",
         description: `Название: ${this.newDisciplineName}`,
       });
-      this.disciplines.push({ id: response.id, name: this.newDisciplineName });
-      this.visibleModalCreateDiscipline = false;
-      this.newDisciplineName = "";
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "discipline-list") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
         description: "Создание дисциплины",
       });
-    } else console.error(error);
+    }
   }
   /** обновление дисциплины */
   async updateDiscipline(): Promise<void> {
@@ -194,16 +197,13 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
         message: "Дисциплина обновлена",
         description: ``,
       });
-      this.changeDiscipline = null;
-      this.visibleModalCreateDiscipline = false;
-      this.newDisciplineName = "";
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "discipline-list") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
         description: "Обновление дисциплины",
       });
-    } else console.error(error);
+    }
   }
   // удаление дисциплины
   async deleteDiscipline(discipline: Discipline | null): Promise<void> {
@@ -217,30 +217,24 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
           this.accessToken,
           discipline.id
         );
-        if (response && !error) {
-          // удаление по id
-          const findId = this.disciplines.findIndex(
-            (item) => item.id === discipline.id
-          );
-          findId > -1 && this.disciplines.splice(findId, 1);
-        } else if (error) {
+        if (response && !error) await this.changePagination(this.pagination);
+        else if (
+          error &&
+          this.$router.currentRoute.name === "discipline-list"
+        ) {
           console.warn(error);
           this.$notification.warning({
             message: error?.message ?? "",
             description: "Удаление дисциплины",
           });
-        } else console.error(error);
+        }
       },
     });
   }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    if (this.filterName)
-      return this.disciplines.filter((item) =>
-        item.name?.toLowerCase().includes(this.filterName.toLowerCase())
-      );
-    else return this.disciplines;
+    return this.disciplines;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -264,6 +258,13 @@ export default class VGroupList extends mixins(VBaseMixin, VEventApiMixin) {
     if (this.userAccess.discipline.update || this.userAccess.discipline.delete)
       return columns;
     else return [columns[0]];
+  }
+  /** переключение страниц */
+  async changePagination(
+    pagination: VPaginationMixin["pagination"]
+  ): Promise<void> {
+    this.pagination.current = pagination.current;
+    await this.getDisciplines();
   }
 }
 </script>

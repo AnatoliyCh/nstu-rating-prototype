@@ -25,8 +25,8 @@
     <a-table
       :columns="columnsTable"
       :data-source="tableData"
-      :loading="isLoading"
-      :pagination="{ pageSize: 20 }"
+      :loading="isDataLoading"
+      :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 16em)' }"
       rowKey="id"
     >
@@ -51,21 +51,25 @@
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
 import VEventApiMixin from "@/common/v-event-api-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { TypeEvent } from "../../../../../../common/types/model";
 
 @Component
-export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
+export default class VEventTypeList extends mixins(
+  VBaseMixin,
+  VEventApiMixin,
+  VPaginationMixin
+) {
   typesEvent: TypeEvent[] = [];
-  size = 0;
   filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
     this.menuKey = [2];
-    this.isLoading = true;
+    this.isDataLoading = true;
     this.typesEvent = await this.getEventTypes();
-    this.isLoading = false;
+    this.isDataLoading = false;
   }
 
   // удаление типа мероприятия
@@ -86,7 +90,10 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
             (item) => item.id === type.id
           );
           findId > -1 && this.typesEvent.splice(findId, 1);
-        } else if (error) {
+        } else if (
+          error &&
+          this.$router.currentRoute.name === "event-type-list"
+        ) {
           console.warn(error);
           this.$notification.warning({
             message: error?.message ?? "",
@@ -98,10 +105,10 @@ export default class VEventTypeList extends mixins(VBaseMixin, VEventApiMixin) {
   }
   // переход на страницу просмотра типа мероприятия
   goEventTypeDetails(idEventType: number | null | undefined): void {
-    if (!idEventType) return;
-    this.$router.push({
-      name: "event-type-details",
-      params: { id: idEventType.toString(), mode: "details" },
+    if (idEventType === null || idEventType === undefined) return;
+    this.routing("event-type-details", {
+      id: idEventType.toString(),
+      mode: "details",
     });
   }
   // данные для таблицы

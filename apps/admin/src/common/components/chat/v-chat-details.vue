@@ -86,17 +86,17 @@ export default class VChatDetails extends mixins(VBaseMixin) {
       this.accessToken,
       this.chatId,
       0,
-      999
+      9999
     );
     if (!error && response && response.data) this.messageList = response.data;
-    else if (error) {
+    else if (error && this.$router.currentRoute.name === "chat-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
         description: "",
       });
       if (!this.messageList.length) this.routing("chat-list");
-    } else console.error(error);
+    }
     this.isLoading = false;
   }
   /** отправка сообщений */
@@ -169,7 +169,8 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     padding: 0px 16px;
     &-list {
       // 300px - размер блока собщения, при максимальном раскрытии
-      max-height: calc(100% - 300px);
+      height: 100%;
+      max-height: calc(100% - 250px);
       overflow: auto;
     }
   }

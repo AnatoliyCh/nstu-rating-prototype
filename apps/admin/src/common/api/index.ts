@@ -195,10 +195,18 @@ export class Api {
     },
   };
   public group = {
-    getGroups: async (accessToken: string, offset: number, limit: number) => {
+    getGroups: async (
+      accessToken: string,
+      offset: number,
+      limit: number,
+      search: string | undefined = undefined
+    ) => {
       return group.getGroups(
         accessToken,
-        this.pathBase + `group/api/v1/group?offset=${offset}&limit=${limit}`
+        this.pathBase +
+          `group/api/v1/group?offset=${offset}&limit=${limit}${
+            search ? "&search=" + search : ""
+          }`
       );
     },
     createGroup: async (accessToken: string, requestBody: GroupCreate) => {
@@ -258,12 +266,15 @@ export class Api {
     getDisciplines: async (
       accessToken: string,
       offset: number,
-      limit: number
+      limit: number,
+      search: string | undefined = undefined
     ) => {
       return discipline.getDisciplines(
         accessToken,
         this.pathBase +
-          `discipline/api/v1/discipline?offset=${offset}&limit=${limit}`
+          `discipline/api/v1/discipline?offset=${offset}&limit=${limit}${
+            search ? "&search=" + search : ""
+          }`
       );
     },
     createDiscipline: async (

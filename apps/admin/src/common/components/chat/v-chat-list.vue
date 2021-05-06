@@ -43,13 +43,13 @@ export default class VChatList extends mixins(VBaseMixin) {
     if (!error && response && response.data) {
       this.chatList = response.data;
       response.size && (this.totalSize = response.size);
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "chat-list") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
         description: "",
       });
-    } else console.error(error);
+    }
     this.isLoading = false;
   }
   // с кем чат
@@ -68,11 +68,8 @@ export default class VChatList extends mixins(VBaseMixin) {
   }
   // переход на страницу чата
   goChatDetails(chat: Chat | null): void {
-    if (!chat?.id) return;
-    this.$router.push({
-      name: "chat-details",
-      params: { id: chat.id.toString() },
-    });
+    if (chat?.id === null || chat?.id === undefined) return;
+    this.routing("chat-details", { id: chat.id.toString() });
   }
 }
 </script>
