@@ -17,3 +17,5 @@ export { Chat } from "./chat/Chat";
 export { Group } from "./group/Group";
 // типы модуля discipline
 export { Discipline } from "./discipline/Discipline";
+// типы модуля achievement
+export { Achievement } from "./achievement/Achievement";
