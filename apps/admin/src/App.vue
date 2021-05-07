@@ -3,9 +3,12 @@
     <!-- тек. пользователь -->
     <div v-if="!isLoading" class="app-user-element">
       <label>Пользователь: </label>
-      <a-button type="link"> {{ viewCurrentUser }} </a-button>
+      <label v-if="!userAccess.user.space"> {{ viewCurrentUser }} </label>
+      <a-button v-else type="link" @click="routing('user-space')">
+        {{ viewCurrentUser }}
+      </a-button>
       <!-- теги -->
-      <label style="margin-right: 16px">Роли: </label>
+      <label style="margin: 0 16px">Роли: </label>
       <template v-for="(role, index) in viewCurrentUserRoles">
         <a-tooltip v-if="role.name.length > 15" :key="index" :title="role.name">
           <a-tag :key="index" :color="role.color">
@@ -75,7 +78,7 @@ export default class App extends mixins(VBaseMixin) {
   }
   get viewCurrentUser(): string {
     if (!this.currentUser) return "-";
-    return `${viewFullName(this.currentUser.profile, false)}`;
+    return `${viewFullName(this.currentUser.profile, false)} `;
   }
   get viewCurrentUserRoles(): UserRole[] {
     return this.currentUser?.roles ?? [];

@@ -40,6 +40,15 @@ const routes: Array<RouteConfig> = [
         },
         component: () => import("@/common/components/user/v-add-edit-user.vue"),
       },
+      // личный кабинет
+      {
+        path: "/user/my-space",
+        name: "user-space",
+        meta: {
+          exact: true,
+        },
+        component: () => import("@/common/components/user/v-user-space.vue"),
+      },
     ],
   },
   //* мероприятия
@@ -171,7 +180,7 @@ const routes: Array<RouteConfig> = [
     name: "group",
     meta: {
       exact: false,
-      icon: "team",
+      icon: "usergroup-add",
       name: "Группы",
     },
     component: () => import("@/common/components/v-router-parent.vue"),

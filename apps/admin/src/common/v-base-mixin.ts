@@ -49,6 +49,8 @@ export default class VBaseMixin extends Vue {
         create: this.getIsContainsAccessRole(["администратор", "тьютор"]),
         view: true,
         delete: false,
+        /** личный кабинет */
+        space: this.getIsContainsAccessRole(["студент"]),
       },
       event: {
         viewList: true,
@@ -104,6 +106,7 @@ export default class VBaseMixin extends Vue {
       },
     };
   }
+
   // перенаправление
   async routing(
     namePath: string | null,
@@ -137,11 +140,6 @@ export default class VBaseMixin extends Vue {
     return false;
   }
   get isAdmin(): boolean {
-    return (
-      (process.env.NODE_ENV === "development" &&
-        this.currentUser?.profile.firstName === "admin__") ||
-      this.currentUser?.profile.lastName === "admin__" ||
-      this.currentUser?.profile.middleName === "admin__"
-    );
+    return process.env.NODE_ENV === "development";
   }
 }
