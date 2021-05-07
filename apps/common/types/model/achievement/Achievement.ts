@@ -1,4 +1,4 @@
-import { OutstudyEvent, Criteria } from "../index";
+import { OutstudyEvent, Criteria, Discipline } from "../index";
 /** достижение студента */
 export interface Achievement {
   /** ид в БД */
@@ -7,10 +7,12 @@ export interface Achievement {
   name: string | null;
   /** всего баллов */
   score: number | null;
-  /** остаток очков */
-  balanceScore: number | null;
+  /** остаток баллов */
+  balanceScore?: number | null;
   /** мероприятие, где было получено достижение */
   event: OutstudyEvent;
   /** критерий */
   criterion: Criteria;
+  /** дисциплины */
+  discipline?: Discipline;
 }
