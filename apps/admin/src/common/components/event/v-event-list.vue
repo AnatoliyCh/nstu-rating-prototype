@@ -174,6 +174,7 @@ export default class VEventList extends mixins(
       const newEvents = response.data ?? [];
       this.outstudyEvents = this.outstudyEvents.concat(newEvents);
       this.pagination.total = response.size ?? 0;
+      !response.data?.length && this.pagination.current--;
     } else if (error && this.$router.currentRoute.name === "event-list") {
       this.pagination.current--;
       console.warn(error);
@@ -181,7 +182,7 @@ export default class VEventList extends mixins(
         message: "Не удалось загрузить мероприятия",
         description: "",
       });
-    } else console.error(error);
+    } else this.pagination.current--;
   }
   // модель для отображения
   // eslint-disable-next-line

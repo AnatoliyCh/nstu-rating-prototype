@@ -55,6 +55,7 @@
                 allowClear
                 style="width: 100%"
                 :disabled="!(mode === 'add')"
+                :parser="(value) => value.replace(/\$\s?|([.\,,]*)/g, '')"
               />
               <a-button
                 v-if="isEdit && mode === 'add'"
@@ -91,6 +92,7 @@
                 :min="0"
                 style="width: 100%"
                 :disabled="!(mode === 'add')"
+                :parser="(value) => value.replace(/\$\s?|([.\,,]*)/g, '')"
               />
               <label style="white-space: nowrap">места c </label>
               <a-input-number
@@ -98,6 +100,7 @@
                 :min="1"
                 style="width: 100%"
                 :disabled="!(mode === 'add')"
+                :parser="(value) => value.replace(/\$\s?|([.\,,]*)/g, '')"
               />
               <label style="white-space: nowrap">по </label>
               <a-input-number
@@ -105,6 +108,7 @@
                 :min="criteria.topPlace"
                 style="width: 100%"
                 :disabled="!(mode === 'add')"
+                :parser="(value) => value.replace(/\$\s?|([.\,,]*)/g, '')"
               />
               <a-button
                 v-if="isEdit && mode === 'add'"
@@ -150,6 +154,7 @@
                 :min="0"
                 style="width: 100%"
                 :disabled="!(mode === 'add')"
+                :parser="(value) => value.replace(/\$\s?|([.\,,]*)/g, '')"
               />
               <a-button
                 v-if="isEdit && mode === 'add'"
