@@ -68,7 +68,7 @@
               <a-date-picker
                 :value="outstudyEvent.dateStart"
                 show-time
-                format="YYYY-MM-DD HH:mm"
+                format="DD.MM.YYYY HH:mm"
                 style="width: 100%"
                 disabled
               />
@@ -78,7 +78,7 @@
               <a-date-picker
                 :value="outstudyEvent.dateEnd"
                 show-time
-                format="YYYY-MM-DD HH:mm"
+                format="DD.MM.YYYY HH:mm"
                 style="width: 100%"
                 disabled
               />
@@ -91,7 +91,7 @@
               <a-date-picker
                 :value="outstudyEvent.dateRegistrationEnd"
                 show-time
-                format="YYYY-MM-DD HH:mm"
+                format="DD.MM.YYYY HH:mm"
                 style="width: 100%"
                 disabled
               />
@@ -414,7 +414,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
           this.outstudyEvent.id
         );
         if (!error && response) this.routing("event-list");
-        else if (error) {
+        else if (error && this.$router.currentRoute.name === "event-details") {
           console.warn(error);
           this.$notification.warning({
             message: error?.message ?? "",
@@ -433,7 +433,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       idCurrentEvent
     );
     if (!error && response) this.outstudyEvent = response;
-    else if (error) {
+    else if (error && this.$router.currentRoute.name === "event-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
@@ -452,7 +452,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     );
   }
   // получение списка участников
-  async getMembers(): Promise<void> {
+  async getMembers(message = true): Promise<void> {
     if (!this.outstudyEvent?.id) return;
     const [response, error] = await api.event.getMembersEvent(
       this.accessToken,
@@ -460,7 +460,11 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     );
     if (!error && response && response.data) {
       this.members = response.data ?? [];
-    } else if (error) {
+    } else if (
+      error &&
+      this.$router.currentRoute.name === "event-details" &&
+      message
+    ) {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
@@ -522,7 +526,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       this.outstudyEvent.id
     );
     if (!error && response && response.data) this.requests = response.data;
-    else if (error) {
+    else if (error && this.$router.currentRoute.name === "event-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
@@ -537,6 +541,32 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       Boolean(this.outstudyEvent?.isNeedMemberConfirmation) &&
       this.userAccess.event.membersConfirmation
     );
+  }
+  // принятие/отклонение заявок
+  async changeRequest(
+    idRequest: number,
+    status: 1 | 2 | 3 | null
+  ): Promise<void> {
+    if (!this.outstudyEvent?.id || !status) return;
+    this.isLoadingRequests = true;
+    const [response, error] = await api.event.memberEventRequestChange(
+      this.accessToken,
+      this.outstudyEvent.id,
+      idRequest,
+      status
+    );
+    if (!error && response) {
+      const find = this.requests.find((item) => item.id === idRequest);
+      find && (find.status = status);
+      await this.getMembers(false);
+    } else if (error && this.$router.currentRoute.name === "event-details") {
+      console.warn(error);
+      this.$notification.warning({
+        message: error?.message ?? "",
+        description: "",
+      });
+    } else console.error(error);
+    this.isLoadingRequests = false;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -577,32 +607,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
         status: newStatus,
       };
     });
-  }
-  // принятие/отклонение заявок
-  async changeRequest(
-    idRequest: number,
-    status: 1 | 2 | 3 | null
-  ): Promise<void> {
-    if (!this.outstudyEvent?.id || !status) return;
-    this.isLoadingRequests = true;
-    const [response, error] = await api.event.memberEventRequestChange(
-      this.accessToken,
-      this.outstudyEvent.id,
-      idRequest,
-      status
-    );
-    if (!error && response) {
-      const find = this.requests.find((item) => item.id === idRequest);
-      find && (find.status = status);
-      await this.getMembers();
-    } else if (error) {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoadingRequests = false;
   }
 
   //* модальное окно и таблица (награждение)
@@ -715,7 +719,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
         message: "Участники награждены",
         description: this.criteriaReward.name,
       });
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "event-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
@@ -759,7 +763,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
           ).toLocaleTimeString()}`)
       );
       this.messageList = response.data;
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "event-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",
@@ -784,7 +788,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     if (!error && response) {
       this.message = "";
       await this.getMessages();
-    } else if (error) {
+    } else if (error && this.$router.currentRoute.name === "event-details") {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",

@@ -40,29 +40,32 @@
       <a-col :span="8">
         <a-card title="Дата и место проведения" hoverable>
           <div class="vertical-margin-element-24">
+            <!-- дата начала -->
             <label class="required-label">Дата начала </label>
             <a-date-picker
               show-time
-              format="YYYY-MM-DD HH:mm"
-              @change="startDateChange"
+              format="DD.MM.YYYY HH:mm"
+              @change="dateChange($event, 'start')"
               style="width: 100%"
             />
           </div>
+          <!-- дата окончания -->
           <div class="vertical-margin-element-24">
             <label class="required-label">Дата окончания </label>
             <a-date-picker
               show-time
-              format="YYYY-MM-DD HH:mm"
-              @change="endDateChange"
+              format="DD.MM.YYYY HH:mm"
+              @change="dateChange($event, 'end')"
               style="width: 100%"
             />
           </div>
+          <!-- дата окончания регистрации -->
           <div class="vertical-margin-element-24">
             <label>Дата окончания регистрации </label>
             <a-date-picker
               show-time
-              format="YYYY-MM-DD HH:mm"
-              @change="endRegistrationDateChange"
+              format="DD.MM.YYYY HH:mm"
+              @change="dateChange($event, 'regEnd')"
               style="width: 100%"
             />
           </div>
@@ -129,6 +132,7 @@ import VEventApiMixin from "@/common/v-event-api-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { OutstudyEvent, TypeEvent } from "../../../../../common/types/model";
+import { Moment } from "moment";
 
 @Component
 export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
@@ -169,27 +173,27 @@ export default class VAddEditEvent extends mixins(VBaseMixin, VEventApiMixin) {
     );
     return find?.name ?? "";
   }
-  //* даты
-  // дата начала
-  // eslint-disable-next-line
-  startDateChange(date: any, dateString: string): void {
-    this.outstudyEvent.dateStart = dateString
-      ? new Date(dateString).toISOString()
-      : null;
-  }
-  // дата окончания
-  // eslint-disable-next-line
-  endDateChange(date: any, dateString: string): void {
-    this.outstudyEvent.dateEnd = dateString
-      ? new Date(dateString).toISOString()
-      : null;
-  }
-  // дата окончания регистрации
-  // eslint-disable-next-line
-  endRegistrationDateChange(date: any, dateString: string): void {
-    this.outstudyEvent.dateRegistrationEnd = dateString
-      ? new Date(dateString).toISOString()
-      : null;
+  /** изменение дат */
+  dateChange(value: Moment | null, type: "start" | "regEnd" | "end"): void {
+    switch (type) {
+      case "start":
+        this.outstudyEvent.dateStart = value
+          ? new Date(value.toString()).toISOString()
+          : null;
+        break;
+      case "regEnd":
+        this.outstudyEvent.dateRegistrationEnd = value
+          ? new Date(value.toString()).toISOString()
+          : null;
+        break;
+      case "end":
+        this.outstudyEvent.dateEnd = value
+          ? new Date(value.toString()).toISOString()
+          : null;
+        break;
+      default:
+        break;
+    }
   }
   // блокировка кнопки
   get disabledButton(): boolean {

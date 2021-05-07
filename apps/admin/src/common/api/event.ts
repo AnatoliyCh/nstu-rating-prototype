@@ -138,14 +138,19 @@ export async function memberEventRequestChange(
   accessToken: string,
   path: string,
   requestBody: { status: number }
-): Promise<[any | undefined, ApiError | undefined]> {
-  return await http.put<{ status: number }, any>(path, requestBody, {
-    headers: {
-      accept: "*/*",
-      "Content-Type": "application/json;charset=UTF-8",
-      Authorization: "Bearer " + accessToken,
-    },
-  });
+): Promise<[boolean | undefined, ApiError | undefined]> {
+  const [response, error] = await http.put<{ status: number }, any>(
+    path,
+    requestBody,
+    {
+      headers: {
+        accept: "*/*",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  return [response ? true : undefined, error];
 }
 /** награждение участников (пользовтелей) по критериям */
 export async function membersReward(
