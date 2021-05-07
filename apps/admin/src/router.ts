@@ -47,7 +47,8 @@ const routes: Array<RouteConfig> = [
         meta: {
           exact: true,
         },
-        component: () => import("@/common/components/user/v-user-space.vue"),
+        component: () =>
+          import("@/common/components/user/rating/v-user-space.vue"),
       },
     ],
   },

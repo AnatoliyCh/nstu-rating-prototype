@@ -33,8 +33,8 @@ import { roles } from "@/common/services/user";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { CreateUser } from "../../../../../common/types/api";
-import { UserRole } from "../../../../../common/types/model";
+import { CreateUser } from "../../../../../../common/types/api";
+import { UserRole } from "../../../../../../common/types/model";
 
 @Component
 export default class VUserSpace extends mixins(VBaseMixin) {
