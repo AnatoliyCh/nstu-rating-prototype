@@ -42,7 +42,7 @@ export default class VModalGetGradebook extends mixins(
   @Model("change", { type: Boolean }) readonly value!: boolean;
   /** изменение видимости */
   @Emit("change")
-  changeVisible(visible: boolean) {
+  changeVisible(visible: boolean): boolean {
     return visible;
   }
   pages: GradebookPage[] = [];

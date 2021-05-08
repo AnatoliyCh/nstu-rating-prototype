@@ -42,12 +42,12 @@
   </a-modal>
 </template>
 <script lang="ts">
-import VPaginationMixin from "@/common/v-pagination-mixin";
-import VBaseMixin from "@/common/v-base-mixin";
-import { mixins } from "vue-class-component";
-import { Component, Emit, Prop, Model } from "vue-property-decorator";
-import { Group } from "../../../../../common/types/model";
 import api from "@/common/api";
+import VBaseMixin from "@/common/v-base-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
+import { mixins } from "vue-class-component";
+import { Component, Emit, Model } from "vue-property-decorator";
+import { Group } from "../../../../../common/types/model";
 
 @Component
 export default class VModalgetGroup extends mixins(
@@ -58,7 +58,7 @@ export default class VModalgetGroup extends mixins(
   @Model("change", { type: Boolean }) readonly value!: boolean;
   /** изменение видимости */
   @Emit("change")
-  changeVisible(visible: boolean) {
+  changeVisible(visible: boolean): boolean {
     return visible;
   }
   groups: Group[] = [];

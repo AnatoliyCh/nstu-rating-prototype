@@ -208,7 +208,7 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     this.renderKey.requestList++;
   }
   /** выбор страницы журнала */
-  setGradebookPage(value: Discipline | null) {
+  setGradebookPage(value: Discipline | null): void {
     this.modalGradebookPagesVisible = false;
     if (!value || !this.request?.achievement) return;
     this.request.gradebookPage = value;

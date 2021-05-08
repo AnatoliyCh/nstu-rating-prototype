@@ -431,6 +431,17 @@ export class Api {
           `rating/api/v1/gradebook/page/disciplin/${disciplinId}/group/${groupId}`
       );
     },
+    getGradebookPageByDisciplineAndStudent: async (
+      accessToken: string,
+      disciplinId: number,
+      studentId: number
+    ) => {
+      return rating.getGradebookPageByDisciplineAndStudent(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/gradebook/page/disciplin/${disciplinId}/student/${studentId}`
+      );
+    },
     getGradebook: async (
       accessToken: string,
       offset: number,

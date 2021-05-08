@@ -45,26 +45,26 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    // return this.data.map((item, index) => ({
-    //   id: item.id ?? index,
-    //   name: item.name,
-    //   balanceScore: item.balanceScore,
-    //   score: item.score,
-    //   eventName: item.event.name,
-    //   discipline: item.discipline?.name ?? "",
-    // }));
-    const a: any[] = [];
-    for (let i = 0; i < 40; i++) {
-      a.push({
-        id: i,
-        name: `name ${i}`,
-        balanceScore: i,
-        score: i,
-        eventName: `eventName ${i}`,
-        discipline: "",
-      });
-    }
-    return a;
+    return this.data.map((item, index) => ({
+      id: item.id ?? index,
+      name: item.name,
+      balanceScore: item.balanceScore,
+      score: item.score,
+      eventName: item.event.name,
+      discipline: item.discipline?.name ?? "",
+    }));
+    // const a: any[] = [];
+    // for (let i = 0; i < 40; i++) {
+    //   a.push({
+    //     id: i,
+    //     name: `name ${i}`,
+    //     balanceScore: i,
+    //     score: i,
+    //     eventName: `eventName ${i}`,
+    //     discipline: "",
+    //   });
+    // }
+    // return a;
   }
   // колонки таблицы
   // eslint-disable-next-line
