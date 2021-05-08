@@ -7,18 +7,18 @@
       :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 18em)' }"
       @change="changePagination"
+      rowKey="id"
     >
-      <div v-if="Boolean(action)" slot="action">
-        <a @click="action.func">{{ action.name }}</a>
+      <div v-if="Boolean(actionName)" slot="action" slot-scope="achievement">
+        <a @click="actionClick(achievement)">{{ actionName }}</a>
       </div>
     </a-table>
   </div>
 </template>
 <script lang="ts">
-import api from "@/common/api";
 import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
-import { Component, Prop } from "vue-property-decorator";
+import { Component, Emit, Prop } from "vue-property-decorator";
 import { Achievement } from "../../../../../../common/types/model";
 
 @Component
@@ -28,13 +28,17 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
   @Prop({ type: Function, default: null }) readonly getData!:
     | ((offset: number, pageSize: number) => Promise<[Achievement[], number]>)
     | null;
-  /** блок действий */
-  @Prop({ type: Object, default: null }) readonly action!: {
-    name: string | null; // название кнопки
-    func: () => void; // функция
-  } | null;
+  /** название действия */
+  @Prop({ type: String, default: null }) actionName!: string | null;
+  /** событие при нажатии */
+  @Emit("action-click") actionClick(
+    value: Achievement | null
+  ): Achievement | null {
+    const find = this.data.find((item) => item.id === value?.id);
+    return find ?? null;
+  }
 
-  async created() {
+  async created(): Promise<void> {
     this.pagination.hideOnSinglePage = false;
     await this.changePagination(this.pagination);
   }
@@ -42,18 +46,32 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
+    // const a: any[] = [];
+    // for (let i = 0; i < 40; i++) {
+    //   a.push({
+    //     id: i,
+    //     name: `name ${i}`,
+    //     balanceScore: i,
+    //     score: i,
+    //     eventName: `eventName ${i}`,
+    //     discipline: "",
+    //   });
+    // }
+    // return a;
     return this.data.map((item, index) => ({
-      key: item.id ?? index,
+      id: item.id ?? index,
       name: item.name,
       balanceScore: item.balanceScore,
       score: item.score,
       eventName: item.event.name,
+      discipline: item.discipline?.name ?? "",
     }));
   }
   // колонки таблицы
   // eslint-disable-next-line
   get tableColumns() {
-    const columns = [
+    // eslint-disable-next-line
+    const columns: any[] = [
       {
         title: "Название",
         dataIndex: "name",
@@ -64,6 +82,7 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         title: "Остаток баллов",
         dataIndex: "balanceScore",
         key: "balanceScore",
+        align: "center",
         ellipsis: true,
         width: 200,
       },
@@ -71,6 +90,7 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         title: "Всего баллов",
         dataIndex: "score",
         key: "score",
+        align: "center",
         ellipsis: true,
         width: 200,
       },
@@ -80,15 +100,26 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         key: "eventName",
         ellipsis: true,
       },
-      {
+    ];
+    const showDiscipline = Boolean(
+      this.data.find((item) => item.discipline?.name)
+    ); //показывать дисциплину при наличии
+    if (showDiscipline)
+      columns.push({
+        title: "Дициплина",
+        dataIndex: "discipline",
+        key: "discipline",
+        width: 200,
+        ellipsis: true,
+      });
+    if (this.actionName)
+      columns.push({
         title: "Действия",
         key: "action",
         width: 150,
         ellipsis: true,
         scopedSlots: { customRender: "action" },
-      },
-    ];
-    if (!this.action) return columns.slice(0, columns.length - 1);
+      });
     return columns;
   }
   /** переключение страниц */

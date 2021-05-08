@@ -4,7 +4,7 @@ export { EventObject, EventRequestObject } from "./event";
 export { ChatObject, MessageObject, CreateChat } from "./chat";
 export { GroupObject, GroupCreate } from "./group";
 export { DisciplineObject, DisciplineCreate } from "./discipline";
-export { AchievementObject } from "./rating";
+export { AchievementObject, AchievementCreate } from "./rating";
 
 /** Объект получения списка объектов с указанием типа */
 export interface ArrayObject<T> {

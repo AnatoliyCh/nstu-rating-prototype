@@ -6,6 +6,7 @@ import {
   CreateUser,
   DisciplineCreate,
   GroupCreate,
+  AchievementCreate,
 } from "../../../../common/types/api";
 import {
   Account,
@@ -334,6 +335,57 @@ export class Api {
         accessToken,
         this.pathBase +
           `rating/api/v1/achievement?offset=${offset}&limit=${limit}`
+      );
+    },
+    getAchievementsHistory: async (
+      accessToken: string,
+      offset: number,
+      limit: number,
+      disciplineId: number | undefined = undefined
+    ) => {
+      return rating.getAchievements(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement/history?offset=${offset}&limit=${limit}` +
+          `${disciplineId ? `&disciplineId=${disciplineId}` : ""}`
+      );
+    },
+    getAchievementRequests: async (
+      accessToken: string,
+      offset: number,
+      limit: number,
+      disciplineId: number | undefined = undefined
+    ) => {
+      return rating.getAchievementRequests(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement/request?offset=${offset}&limit=${limit}` +
+          `${disciplineId ? `&disciplineId=${disciplineId}` : ""}`
+      );
+    },
+    createAchievementRequest: async (
+      accessToken: string,
+      achievementId: number,
+      disciplineId: number,
+      score: number
+    ) => {
+      return rating.createAchievementRequest(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement/${achievementId}/discipline/${disciplineId}/request`,
+        { score: score }
+      );
+    },
+    deleteAchievementRequest: async (
+      accessToken: string,
+      achievementId: number,
+      disciplineId: number,
+      requestId: number
+    ) => {
+      return rating.deleteAchievementRequest(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement/${achievementId}/discipline/${disciplineId}/request/${requestId}`
       );
     },
   };
