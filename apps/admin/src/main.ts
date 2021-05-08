@@ -15,9 +15,12 @@ Vue.component("v-loading", vLoading);
 // таблица достижений пользователя
 import VUserTableAchievements from "@/common/components/user/account/v-user-table-achievements.vue";
 Vue.component("v-user-table-achievements", VUserTableAchievements);
-// модальное окно получение дисциплины
+// модальное окно получения дисциплины
 import VModalGetDiscipline from "@/common/components/discipline/v-modal-get-discipline.vue";
 Vue.component("v-modal-get-discipline", VModalGetDiscipline);
+// модальное окно получение группы
+import VModalgetGroup from "@/common/components/group/v-modal-get-group.vue";
+Vue.component("v-modal-get-group", VModalgetGroup);
 
 new Vue({
   router,

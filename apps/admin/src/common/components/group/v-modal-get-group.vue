@@ -3,10 +3,10 @@
     :visible="value"
     @change="changeVisible"
     :footer="null"
-    title="Выбрать дисциплину"
+    title="Выбрать группу"
     :width="600"
     centered
-    class="v-modal-get-discipline"
+    class="v-modal-get-group"
   >
     <a-table
       :columns="columnsTable"
@@ -17,11 +17,7 @@
       rowKey="id"
       @change="changePagination"
     >
-      <a
-        slot="name"
-        slot-scope="name, discipline"
-        @click="getDiscipline(discipline)"
-      >
+      <a slot="name" slot-scope="name, group" @click="getGroup(group)">
         {{ name }}
       </a>
       <div
@@ -31,14 +27,14 @@
         <span
           style="display: flex; flex-direction: column; justify-content: center"
         >
-          Название дисциплины
+          Название группы
         </span>
         <a-input-search
           v-model="filterName"
           placeholder="поиск по названию..."
           allowClear
           enter-button
-          @search="(pagination.current = 1) && getDisciplines()"
+          @search="(pagination.current = 1) && getGroups()"
           style="width: 45%"
         />
       </div>
@@ -50,11 +46,11 @@ import VPaginationMixin from "@/common/v-pagination-mixin";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component, Emit, Prop, Model } from "vue-property-decorator";
-import { Achievement, Discipline } from "../../../../../common/types/model";
+import { Group } from "../../../../../common/types/model";
 import api from "@/common/api";
 
 @Component
-export default class VModalGetDiscipline extends mixins(
+export default class VModalgetGroup extends mixins(
   VPaginationMixin,
   VBaseMixin
 ) {
@@ -65,35 +61,41 @@ export default class VModalGetDiscipline extends mixins(
   changeVisible(visible: boolean) {
     return visible;
   }
-  disciplines: Discipline[] = [];
+  groups: Group[] = [];
   filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
-    await this.getDisciplines();
+    await this.getGroups();
   }
-  /** получение списка дисциплин */
-  async getDisciplines(): Promise<void> {
+  /** получение списка групп */
+  async getGroups(): Promise<void> {
     this.isDataLoading = true;
-    const [response, error] = await api.discipline.getDisciplines(
+    const [response, error] = await api.group.getGroups(
       this.accessToken,
       this.offset,
       this.pagination.pageSize,
       this.filterName
     );
     if (response && !error) {
-      this.disciplines = response.data ?? [];
+      this.groups = response.data ?? [];
       this.pagination.total = response.size ?? 0;
+    } else if (error && this.$router.currentRoute.name === "group-list") {
+      console.warn(error);
+      this.$notification.error({
+        message: "Не удалось загрузить группы",
+        description: "",
+      });
     }
     this.isDataLoading = false;
   }
   /** возвращает дисциплину parent объекту */
-  @Emit("click") getDiscipline(value: Discipline | null): Discipline | null {
+  @Emit("click") getGroup(value: Group | null): Group | null {
     return value;
   }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    return this.disciplines;
+    return this.groups;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -113,14 +115,14 @@ export default class VModalGetDiscipline extends mixins(
     pagination: VPaginationMixin["pagination"]
   ): Promise<void> {
     this.pagination.current = pagination.current;
-    await this.getDisciplines();
+    await this.getGroups();
   }
 }
 </script>
 
 <style lang="scss">
 @import "src/common/main.scss";
-.v-modal-get-discipline {
+.v-modal-get-group {
   .ant-modal-body {
     padding: 0 !important;
     .ant-table-header-column {
