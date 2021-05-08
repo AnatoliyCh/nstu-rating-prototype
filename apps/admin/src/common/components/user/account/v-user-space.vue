@@ -5,6 +5,9 @@
       class="v-user-space-header-block"
     />
     <div class="v-user-space-body">
+      <a-button @click="modalDisciplinesVisible = true">
+        Создать группу
+      </a-button>
       <a-tabs default-active-key="1" size="small">
         <a-tab-pane key="1" tab="Достижения">
           <v-user-table-achievements
@@ -42,6 +45,9 @@
             <p>{{ request.achievement.name }}</p>
           </div>
           <div class="vertical-margin-element-16">
+            <label>Дисциплина: </label>
+          </div>
+          <div class="vertical-margin-element-16">
             <label>Количество баллов: </label>
             <a-input-number
               v-model="request.requestScore"
@@ -52,6 +58,11 @@
           </div>
         </template>
       </a-modal>
+      <!-- модальное окно выбора дисциплины -->
+      <v-modal-get-discipline
+        v-model="modalDisciplinesVisible"
+        @click="setDiscipline"
+      />
     </div>
   </div>
 </template>
@@ -68,6 +79,7 @@ type TypeRequest = "achievement";
 export default class VUserSpace extends mixins(VBaseMixin) {
   modalRequestVisible = false; // видимость окна для распределения
   modalRequestIsLoading = false; // ожидание отправки запроса
+  modalDisciplinesVisible = false;
   // данные для запроса
   request: null | {
     type: TypeRequest;
@@ -178,6 +190,12 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     this.renderKey.list++;
     this.renderKey.history++;
     this.renderKey.requestList++;
+  }
+  /** выбор дисциплины */
+  setDiscipline(value: Discipline | null) {
+    this.modalDisciplinesVisible = false;
+    if (!value || !this.request?.achievement) return;
+    this.request.discipline = value;
   }
   /** удаление запроса на распределение */
   async deleteAchievementRequest(): Promise<void> {
