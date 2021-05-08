@@ -18,6 +18,7 @@
     </a-page-header>
     <div v-if="!isLoading" class="v-edit-details-group-body">
       <a-row type="flex" justify="start" :gutter="16">
+        <!-- информация -->
         <a-col :span="6">
           <a-card
             title="Основная инфомация"
@@ -35,6 +36,7 @@
             </div>
           </a-card>
         </a-col>
+        <!-- участники -->
         <a-col :span="9">
           <a-card
             title="Участники"
@@ -88,7 +90,7 @@ import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { Group, User } from "../../../../../common/types/model";
+import { Group, User, Gradebook } from "../../../../../common/types/model";
 
 type TypeMember = "user" | "moder";
 
@@ -101,6 +103,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     moderators: [],
   };
   users: User[] = [];
+  gradebook: Gradebook | null = null; // журнал группы
   membersOnly = true; // фильтр только участники
   filterName = ""; // фильтр названия
   // изменение состава участников
@@ -112,10 +115,11 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     const id = Number(this.$route.params["id"]); // id тек. группы
     // получение тек. группы по id
     if (id) {
+      this.group.id = id;
       // тек. группа
       const [response, error] = await api.group.getGroupById(
         this.accessToken,
-        id
+        this.group.id
       );
       if (response && !error) this.group = response;
       else if (error) {
@@ -137,6 +141,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
           description: "",
         });
       } else console.error(errorUsers);
+      this.getGradebook();
     }
     this.isLoading = false;
   }
@@ -240,6 +245,19 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
       });
     }
     return Boolean(response);
+  }
+  /** получение журнала группы */
+  async getGradebook(): Promise<void> {
+    if (!this.isEdit) return;
+    const [response, error] = await api.rating.getGradebook(
+      this.accessToken,
+      0,
+      999,
+      undefined,
+      undefined,
+      this.group?.id ?? undefined
+    );
+    if (response?.data && !error) this.gradebook = response.data[0];
   }
 
   // возможность редактировть

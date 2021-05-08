@@ -161,7 +161,6 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     return [[], 0];
   }
   modalRequestShow(value: Achievement | null, type: TypeRequest): void {
-    this.modalRequestVisible = true;
     if (!value) return;
     this.request = {
       type: type,

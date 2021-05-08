@@ -446,13 +446,17 @@ export class Api {
       accessToken: string,
       offset: number,
       limit: number,
-      studentId: number | undefined = undefined
+      moderatorId: number | undefined = undefined,
+      studentId: number | undefined = undefined,
+      groupId: number | undefined = undefined
     ) => {
       return rating.getGradebook(
         accessToken,
         this.pathBase +
           `rating/api/v1/gradebook?offset=${offset}&limit=${limit}` +
-          `${studentId ? `&studentId=${studentId}` : ""}`
+          `${moderatorId ? `&moderatorId=${moderatorId}` : ""}` +
+          `${studentId ? `&studentId=${studentId}` : ""}` +
+          `${groupId ? `&groupId=${groupId}` : ""}`
       );
     },
   };

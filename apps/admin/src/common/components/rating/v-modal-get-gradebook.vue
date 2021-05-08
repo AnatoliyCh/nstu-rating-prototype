@@ -57,6 +57,7 @@ export default class VModalGetGradebook extends mixins(
       this.accessToken,
       this.offset,
       this.pagination.pageSize,
+      undefined,
       this.currentUser?.id
     );
     if (response && !error) {
