@@ -5,10 +5,8 @@
       class="v-user-space-header-block"
     />
     <div class="v-user-space-body">
-      <a-button @click="modalDisciplinesVisible = true">
-        Создать группу
-      </a-button>
       <a-tabs default-active-key="1" size="small">
+        <!-- достижения -->
         <a-tab-pane key="1" tab="Достижения">
           <v-user-table-achievements
             :key="renderKey.list"
@@ -17,14 +15,16 @@
             @action-click="modalRequestShow($event, 'achievement')"
           />
         </a-tab-pane>
+        <!-- история распределения достижений -->
         <a-tab-pane key="2" tab="История распределения достижений">
           <v-user-table-achievements :getData="getAchievementsHistory" />
         </a-tab-pane>
+        <!-- мои запросы на распределение -->
         <a-tab-pane key="3" tab="Мои запросы на распределение">
           <v-user-table-achievements
             :getData="getAchievementRequests"
             action-name="Отозвать"
-            @action-click="deleteAchievementRequest"
+            @action-click="deleteAchievementRequest($event, 'achievement')"
           />
         </a-tab-pane>
       </a-tabs>
@@ -35,18 +35,27 @@
         :confirm-loading="modalRequestIsLoading"
         :closable="false"
         @ok="modalRequestOk"
-        @cancel="modalRequestcancel"
+        @cancel="modalRequestCancel"
         centered
       >
         <!-- отправка баллов за внеучебные достижения -->
         <template v-if="requestType === 'achievement'">
+          <!-- название -->
           <div class="vertical-margin-element-16">
             <label>Название достижения: </label>
             <p>{{ request.achievement.name }}</p>
           </div>
+          <!-- дисциплина -->
           <div class="vertical-margin-element-16">
-            <label>Дисциплина: </label>
+            <label style="display: block">Дисциплина: </label>
+            <a-input-search
+              :value="selectedDiscipline"
+              placeholder="выбрать дисциплину..."
+              enter-button
+              @search="modalGradebookPagesVisible = true"
+            />
           </div>
+          <!-- количество баллов -->
           <div class="vertical-margin-element-16">
             <label>Количество баллов: </label>
             <a-input-number
@@ -59,9 +68,9 @@
         </template>
       </a-modal>
       <!-- модальное окно выбора дисциплины -->
-      <v-modal-get-discipline
-        v-model="modalDisciplinesVisible"
-        @click="setDiscipline"
+      <v-modal-get-gradebook
+        v-model="modalGradebookPagesVisible"
+        @click="setGradebookPage"
       />
     </div>
   </div>
@@ -71,7 +80,11 @@ import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { Achievement, Discipline } from "../../../../../../common/types/model";
+import {
+  Achievement,
+  Discipline,
+  GradebookPage,
+} from "../../../../../../common/types/model";
 
 type TypeRequest = "achievement";
 
@@ -79,13 +92,13 @@ type TypeRequest = "achievement";
 export default class VUserSpace extends mixins(VBaseMixin) {
   modalRequestVisible = false; // видимость окна для распределения
   modalRequestIsLoading = false; // ожидание отправки запроса
-  modalDisciplinesVisible = false;
+  modalGradebookPagesVisible = false;
   // данные для запроса
   request: null | {
-    type: TypeRequest;
-    achievement: Achievement | null;
+    type: TypeRequest; // тип запроса
+    achievement: Achievement | null; // выбранное достижение
     requestScore: number; // запрашеваемый балл на распределение
-    discipline: Discipline | null; // выбранная дисциплина
+    gradebookPage: GradebookPage | null; // выбранная страница журнала
     requestId: number | null; // при удалении
   } = null;
   renderKey = { list: 0, history: 0, requestList: 0 }; // ключи для рендера
@@ -119,7 +132,8 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     const [response, error] = await api.rating.getAchievementsHistory(
       this.accessToken,
       offset,
-      pageSize
+      pageSize,
+      this.currentUser?.id
     );
     if (response && !error) {
       const data = response.data ?? [];
@@ -136,7 +150,8 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     const [response, error] = await api.rating.getAchievementRequests(
       this.accessToken,
       offset,
-      pageSize
+      pageSize,
+      this.currentUser?.id
     );
     if (response && !error) {
       const data = response.data ?? [];
@@ -146,33 +161,34 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     return [[], 0];
   }
   modalRequestShow(value: Achievement | null, type: TypeRequest): void {
+    this.modalRequestVisible = true;
     if (!value) return;
     this.request = {
       type: type,
       achievement: value,
       requestScore: value.balanceScore ?? 0,
-      discipline: null,
+      gradebookPage: null,
       requestId: null,
     };
     this.modalRequestVisible = true;
   }
-  /** отправка запроса */
+  /** отправка запроса на распределение */
   async modalRequestOk(): Promise<void> {
     this.modalRequestIsLoading = true;
     // создание запроса на распределение
-    if (this.request?.achievement?.id && this.request.discipline?.id) {
+    if (this.request?.achievement?.id && this.request.gradebookPage?.id) {
       const [response, error] = await api.rating.createAchievementRequest(
         this.accessToken,
         this.request.achievement.id,
-        this.request.discipline?.id,
+        this.request.gradebookPage.id,
         this.request.requestScore
       );
       if (response && !error) this.updateKeys();
     }
     this.modalRequestIsLoading = false;
-    this.modalRequestcancel();
+    this.modalRequestCancel();
   }
-  modalRequestcancel(): void {
+  modalRequestCancel(): void {
     this.modalRequestVisible = false;
     // this.request = null;
   }
@@ -191,28 +207,36 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     this.renderKey.history++;
     this.renderKey.requestList++;
   }
-  /** выбор дисциплины */
-  setDiscipline(value: Discipline | null) {
-    this.modalDisciplinesVisible = false;
+  /** выбор страницы журнала */
+  setGradebookPage(value: Discipline | null) {
+    this.modalGradebookPagesVisible = false;
     if (!value || !this.request?.achievement) return;
-    this.request.discipline = value;
+    this.request.gradebookPage = value;
+  }
+  /** выбранная страница журнала */
+  get selectedDiscipline(): string | null {
+    return this.request?.gradebookPage?.discipline?.name ?? null;
   }
   /** удаление запроса на распределение */
-  async deleteAchievementRequest(): Promise<void> {
+  async deleteAchievementRequest(
+    value: Achievement | null,
+    type: TypeRequest
+  ): Promise<void> {
+    //! achievementId или requestId нету!!!!
     this.$confirm({
       title: "Удаление запроса на распределение",
       content: "Вы точно хотите удалить запрос?",
       onOk: async () => {
         if (
           !this.request?.achievement?.id ||
-          !this.request?.discipline?.id ||
+          !this.request?.gradebookPage?.id ||
           !this.request?.requestId
         )
           return;
         const [response, error] = await api.rating.deleteAchievementRequest(
           this.accessToken,
           this.request.achievement.id,
-          this.request.discipline.id,
+          this.request.gradebookPage.id,
           this.request.requestId
         );
         if (response && !error) this.updateKeys();

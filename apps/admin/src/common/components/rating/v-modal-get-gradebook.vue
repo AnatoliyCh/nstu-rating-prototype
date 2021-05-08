@@ -3,10 +3,10 @@
     :visible="value"
     @change="changeVisible"
     :footer="null"
-    title="Выбрать дисциплину"
+    title="Выбрать дисциплину для отправки запроса"
     :width="600"
     centered
-    class="v-modal-get-discipline"
+    class="v-modal-get-gradebook"
   >
     <a-table
       :columns="columnsTable"
@@ -14,34 +14,14 @@
       :loading="isDataLoading"
       :pagination="pagination"
       :scroll="{ y: 'calc(50vh)' }"
-      rowKey="id"
-      @change="changePagination"
     >
       <a
         slot="name"
-        slot-scope="name, discipline"
-        @click="getDiscipline(discipline)"
+        slot-scope="name, record"
+        @click="getGradebookPage(record.page)"
       >
         {{ name }}
       </a>
-      <div
-        slot="customTitle"
-        style="display: flex; justify-content: space-between"
-      >
-        <span
-          style="display: flex; flex-direction: column; justify-content: center"
-        >
-          Название дисциплины
-        </span>
-        <a-input-search
-          v-model="filterName"
-          placeholder="поиск по названию..."
-          allowClear
-          enter-button
-          @search="(pagination.current = 1) && getDisciplines()"
-          style="width: 45%"
-        />
-      </div>
     </a-table>
   </a-modal>
 </template>
@@ -51,10 +31,10 @@ import VBaseMixin from "@/common/v-base-mixin";
 import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component, Emit, Model } from "vue-property-decorator";
-import { Discipline } from "../../../../../common/types/model";
+import { GradebookPage } from "../../../../../common/types/model";
 
 @Component
-export default class VModalGetDiscipline extends mixins(
+export default class VModalGetGradebook extends mixins(
   VPaginationMixin,
   VBaseMixin
 ) {
@@ -65,62 +45,63 @@ export default class VModalGetDiscipline extends mixins(
   changeVisible(visible: boolean) {
     return visible;
   }
-  disciplines: Discipline[] = [];
-  filterName = ""; // фильтр названия
+  pages: GradebookPage[] = [];
 
   async created(): Promise<void> {
-    await this.getDisciplines();
+    await this.getGradebook();
   }
-  /** получение списка дисциплин */
-  async getDisciplines(): Promise<void> {
+  /** получение журнала и его страниц */
+  async getGradebook(): Promise<void> {
     this.isDataLoading = true;
-    const [response, error] = await api.discipline.getDisciplines(
+    const [response, error] = await api.rating.getGradebook(
       this.accessToken,
       this.offset,
       this.pagination.pageSize,
-      this.filterName
+      this.currentUser?.id
     );
     if (response && !error) {
-      this.disciplines = response.data ?? [];
+      // там может прийти массив
+      response.data?.forEach((item) => {
+        this.pages = this.pages.concat(item.pages ?? []);
+      });
       this.pagination.total = response.size ?? 0;
     }
     this.isDataLoading = false;
   }
-  /** возвращает дисциплину parent объекту */
-  @Emit("click") getDiscipline(value: Discipline | null): Discipline | null {
+  /** возвращает страницу журнала, parent объекту */
+  @Emit("click") getGradebookPage(
+    value: GradebookPage | null
+  ): GradebookPage | null {
     return value;
   }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    return this.disciplines;
+    return this.pages.map((item) => ({
+      key: item.id,
+      name: item.discipline?.name ?? "",
+      page: item,
+    }));
   }
   // колонки таблицы
   // eslint-disable-next-line
   get columnsTable() {
     return [
       {
+        title: "Название дисциплинны",
         dataIndex: "name",
         key: "name",
         ellipsis: true,
-        slots: { title: "customTitle" },
         scopedSlots: { customRender: "name" },
       },
     ];
-  }
-  /** переключение страниц */
-  async changePagination(
-    pagination: VPaginationMixin["pagination"]
-  ): Promise<void> {
-    this.pagination.current = pagination.current;
-    await this.getDisciplines();
   }
 }
 </script>
 
 <style lang="scss">
 @import "src/common/main.scss";
-.v-modal-get-discipline {
+.v-modal-get-gradebook {
   .ant-modal-body {
     padding: 0 !important;
     .ant-table-header-column {

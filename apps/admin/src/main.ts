@@ -18,9 +18,12 @@ Vue.component("v-user-table-achievements", VUserTableAchievements);
 // модальное окно получения дисциплины
 import VModalGetDiscipline from "@/common/components/discipline/v-modal-get-discipline.vue";
 Vue.component("v-modal-get-discipline", VModalGetDiscipline);
-// модальное окно получение группы
+// модальное окно получения группы
 import VModalgetGroup from "@/common/components/group/v-modal-get-group.vue";
 Vue.component("v-modal-get-group", VModalgetGroup);
+// модальное окно получения страницы журанала
+import VModalGetGradebook from "@/common/components/rating/v-modal-get-gradebook.vue";
+Vue.component("v-modal-get-gradebook", VModalGetGradebook);
 
 new Vue({
   router,

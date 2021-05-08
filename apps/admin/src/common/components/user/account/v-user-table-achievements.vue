@@ -45,26 +45,26 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    // const a: any[] = [];
-    // for (let i = 0; i < 40; i++) {
-    //   a.push({
-    //     id: i,
-    //     name: `name ${i}`,
-    //     balanceScore: i,
-    //     score: i,
-    //     eventName: `eventName ${i}`,
-    //     discipline: "",
-    //   });
-    // }
-    // return a;
-    return this.data.map((item, index) => ({
-      id: item.id ?? index,
-      name: item.name,
-      balanceScore: item.balanceScore,
-      score: item.score,
-      eventName: item.event.name,
-      discipline: item.discipline?.name ?? "",
-    }));
+    // return this.data.map((item, index) => ({
+    //   id: item.id ?? index,
+    //   name: item.name,
+    //   balanceScore: item.balanceScore,
+    //   score: item.score,
+    //   eventName: item.event.name,
+    //   discipline: item.discipline?.name ?? "",
+    // }));
+    const a: any[] = [];
+    for (let i = 0; i < 40; i++) {
+      a.push({
+        id: i,
+        name: `name ${i}`,
+        balanceScore: i,
+        score: i,
+        eventName: `eventName ${i}`,
+        discipline: "",
+      });
+    }
+    return a;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -78,31 +78,37 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         ellipsis: true,
       },
       {
-        title: "Остаток баллов",
-        dataIndex: "balanceScore",
-        key: "balanceScore",
-        align: "center",
+        title: "Мероприятие",
+        dataIndex: "eventName",
+        key: "eventName",
         ellipsis: true,
-        width: 200,
       },
       {
-        title: "Всего баллов",
+        title: "Баллы",
         dataIndex: "score",
         key: "score",
         align: "center",
         ellipsis: true,
         width: 200,
       },
-      {
-        title: "Мероприятие",
-        dataIndex: "eventName",
-        key: "eventName",
-        ellipsis: true,
-      },
     ];
+    //показывать остаток баллов
+    const showBalanceScore = Boolean(
+      this.data.find((item) => item.balanceScore)
+    );
+    if (showBalanceScore)
+      columns.push({
+        title: "Остаток баллов",
+        dataIndex: "balanceScore",
+        key: "balanceScore",
+        align: "center",
+        ellipsis: true,
+        width: 200,
+      });
+    //показывать дисциплину при наличии
     const showDiscipline = Boolean(
       this.data.find((item) => item.discipline?.name)
-    ); //показывать дисциплину при наличии
+    );
     if (showDiscipline)
       columns.push({
         title: "Дициплина",

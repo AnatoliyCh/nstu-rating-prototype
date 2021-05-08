@@ -5,21 +5,22 @@ import {
   CreateChat,
   CreateUser,
   DisciplineCreate,
+  GradebookPageCreate,
   GroupCreate,
-  AchievementCreate,
 } from "../../../../common/types/api";
 import {
   Account,
   OutstudyEvent,
   TypeEvent,
+  GradebookPage,
 } from "../../../../common/types/model";
 import * as auth from "./auth";
 import * as chat from "./chat";
 import * as discipline from "./discipline";
 import * as event from "./event";
 import * as group from "./group";
-import * as user from "./user";
 import * as rating from "./rating";
+import * as user from "./user";
 
 // API
 export const PATH_BASE = "http://";
@@ -341,51 +342,106 @@ export class Api {
       accessToken: string,
       offset: number,
       limit: number,
-      disciplineId: number | undefined = undefined
+      userId: number | undefined = undefined
     ) => {
-      return rating.getAchievements(
+      return rating.getAchievementsHistory(
         accessToken,
         this.pathBase +
           `rating/api/v1/achievement/history?offset=${offset}&limit=${limit}` +
-          `${disciplineId ? `&disciplineId=${disciplineId}` : ""}`
+          `${userId ? `&userId=${userId}` : ""}`
       );
     },
     getAchievementRequests: async (
       accessToken: string,
       offset: number,
       limit: number,
-      disciplineId: number | undefined = undefined
+      userId: number | undefined = undefined
     ) => {
       return rating.getAchievementRequests(
         accessToken,
         this.pathBase +
           `rating/api/v1/achievement/request?offset=${offset}&limit=${limit}` +
-          `${disciplineId ? `&disciplineId=${disciplineId}` : ""}`
+          `${userId ? `&userId=${userId}` : ""}`
       );
     },
     createAchievementRequest: async (
       accessToken: string,
       achievementId: number,
-      disciplineId: number,
+      gradebookPageId: number,
       score: number
     ) => {
       return rating.createAchievementRequest(
         accessToken,
         this.pathBase +
-          `rating/api/v1/achievement/${achievementId}/discipline/${disciplineId}/request`,
+          `rating/api/v1/achievement/${achievementId}/gradebook/page/${gradebookPageId}/request`,
         { score: score }
       );
     },
     deleteAchievementRequest: async (
       accessToken: string,
       achievementId: number,
-      disciplineId: number,
+      gradebookPageId: number,
       requestId: number
     ) => {
       return rating.deleteAchievementRequest(
         accessToken,
         this.pathBase +
-          `rating/api/v1/achievement/${achievementId}/discipline/${disciplineId}/request/${requestId}`
+          `rating/api/v1/achievement/${achievementId}/radebook/page/${gradebookPageId}/request/${requestId}`
+      );
+    },
+    //* gradebook
+    createGradebookPage: async (
+      accessToken: string,
+      requestBody: GradebookPageCreate
+    ) => {
+      return rating.createGradebookPage(
+        accessToken,
+        this.pathBase + `rating/api/v1/gradebook/page`,
+        requestBody
+      );
+    },
+    сhangeGradebookPage: async (
+      accessToken: string,
+      gradebookPageId: number,
+      moderators: number[]
+    ) => {
+      return rating.сhangeGradebookPage(
+        accessToken,
+        this.pathBase + `rating/api/v1/gradebook/page/${gradebookPageId}`,
+        moderators
+      );
+    },
+    deleteGradebookPage: async (
+      accessToken: string,
+      gradebookPageId: number
+    ) => {
+      return rating.deleteGradebookPage(
+        accessToken,
+        this.pathBase + `rating/api/v1/gradebook/page/${gradebookPageId}`
+      );
+    },
+    getGradebookPageByDisciplineAndGroup: async (
+      accessToken: string,
+      disciplinId: number,
+      groupId: number
+    ) => {
+      return rating.getGradebookPageByDisciplineAndGroup(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/gradebook/page/disciplin/${disciplinId}/group/${groupId}`
+      );
+    },
+    getGradebook: async (
+      accessToken: string,
+      offset: number,
+      limit: number,
+      studentId: number | undefined = undefined
+    ) => {
+      return rating.getGradebook(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/gradebook?offset=${offset}&limit=${limit}` +
+          `${studentId ? `&studentId=${studentId}` : ""}`
       );
     },
   };

@@ -19,3 +19,6 @@ export { Group } from "./group/Group";
 export { Discipline } from "./discipline/Discipline";
 // типы модуля rating
 export { Achievement } from "./rating/Achievement";
+export { Gradebook } from "./rating/Gradebook";
+export { GradebookPage } from "./rating/GradebookPage";
+export { Work } from "./rating/Work";

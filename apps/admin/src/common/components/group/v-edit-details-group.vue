@@ -36,7 +36,11 @@
           </a-card>
         </a-col>
         <a-col :span="9">
-          <a-card title="Участники" class="v-edit-details-group-card" hoverable>
+          <a-card
+            title="Участники"
+            class="v-edit-details-group-card v-edit-details-group-body-card-no-pading"
+            hoverable
+          >
             <div slot="extra">
               <a-input-search
                 v-model="filterName"
@@ -53,7 +57,8 @@
               :data-source="tableData"
               :loading="isLoading"
               :pagination="{ pageSize: 20 }"
-              :scroll="{ y: 'calc(100vh - 25em)' }"
+              size="small"
+              :scroll="{ y: 'calc(100vh - 22em)' }"
             >
               <span slot="isUser" slot-scope="item">
                 <a-checkbox
@@ -96,7 +101,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     moderators: [],
   };
   users: User[] = [];
-  membersOnly = false; // фильтр только участники
+  membersOnly = true; // фильтр только участники
   filterName = ""; // фильтр названия
   // изменение состава участников
   isLoadingMember = false;
@@ -331,6 +336,11 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     margin: 0px 16px;
     .v-edit-details-group-card {
       cursor: default;
+    }
+    &-card-no-pading {
+      .ant-card-body {
+        padding: 0;
+      }
     }
   }
 }
