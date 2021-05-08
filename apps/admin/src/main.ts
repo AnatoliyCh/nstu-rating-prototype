@@ -12,6 +12,9 @@ Vue.use(Antd);
 // регистрация компонентов
 import vLoading from "@/common/components/v-loading.vue";
 Vue.component("v-loading", vLoading);
+// таблица достижений пользователя
+import VUserTableAchievements from "@/common/components/user/account/v-user-table-achievements.vue";
+Vue.component("v-user-table-achievements", VUserTableAchievements);
 
 new Vue({
   router,

@@ -18,6 +18,7 @@ import * as discipline from "./discipline";
 import * as event from "./event";
 import * as group from "./group";
 import * as user from "./user";
+import * as rating from "./rating";
 
 // API
 export const PATH_BASE = "http://";
@@ -320,6 +321,19 @@ export class Api {
       return discipline.deleteDiscipline(
         accessToken,
         this.pathBase + `discipline/api/v1/discipline/${id}`
+      );
+    },
+  };
+  public rating = {
+    getAchievements: async (
+      accessToken: string,
+      offset: number,
+      limit: number
+    ) => {
+      return rating.getAchievements(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement?offset=${offset}&limit=${limit}`
       );
     },
   };

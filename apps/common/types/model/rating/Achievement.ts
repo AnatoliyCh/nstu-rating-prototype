@@ -3,7 +3,7 @@ import { OutstudyEvent, Criteria, Discipline } from "../index";
 export interface Achievement {
   /** ид в БД */
   id?: number | null;
-  /** название (имя критерия сформированное на сервере) */
+  /** название достижения (имя сформированное на сервере) */
   name: string | null;
   /** всего баллов */
   score: number | null;

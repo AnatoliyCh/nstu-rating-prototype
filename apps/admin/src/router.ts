@@ -48,7 +48,7 @@ const routes: Array<RouteConfig> = [
           exact: true,
         },
         component: () =>
-          import("@/common/components/user/rating/v-user-space.vue"),
+          import("@/common/components/user/account/v-user-space.vue"),
       },
     ],
   },
