@@ -42,7 +42,6 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
     this.pagination.hideOnSinglePage = false;
     await this.changePagination(this.pagination);
   }
-
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
