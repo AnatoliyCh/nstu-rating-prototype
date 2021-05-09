@@ -206,6 +206,16 @@ const routes: Array<RouteConfig> = [
         component: () =>
           import("@/common/components/group/v-edit-details-group.vue"),
       },
+      // детальное представление страницы журнала
+      {
+        path: "/group/:groupId/discipline/:disciplineId/gradebook-page",
+        name: "group-gradebook-page",
+        meta: {
+          exact: true,
+        },
+        component: () =>
+          import("@/common/components/group/v-group-gradebook-page.vue"),
+      },
     ],
   },
   //* дисциплины

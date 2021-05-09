@@ -13,7 +13,7 @@ export interface GradebookPage {
     marks?: {
       value: number;
       date: string;
-    };
+    }[];
     bonusScore?: number;
   }[];
   /**  */
