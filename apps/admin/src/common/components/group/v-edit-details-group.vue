@@ -90,7 +90,7 @@
         <!-- список страниц журнала группы -->
         <a-col :span="9">
           <v-group-details-gradebook-pages
-            v-if="this.group.id !== -1 && this.group.id"
+            v-if="this.group.id !== -1 && this.group.id && keyPages"
             :groupId="this.group.id"
             :isEdit="isEdit"
             :key="keyPages"
@@ -113,9 +113,9 @@ import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { Group, User, Gradebook } from "../../../../../common/types/model";
-import VModalAddGradebookPageGroup from "./v-modal-add-gradebook-page-group.vue";
+import { Group, User } from "../../../../../common/types/model";
 import VGroupDetailsGradebookPages from "./v-group-details-gradebook-pages.vue";
+import VModalAddGradebookPageGroup from "./v-modal-add-gradebook-page-group.vue";
 
 type TypeMember = "user" | "moder";
 
@@ -133,7 +133,6 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     moderators: [],
   };
   users: User[] = [];
-  gradebook: Gradebook | null = null; // журнал группы
   modalAddGradebookPageVisible = false; // видимость окна добавления дисциплины
   membersOnly = true; // фильтр только участники
   filterName = ""; // фильтр названия
@@ -177,7 +176,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
           description: "",
         });
       } else console.error(errorUsers);
-      this.getGradebook();
+      this.keyPages++;
     }
     this.isLoading = false;
   }
@@ -282,20 +281,6 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     }
     return Boolean(response);
   }
-  /** получение журнала группы */
-  async getGradebook(): Promise<void> {
-    if (!this.isEdit) return;
-    const [response, error] = await api.rating.getGradebook(
-      this.accessToken,
-      0,
-      999,
-      undefined,
-      undefined,
-      this.group?.id ?? undefined
-    );
-    if (response?.data && !error) this.gradebook = response.data[0];
-  }
-
   // возможность редактировть
   get isEdit(): boolean {
     return this.userAccess.group.create || this.userAccess.group.update;

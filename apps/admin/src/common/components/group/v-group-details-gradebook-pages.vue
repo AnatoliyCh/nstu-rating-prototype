@@ -28,6 +28,14 @@
       >
         {{ name }}
       </a>
+      <a
+        slot="action"
+        slot-scope="record"
+        v-if="isEdit"
+        @click="deletePage(record.page)"
+      >
+        Удалить
+      </a>
     </a-table>
   </a-card>
 </template>
@@ -99,9 +107,16 @@ export default class VGroupDetailsGradebookPages extends mixins(
         ellipsis: true,
         scopedSlots: { customRender: "name" },
       },
+      {
+        title: "Действия",
+        key: "action",
+        width: 200,
+        ellipsis: true,
+        scopedSlots: { customRender: "action" },
+      },
     ];
   }
-  // переход на страницу просмотра группы
+  // переход на страницу просмотра страницы журнала
   goGroupGradebookPage(value: GradebookPage): void {
     if (
       this.groupId === null ||
@@ -113,6 +128,33 @@ export default class VGroupDetailsGradebookPages extends mixins(
     this.routing("group-gradebook-page", {
       groupId: this.groupId.toString(),
       disciplineId: value.discipline.id.toString(),
+    });
+  }
+  // удаление страницы журнала
+  async deletePage(gradebookPage: GradebookPage | null): Promise<void> {
+    if (!gradebookPage || !this.isEdit) return;
+    this.$confirm({
+      title: "Удаление журнала группы",
+      content: `Вы точно хотите удалить страницу журнала: ${gradebookPage.discipline?.name}`,
+      onOk: async () => {
+        if (gradebookPage?.id === null || gradebookPage?.id === undefined)
+          return;
+        const [response, error] = await api.rating.deleteGradebookPage(
+          this.accessToken,
+          gradebookPage.id
+        );
+        if (response && !error) {
+          this.pages = this.pages.filter(
+            (item) => item.id !== gradebookPage.id
+          );
+        } else if (error) {
+          console.warn(error);
+          this.$notification.warning({
+            message: error?.message ?? "",
+            description: "Удаление журнала группы",
+          });
+        }
+      },
     });
   }
 }
