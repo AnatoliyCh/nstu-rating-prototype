@@ -87,6 +87,15 @@
             </a-table>
           </a-card>
         </a-col>
+        <!-- список страниц журнала группы -->
+        <a-col :span="9">
+          <v-group-details-gradebook-pages
+            v-if="this.group.id !== -1 && this.group.id"
+            :groupId="this.group.id"
+            :isEdit="isEdit"
+            :key="keyPages"
+          />
+        </a-col>
       </a-row>
     </div>
     <v-loading v-else />
@@ -94,7 +103,7 @@
     <v-modal-add-gradebook-page-group
       v-model="modalAddGradebookPageVisible"
       :groupId="group.id"
-      @successful="test"
+      @successful="keyPages++"
     />
   </div>
 </template>
@@ -106,12 +115,14 @@ import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { Group, User, Gradebook } from "../../../../../common/types/model";
 import VModalAddGradebookPageGroup from "./v-modal-add-gradebook-page-group.vue";
+import VGroupDetailsGradebookPages from "./v-group-details-gradebook-pages.vue";
 
 type TypeMember = "user" | "moder";
 
 @Component({
   components: {
     "v-modal-add-gradebook-page-group": VModalAddGradebookPageGroup,
+    "v-group-details-gradebook-pages": VGroupDetailsGradebookPages,
   },
 })
 export default class VEditDetailsGroup extends mixins(VBaseMixin) {
@@ -126,11 +137,12 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   modalAddGradebookPageVisible = false; // видимость окна добавления дисциплины
   membersOnly = true; // фильтр только участники
   filterName = ""; // фильтр названия
+  keyPages = 0; // ключ для перерендера списка страниц журнала
   // изменение состава участников
   isLoadingMember = false;
 
-  test(){
-    console.log('1')
+  test() {
+    console.log("1");
   }
 
   async created(): Promise<void> {

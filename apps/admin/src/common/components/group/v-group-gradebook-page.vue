@@ -27,7 +27,7 @@ import { GradebookPage } from "../../../../../common/types/model";
 import { viewFullName } from "@/common/filters";
 import { Dictionary } from "node_modules/vue-router/types/router";
 import api from "@/common/api";
-
+/** страница журнала успеваемости группы, по предмету */
 @Component
 export default class VGroupGradebookPage extends mixins(
   VBaseMixin,

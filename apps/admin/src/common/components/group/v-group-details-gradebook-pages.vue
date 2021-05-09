@@ -1,13 +1,18 @@
 <template>
-  <a-modal
-    :visible="value"
-    @change="changeVisible"
-    :footer="null"
-    title="Выбрать дисциплину для отправки запроса"
-    :width="600"
-    centered
-    class="v-modal-get-gradebook"
+  <a-card
+    title="Журнал группы"
+    class="v-group-details-gradebook-pages"
+    hoverable
   >
+    <div slot="extra">
+      <a-input-search
+        v-model="filterName"
+        key="1"
+        placeholder="поиск по названию..."
+        allowClear
+        style="width: 200px"
+      />
+    </div>
     <a-table
       :columns="columnsTable"
       :data-source="tableData"
@@ -16,36 +21,34 @@
       :scroll="{ y: 'calc(50vh)' }"
     >
       <a
+        v-if="isEdit"
         slot="name"
         slot-scope="name, record"
-        @click="getGradebookPage(record.page)"
+        @click="goGroupGradebookPage(record.page)"
       >
         {{ name }}
       </a>
     </a-table>
-  </a-modal>
+  </a-card>
 </template>
 <script lang="ts">
 import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
 import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
-import { Component, Emit, Model } from "vue-property-decorator";
+import { Component, Emit, Model, Prop } from "vue-property-decorator";
 import { GradebookPage } from "../../../../../common/types/model";
-
+/** страницы журнала успеваемости группы */
 @Component
-export default class VModalGetGradebook extends mixins(
+export default class VGroupDetailsGradebookPages extends mixins(
   VPaginationMixin,
   VBaseMixin
 ) {
-  /** видимость окна */
-  @Model("change", { type: Boolean }) readonly value!: boolean;
-  /** изменение видимости */
-  @Emit("change")
-  changeVisible(visible: boolean): boolean {
-    return visible;
-  }
+  @Prop({ type: Number, default: null }) readonly groupId!: number | null;
+  @Prop({ type: Boolean, default: false }) readonly isEdit!: boolean;
+
   pages: GradebookPage[] = [];
+  filterName = ""; // фильтр названия
 
   async created(): Promise<void> {
     await this.getGradebook();
@@ -58,31 +61,32 @@ export default class VModalGetGradebook extends mixins(
       this.offset,
       this.pagination.pageSize,
       undefined,
-      this.currentUser?.id
+      undefined,
+      this.groupId ?? undefined
     );
     if (response && !error) {
       // там может прийти массив
       response.data?.forEach((item) => {
         this.pages = this.pages.concat(item.pages ?? []);
       });
-      this.pagination.total = this.pages.length;
+      this.pagination.total = this.tableData.length;
     }
     this.isDataLoading = false;
-  }
-  /** возвращает страницу журнала, parent объекту */
-  @Emit("click") getGradebookPage(
-    value: GradebookPage | null
-  ): GradebookPage | null {
-    return value;
   }
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    return this.pages.map((item) => ({
+    let data = this.pages.map((item) => ({
       key: item.id,
       name: item.discipline?.name ?? "",
       page: item,
     }));
+    if (this.filterName)
+      data = data.filter((item) =>
+        item.name.toLowerCase().includes(this.filterName.toLowerCase())
+      );
+    this.pagination.total = data.length;
+    return data;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -97,17 +101,29 @@ export default class VModalGetGradebook extends mixins(
       },
     ];
   }
+  // переход на страницу просмотра группы
+  goGroupGradebookPage(value: GradebookPage): void {
+    if (
+      this.groupId === null ||
+      this.groupId === undefined ||
+      value.discipline?.id === null ||
+      value.discipline?.id === undefined
+    )
+      return;
+    this.routing("group-gradebook-page", {
+      groupId: this.groupId.toString(),
+      disciplineId: value.discipline.id.toString(),
+    });
+  }
 }
 </script>
 
 <style lang="scss">
 @import "src/common/main.scss";
-.v-modal-get-gradebook {
-  .ant-modal-body {
+.v-group-details-gradebook-pages {
+  cursor: default;
+  .ant-card-body {
     padding: 0 !important;
-    .ant-table-header-column {
-      width: 100%;
-    }
   }
 }
 </style>
