@@ -70,6 +70,7 @@ export default class VGroupGradebookPage extends mixins(
   // колонки таблицы
   // eslint-disable-next-line
   get columnsTable() {
+    // eslint-disable-next-line
     const columns: any[] = [
       {
         title: "ФИО студента",
@@ -158,7 +159,7 @@ export default class VGroupGradebookPage extends mixins(
   ): Promise<void> {
     this.pagination.current = pagination.current;
   }
-  test() {
+  test(): void {
     this.gradebookPage = {
       id: 0,
       discipline: {

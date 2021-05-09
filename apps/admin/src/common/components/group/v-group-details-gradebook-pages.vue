@@ -44,7 +44,7 @@ import api from "@/common/api";
 import VBaseMixin from "@/common/v-base-mixin";
 import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
-import { Component, Emit, Model, Prop } from "vue-property-decorator";
+import { Component, Prop } from "vue-property-decorator";
 import { GradebookPage } from "../../../../../common/types/model";
 /** страницы журнала успеваемости группы */
 @Component

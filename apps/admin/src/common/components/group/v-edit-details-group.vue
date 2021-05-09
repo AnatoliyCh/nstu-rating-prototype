@@ -140,10 +140,6 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   // изменение состава участников
   isLoadingMember = false;
 
-  test() {
-    console.log("1");
-  }
-
   async created(): Promise<void> {
     this.isLoading = true;
     this.menuKey = [4];
