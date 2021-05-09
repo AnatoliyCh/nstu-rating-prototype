@@ -7,8 +7,16 @@
     >
       <template slot="extra">
         <a-button
-          v-if="userAccess.group.delete"
+          v-if="isEdit"
           key="2"
+          type="primary"
+          @click="modalAddGradebookPageVisible = true"
+        >
+          Добавить дисциплину
+        </a-button>
+        <a-button
+          v-if="userAccess.group.delete"
+          key="1"
           type="danger"
           @click="deleteGroup"
         >
@@ -82,6 +90,12 @@
       </a-row>
     </div>
     <v-loading v-else />
+    <!-- добавление к группе страницы журнала успеваемости -->
+    <v-modal-add-gradebook-page-group
+      v-model="modalAddGradebookPageVisible"
+      :groupId="group.id"
+      @successful="test"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -91,10 +105,15 @@ import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import { Group, User, Gradebook } from "../../../../../common/types/model";
+import VModalAddGradebookPageGroup from "./v-modal-add-gradebook-page-group.vue";
 
 type TypeMember = "user" | "moder";
 
-@Component
+@Component({
+  components: {
+    "v-modal-add-gradebook-page-group": VModalAddGradebookPageGroup,
+  },
+})
 export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   group: Group = {
     id: -1,
@@ -104,10 +123,15 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
   };
   users: User[] = [];
   gradebook: Gradebook | null = null; // журнал группы
+  modalAddGradebookPageVisible = false; // видимость окна добавления дисциплины
   membersOnly = true; // фильтр только участники
   filterName = ""; // фильтр названия
   // изменение состава участников
   isLoadingMember = false;
+
+  test(){
+    console.log('1')
+  }
 
   async created(): Promise<void> {
     this.isLoading = true;

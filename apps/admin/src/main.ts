@@ -15,13 +15,16 @@ Vue.component("v-loading", vLoading);
 // таблица достижений пользователя
 import VUserTableAchievements from "@/common/components/user/account/v-user-table-achievements.vue";
 Vue.component("v-user-table-achievements", VUserTableAchievements);
+// модальное окно получения пользователя
+import VModalGetUser from "@/common/components/user/v-modal-get-user.vue";
+Vue.component("v-modal-get-user", VModalGetUser);
 // модальное окно получения дисциплины
 import VModalGetDiscipline from "@/common/components/discipline/v-modal-get-discipline.vue";
 Vue.component("v-modal-get-discipline", VModalGetDiscipline);
 // модальное окно получения группы
 import VModalgetGroup from "@/common/components/group/v-modal-get-group.vue";
 Vue.component("v-modal-get-group", VModalgetGroup);
-// модальное окно получения страницы журанала
+// модальное окно получения журанала
 import VModalGetGradebook from "@/common/components/rating/v-modal-get-gradebook.vue";
 Vue.component("v-modal-get-gradebook", VModalGetGradebook);
 

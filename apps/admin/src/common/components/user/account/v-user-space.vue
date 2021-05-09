@@ -67,7 +67,7 @@
           </div>
         </template>
       </a-modal>
-      <!-- модальное окно выбора дисциплины -->
+      <!-- модальное окно выбора дисциплины (страница журнала) -->
       <v-modal-get-gradebook
         v-model="modalGradebookPagesVisible"
         @click="setGradebookPage"
@@ -82,7 +82,6 @@ import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
 import {
   Achievement,
-  Discipline,
   GradebookPage,
 } from "../../../../../../common/types/model";
 
@@ -207,7 +206,7 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     this.renderKey.requestList++;
   }
   /** выбор страницы журнала */
-  setGradebookPage(value: Discipline | null): void {
+  setGradebookPage(value: GradebookPage | null): void {
     this.modalGradebookPagesVisible = false;
     if (!value || !this.request?.achievement) return;
     this.request.gradebookPage = value;

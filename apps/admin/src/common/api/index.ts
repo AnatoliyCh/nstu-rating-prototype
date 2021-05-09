@@ -50,9 +50,15 @@ export class Api {
     },
   };
   public user = {
-    getUsers: async (offset: number, limit: number) => {
+    getUsers: async (offset: number, limit: number, roles: number[] = []) => {
+      let filterRoles = "";
+      if (roles.length) {
+        roles.forEach((item) => (filterRoles += `&roles=${item}`));
+      }
       return user.getUsers(
-        this.pathBase + `user/api/v1/user?offset=${offset}&limit=${limit}`
+        this.pathBase +
+          `user/api/v1/user?offset=${offset}&limit=${limit}` +
+          `${filterRoles ? `${filterRoles}` : ""}`
       );
     },
     createUser: async (accessToken: string, requestBody: CreateUser) => {
