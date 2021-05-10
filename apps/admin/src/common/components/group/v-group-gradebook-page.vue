@@ -83,12 +83,12 @@ export default class VGroupGradebookPage extends mixins(
     ];
     // добавления колонок работ
     if (this.works.length)
-      for (const work of this.works) {
+      for (const [i, work] of this.works.entries()) {
         work.name &&
           columns.push({
+            key: i,
             title: `${work.name}`,
-            dataIndex: `${work.name}`,
-            key: `${work.name}`,
+            dataIndex: `${work.name}_${i}`,
             align: "center",
             width: this.works?.length > 10 ? 100 : null,
           });
@@ -128,7 +128,7 @@ export default class VGroupGradebookPage extends mixins(
           const element = this.works[i];
           if (element.name) {
             const mark = (item.marks && item.marks[i]?.value) ?? 0;
-            row[element.name] = mark.toString();
+            row[`${element.name}_${i}`] = mark.toString();
             sum += mark;
           }
         }

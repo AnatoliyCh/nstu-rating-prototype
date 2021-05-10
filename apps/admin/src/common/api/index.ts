@@ -370,6 +370,18 @@ export class Api {
           `${userId ? `&userId=${userId}` : ""}`
       );
     },
+    createAchievement: async (
+      accessToken: string,
+      score: number,
+      name: string,
+      userId: number
+    ) => {
+      return rating.createAchievement(
+        accessToken,
+        this.pathBase + "rating/api/v1/achievement",
+        { score: score, name: name, userId: userId }
+      );
+    },
     createAchievementRequest: async (
       accessToken: string,
       achievementId: number,

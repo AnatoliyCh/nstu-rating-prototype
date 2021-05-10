@@ -2,6 +2,7 @@
 //* модуль rating
 import {
   AchievementObject,
+  AchievementCreate,
   AchievementRequestCreate,
   GradebookObject,
   GradebookPageCreate,
@@ -44,6 +45,20 @@ export async function getAchievementRequests(
   return await http.get<AchievementObject>(path, {
     headers: {
       accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
+/** создание достижения (преп. для студента) */
+export async function createAchievement(
+  accessToken: string,
+  path: string,
+  requestBody: AchievementCreate
+): Promise<[{ id: number } | undefined, ApiError | undefined]> {
+  return await http.post<AchievementCreate, { id: number }>(path, requestBody, {
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json;charset=UTF-8",
       Authorization: "Bearer " + accessToken,
     },
   });

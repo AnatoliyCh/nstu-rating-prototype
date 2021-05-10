@@ -6,6 +6,7 @@ export { GroupObject, GroupCreate } from "./group";
 export { DisciplineObject, DisciplineCreate } from "./discipline";
 export {
   AchievementObject,
+  AchievementCreate,
   AchievementRequestCreate,
   GradebookPageCreate,
   GradebookObject,

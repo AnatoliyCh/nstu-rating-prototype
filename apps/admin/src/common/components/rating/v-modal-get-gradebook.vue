@@ -78,8 +78,8 @@ export default class VModalGetGradebook extends mixins(
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    return this.pages.map((item) => ({
-      key: item.id,
+    return this.pages.map((item, index) => ({
+      key: index,
       name: item.discipline?.name ?? "",
       page: item,
     }));

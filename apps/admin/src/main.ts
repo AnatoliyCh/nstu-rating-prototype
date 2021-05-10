@@ -24,6 +24,9 @@ Vue.component("v-modal-get-discipline", VModalGetDiscipline);
 // модальное окно получения группы
 import VModalgetGroup from "@/common/components/group/v-modal-get-group.vue";
 Vue.component("v-modal-get-group", VModalgetGroup);
+// модальное окно создания достижения (преп. для студента)
+import VModalCreateAchievement from "@/common/components/rating/v-modal-create-achievement.vue";
+Vue.component("v-modal-create-achievement", VModalCreateAchievement);
 // модальное окно получения журанала
 import VModalGetGradebook from "@/common/components/rating/v-modal-get-gradebook.vue";
 Vue.component("v-modal-get-gradebook", VModalGetGradebook);

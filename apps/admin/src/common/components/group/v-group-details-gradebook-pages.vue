@@ -84,8 +84,8 @@ export default class VGroupDetailsGradebookPages extends mixins(
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    let data = this.pages.map((item) => ({
-      key: item.id,
+    let data = this.pages.map((item, index) => ({
+      key: index,
       name: item.discipline?.name ?? "",
       page: item,
     }));
@@ -112,6 +112,7 @@ export default class VGroupDetailsGradebookPages extends mixins(
         key: "action",
         width: 200,
         ellipsis: true,
+        align: "center",
         scopedSlots: { customRender: "action" },
       },
     ];

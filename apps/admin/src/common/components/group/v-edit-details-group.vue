@@ -101,6 +101,7 @@
     <v-loading v-else />
     <!-- добавление к группе страницы журнала успеваемости -->
     <v-modal-add-gradebook-page-group
+      v-if="isEdit"
       v-model="modalAddGradebookPageVisible"
       :groupId="group.id"
       @successful="keyPages++"

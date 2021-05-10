@@ -43,6 +43,14 @@
             >
               Отправить
             </a-button>
+            <!-- <a-upload
+              :file-list="fileList"
+              :before-upload="beforeUpload"
+              :remove="handleRemove"
+              multiple
+            >
+              <a-button> <a-icon type="upload" /> Выбрать файлы </a-button>
+            </a-upload> -->
           </a-form-item>
         </div>
       </a-comment>
@@ -65,6 +73,8 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   message = ""; // сообщение
   isLoadingMessage = false; // анимация кнопки отправки сообщения
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
+  // файлы
+  fileList: File[] = [];
 
   async created(): Promise<void> {
     this.menuKey = [3];
@@ -153,6 +163,25 @@ export default class VChatDetails extends mixins(VBaseMixin) {
 
     this.routing("chat-list");
   }
+  //* файлы
+  // beforeUpload(file: File) {
+  //   debugger;
+  //   // const a = new FormData();a.set()
+  //   this.fileList = [...this.fileList, file];
+  //   return false;
+  // }
+  // handleRemove(file: File) {
+  //   // const index = this.fileList.indexOf(file);
+  //   // const newFileList = this.fileList.slice();
+  //   // newFileList.splice(index, 1);
+  //   // this.fileList = newFileList;
+  //   var a = document.createElement("a"),
+  //     url = URL.createObjectURL(file);
+  //   a.href = url;
+  //   a.download = file.name;
+  //   document.body.appendChild(a);
+  //   a.click();
+  // }
 }
 </script>
 

@@ -174,7 +174,12 @@ export default class VUserSpace extends mixins(VBaseMixin) {
   async modalRequestOk(): Promise<void> {
     this.modalRequestIsLoading = true;
     // создание запроса на распределение
-    if (this.request?.achievement?.id && this.request.gradebookPage?.id) {
+    if (
+      this.request?.achievement?.id !== null &&
+      this.request?.achievement?.id !== undefined &&
+      this.request.gradebookPage?.id !== null &&
+      this.request.gradebookPage?.id !== undefined
+    ) {
       const [response, error] = await api.rating.createAchievementRequest(
         this.accessToken,
         this.request.achievement.id,
@@ -188,7 +193,9 @@ export default class VUserSpace extends mixins(VBaseMixin) {
   }
   modalRequestCancel(): void {
     this.modalRequestVisible = false;
-    // this.request = null;
+    setTimeout(() => {
+      !this.modalRequestVisible && (this.request = null);
+    }, 2000);
   }
   get modalRequestName(): string {
     return "Запрос на распределение баллов";

@@ -14,16 +14,14 @@ export interface Achievement {
   name: string | null;
   /** всего баллов */
   score: number | null;
-  /** мероприятие, где было получено достижение */
-  event: OutstudyEvent;
-  /** критерий */
-  criterion?: Criteria;
-  /** страница журнала */
-  gradebookPage?: GradebookPage;
   /** остаток баллов */
   balanceScore?: number | null;
-  /** дисциплины */
-  discipline?: Discipline;
+  /** мероприятие, где было получено достижение (при награждении от преподавателя - пусто) */
+  event?: OutstudyEvent;
+  /** страница журнала */
+  gradebookPage?: GradebookPage;
   /** для history user (если свой id то прихожу я) */
   user?: User | null;
+  /** кто наградил (при награждении от мероприятия - пусто) */
+  awardedUser?: User | null;
 }

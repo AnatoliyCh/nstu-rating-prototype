@@ -7,7 +7,6 @@
       :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 18em)' }"
       @change="changePagination"
-      rowKey="id"
     >
       <div v-if="Boolean(actionName)" slot="action" slot-scope="achievement">
         <a @click="actionClick(achievement)">{{ actionName }}</a>
@@ -17,6 +16,7 @@
 </template>
 <script lang="ts">
 import VPaginationMixin from "@/common/v-pagination-mixin";
+import { viewFullName } from "@/common/filters";
 import { mixins } from "vue-class-component";
 import { Component, Emit, Prop } from "vue-property-decorator";
 import { Achievement } from "../../../../../../common/types/model";
@@ -46,12 +46,15 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
   // eslint-disable-next-line
   get tableData() {
     return this.data.map((item, index) => ({
-      id: item.id ?? index,
+      key: index,
+      id: item.id,
       name: item.name,
       balanceScore: item.balanceScore,
       score: item.score,
-      eventName: item.event.name,
-      discipline: item.discipline?.name ?? "",
+      eventName:
+        item.event?.name ??
+        viewFullName(item.awardedUser?.profile ?? null, true),
+      discipline: item.gradebookPage?.discipline?.name ?? "",
     }));
     // const a: any[] = [];
     // for (let i = 0; i < 40; i++) {
@@ -78,7 +81,7 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         ellipsis: true,
       },
       {
-        title: "Мероприятие",
+        title: "Мероприятие / Наградивший",
         dataIndex: "eventName",
         key: "eventName",
         ellipsis: true,
@@ -107,7 +110,7 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
       });
     //показывать дисциплину при наличии
     const showDiscipline = Boolean(
-      this.data.find((item) => item.discipline?.name)
+      this.data.find((item) => item.gradebookPage?.discipline?.name)
     );
     if (showDiscipline)
       columns.push({

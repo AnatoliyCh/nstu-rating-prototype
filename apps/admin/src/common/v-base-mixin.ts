@@ -70,6 +70,12 @@ export default class VBaseMixin extends Vue {
           "тьютор",
           "организатор",
         ]),
+        createAchievement: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+          "преподаватель",
+        ]),
       },
       eventType: {
         viewList: true,
@@ -77,17 +83,20 @@ export default class VBaseMixin extends Vue {
           "администратор",
           "тьютор",
           "организатор",
+          "преподаватель",
         ]),
         view: true,
         delete: this.getIsContainsAccessRole([
           "администратор",
           "тьютор",
           "организатор",
+          "преподаватель",
         ]),
         update: this.getIsContainsAccessRole([
           "администратор",
           "тьютор",
           "организатор",
+          "преподаватель",
         ]),
       },
       group: {
@@ -99,6 +108,7 @@ export default class VBaseMixin extends Vue {
         viewGradebookPage: this.getIsContainsAccessRole([
           "администратор",
           "тьютор",
+          "преподаватель",
         ]),
       },
       discipline: {

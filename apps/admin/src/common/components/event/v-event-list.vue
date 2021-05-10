@@ -22,11 +22,11 @@
           allowClear
         />
         <a-button
-          v-if="userAccess.eventType.create"
+          v-if="userAccess.event.createAchievement"
           key="2"
-          @click="routing('event-type-create')"
+          @click="modalCreateAchievementVisible = true"
         >
-          Создать тип мероприятия
+          Создать достижение
         </a-button>
         <a-button
           v-if="userAccess.event.create"
@@ -121,6 +121,11 @@
         </a-card>
       </a-list-item>
     </a-list>
+    <!-- модальное окно создания достижения (преп. для студента) -->
+    <v-modal-create-achievement
+      v-if="userAccess.event.createAchievement"
+      v-model="modalCreateAchievementVisible"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -147,6 +152,8 @@ export default class VEventList extends mixins(
   dateEnd: Date | null = null;
   status: number | null = null;
   isConfirmed = false;
+
+  modalCreateAchievementVisible = false; // видимость окна для распределения
 
   async created(): Promise<void> {
     this.menuKey = [1];
