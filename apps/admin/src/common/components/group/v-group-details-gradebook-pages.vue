@@ -21,7 +21,6 @@
       :scroll="{ y: 'calc(50vh)' }"
     >
       <a
-        v-if="isEdit"
         slot="name"
         slot-scope="name, record"
         @click="goGroupGradebookPage(record.page)"
@@ -29,9 +28,9 @@
         {{ name }}
       </a>
       <a
+        v-if="isEdit"
         slot="action"
         slot-scope="record"
-        v-if="isEdit"
         @click="deletePage(record.page)"
       >
         Удалить
@@ -99,7 +98,8 @@ export default class VGroupDetailsGradebookPages extends mixins(
   // колонки таблицы
   // eslint-disable-next-line
   get columnsTable() {
-    return [
+    // eslint-disable-next-line
+    const columns: any[] = [
       {
         title: "Название дисциплинны",
         dataIndex: "name",
@@ -107,15 +107,17 @@ export default class VGroupDetailsGradebookPages extends mixins(
         ellipsis: true,
         scopedSlots: { customRender: "name" },
       },
-      {
+    ];
+    if (this.isEdit)
+      columns.push({
         title: "Действия",
         key: "action",
         width: 200,
         ellipsis: true,
         align: "center",
         scopedSlots: { customRender: "action" },
-      },
-    ];
+      });
+    return columns;
   }
   // переход на страницу просмотра страницы журнала
   goGroupGradebookPage(value: GradebookPage): void {

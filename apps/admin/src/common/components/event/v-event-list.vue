@@ -112,7 +112,11 @@
           </div>
           <div class="vertical-margin-element-16">
             <a-space :size="24">
-              <a-button type="primary" @click="registration(event.id)">
+              <a-button
+                v-if="userAccess.event.join"
+                type="primary"
+                @click="registration(event.id)"
+              >
                 {{ event.isNeedMemberConfirmation ? "Заявка" : "Участвовать" }}
               </a-button>
               <a-button @click="goEventDetails(event.id)"> Подробнее </a-button>

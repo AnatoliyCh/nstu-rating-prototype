@@ -107,6 +107,15 @@ export default class VModalAddGradebookPageGroup extends mixins(VBaseMixin) {
 
   /** добавление модератора */
   addModerator(value: User | null): void {
+    const find = this.moderators.some((item) => item.id === value?.id);
+    if (find) {
+      this.$notification.warning({
+        message: "Данный пользователь уже включен в список",
+        description: "",
+      });
+      return;
+    }
+    // добавление
     this.modalUserVisible = false;
     if (!value) return;
     this.moderators.push(value);

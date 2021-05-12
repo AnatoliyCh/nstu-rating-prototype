@@ -6,6 +6,7 @@
     title="Выбрать пользователя"
     :width="600"
     centered
+    @cancel="modalCancel"
     class="v-modal-get-user"
   >
     <a-table
@@ -116,6 +117,15 @@ export default class VModalGetUser extends mixins(
   /** возвращает дисциплину parent объекту */
   @Emit("click") getUser(value: User | null): User | null {
     return value;
+  }
+  modalCancel(): void {
+    this.changeVisible(false);
+    setTimeout(async () => {
+      if (!this.value) {
+        this.filterName = "";
+        await this.changePagination({ ...this.pagination, current: 1 });
+      }
+    }, 2000);
   }
   // данные для таблицы
   // eslint-disable-next-line

@@ -60,7 +60,7 @@
                 style="width: 200px"
               />
               <label> Только участники </label>
-              <a-checkbox v-model="membersOnly" />
+              <a-checkbox v-model="membersOnly" :disabled="!isEdit" />
             </div>
             <a-table
               :columns="tableColumn"

@@ -6,6 +6,7 @@
     title="Выбрать дисциплину"
     :width="600"
     centered
+    @cancel="modalCancel"
     class="v-modal-get-discipline"
   >
     <a-table
@@ -16,6 +17,7 @@
       :scroll="{ y: 'calc(50vh)' }"
       rowKey="id"
       @change="changePagination"
+      :key="keyPage"
     >
       <a
         slot="name"
@@ -67,6 +69,7 @@ export default class VModalGetDiscipline extends mixins(
   }
   disciplines: Discipline[] = [];
   filterName = ""; // фильтр названия
+  keyPage = 0;
 
   async created(): Promise<void> {
     await this.getDisciplines();
@@ -88,7 +91,17 @@ export default class VModalGetDiscipline extends mixins(
   }
   /** возвращает дисциплину parent объекту */
   @Emit("click") getDiscipline(value: Discipline | null): Discipline | null {
+    this.modalCancel();
     return value;
+  }
+  modalCancel(): void {
+    this.changeVisible(false);
+    setTimeout(async () => {
+      if (!this.value) {
+        this.filterName = "";
+        await this.changePagination({ ...this.pagination, current: 1 });
+      }
+    }, 2000);
   }
   // данные для таблицы
   // eslint-disable-next-line

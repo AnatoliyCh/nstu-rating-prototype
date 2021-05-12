@@ -76,6 +76,8 @@ export default class VBaseMixin extends Vue {
           "организатор",
           "преподаватель",
         ]),
+        // присоединиться
+        join: this.getIsContainsAccessRole(["участник"]),
       },
       eventType: {
         viewList: true,
@@ -147,7 +149,7 @@ export default class VBaseMixin extends Vue {
   /** имеется ли роль доступа */
   getIsContainsAccessRole(accessRoles: string[] | null): boolean {
     if (!accessRoles) return false;
-    if (this.isAdmin) return true;
+    // if (this.isAdmin) return true;
     for (const role of this.currentUser?.roles ?? []) {
       if (accessRoles.includes(role.name)) return true;
     }
