@@ -404,7 +404,7 @@ export class Api {
       return rating.deleteAchievementRequest(
         accessToken,
         this.pathBase +
-          `rating/api/v1/achievement/${achievementId}/radebook/page/${gradebookPageId}/request/${requestId}`
+          `rating/api/v1/achievement/${achievementId}/gradebook/page/${gradebookPageId}/request/${requestId}`
       );
     },
     //* gradebook

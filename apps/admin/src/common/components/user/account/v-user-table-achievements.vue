@@ -9,7 +9,7 @@
       @change="changePagination"
     >
       <div v-if="Boolean(actionName)" slot="action" slot-scope="achievement">
-        <a @click="actionClick(achievement)">{{ actionName }}</a>
+        <a @click="actionClick(achievement)"> {{ actionName }} </a>
       </div>
     </a-table>
   </div>
@@ -97,7 +97,9 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
     ];
     //показывать остаток баллов
     const showBalanceScore = Boolean(
-      this.data.find((item) => item.balanceScore)
+      this.data.find(
+        (item) => item.balanceScore !== null && item.balanceScore !== undefined
+      )
     );
     if (showBalanceScore)
       columns.push({

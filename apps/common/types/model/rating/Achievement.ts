@@ -8,8 +8,10 @@ import {
 /** достижение студента */
 export interface Achievement {
   /** ид в БД
-   * для achievement/request это requestId */
+   * для achievement/request это requestId  */
   id?: number | null;
+  /** ид запроса на распределение (для achievement/request) */
+  achievementId?: number | null;
   /** название достижения (имя сформированное на сервере) */
   name: string | null;
   /** всего баллов */

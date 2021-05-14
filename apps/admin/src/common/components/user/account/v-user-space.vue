@@ -17,11 +17,15 @@
         </a-tab-pane>
         <!-- история распределения достижений -->
         <a-tab-pane key="2" tab="История распределения достижений">
-          <v-user-table-achievements :getData="getAchievementsHistory" />
+          <v-user-table-achievements
+            :key="renderKey.history"
+            :getData="getAchievementsHistory"
+          />
         </a-tab-pane>
         <!-- мои запросы на распределение -->
         <a-tab-pane key="3" tab="Мои запросы на распределение">
           <v-user-table-achievements
+            :key="renderKey.requestList"
             :getData="getAchievementRequests"
             action-name="Отозвать"
             @action-click="deleteAchievementRequest($event, 'achievement')"
@@ -35,6 +39,7 @@
         :confirm-loading="modalRequestIsLoading"
         :closable="false"
         @ok="modalRequestOk"
+        :ok-button-props="{ props: { disabled: modalmodalRequestOkDisabled } }"
         @cancel="modalRequestCancel"
         centered
       >
@@ -186,10 +191,24 @@ export default class VUserSpace extends mixins(VBaseMixin) {
         this.request.gradebookPage.id,
         this.request.requestScore
       );
-      if (response && !error) this.updateKeys();
+      if (response && !error) {
+        this.updateKeys();
+        this.$notification.success({
+          message: "Запрос успешно отправлен",
+          description: "",
+        });
+      }
     }
     this.modalRequestIsLoading = false;
     this.modalRequestCancel();
+  }
+  /** блокировка ортправки запроса на распределение */
+  get modalmodalRequestOkDisabled(): boolean {
+    return !(
+      Boolean(this.request?.achievement?.id) &&
+      Boolean(this.request?.gradebookPage?.id) &&
+      Boolean(this.request?.requestScore)
+    );
   }
   modalRequestCancel(): void {
     this.modalRequestVisible = false;
@@ -223,26 +242,18 @@ export default class VUserSpace extends mixins(VBaseMixin) {
     return this.request?.gradebookPage?.discipline?.name ?? null;
   }
   /** удаление запроса на распределение */
-  async deleteAchievementRequest(
-    value: Achievement | null,
-    type: TypeRequest
-  ): Promise<void> {
-    //! achievementId или requestId нету!!!!
+  async deleteAchievementRequest(value: Achievement | null): Promise<void> {
     this.$confirm({
       title: "Удаление запроса на распределение",
       content: "Вы точно хотите удалить запрос?",
       onOk: async () => {
-        if (
-          !this.request?.achievement?.id ||
-          !this.request?.gradebookPage?.id ||
-          !this.request?.requestId
-        )
+        if (!value?.id || !value.achievementId || !value.gradebookPage?.id)
           return;
         const [response, error] = await api.rating.deleteAchievementRequest(
           this.accessToken,
-          this.request.achievement.id,
-          this.request.gradebookPage.id,
-          this.request.requestId
+          value.achievementId,
+          value.gradebookPage?.id,
+          value.id
         );
         if (response && !error) this.updateKeys();
       },

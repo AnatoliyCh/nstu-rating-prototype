@@ -95,8 +95,13 @@ export default class VModalCreateAchievement extends mixins(VBaseMixin) {
       this.name,
       this.student.id
     );
-    if (responce && !error) this.modalCancel();
-    else {
+    if (responce && !error) {
+      this.modalCancel();
+      this.$notification.success({
+        message: "Достижение успешно создано",
+        description: "",
+      });
+    } else {
       console.warn(error);
       this.$notification.warning({
         message: error?.message ?? "",

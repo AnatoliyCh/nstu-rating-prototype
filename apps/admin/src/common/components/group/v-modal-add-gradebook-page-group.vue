@@ -153,6 +153,10 @@ export default class VModalAddGradebookPageGroup extends mixins(VBaseMixin) {
     );
     if (responce && !error) {
       this.$emit("successful");
+      this.$notification.success({
+        message: "Новая страница журнала успешно создана",
+        description: "",
+      });
       this.modalCancel();
     } else {
       console.warn(error);
