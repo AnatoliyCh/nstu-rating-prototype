@@ -212,12 +212,14 @@ export class Api {
     sendMessage: async (
       accessToken: string,
       chatId: number,
-      message: string
+      message: string,
+      files: File[] | null = null
     ) => {
       return chat.sendMessage(
         accessToken,
         this.pathBase + `chat/api/v1/chat/${chatId}/user/message`,
-        { text: message }
+        { text: message },
+        files
       );
     },
   };

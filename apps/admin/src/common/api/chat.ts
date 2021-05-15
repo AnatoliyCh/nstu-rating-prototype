@@ -62,8 +62,24 @@ export async function getMessages(
 export async function sendMessage(
   accessToken: string,
   path: string,
-  requestBody: { text: string }
+  requestBody: { text: string },
+  files: File[] | null = null
 ): Promise<[{ id: number } | undefined, ApiError | undefined]> {
+  // сообщзение с файлами
+  if (files?.length) {
+    const formData = new FormData();
+    // добавление файлов
+    for (const file of files) formData.append("files", file, file.name);
+    formData.append("text", requestBody.text);
+    return await http.post<FormData, { id: number }>(path, formData, {
+      headers: {
+        accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        Authorization: "Bearer " + accessToken,
+      },
+    });
+  }
+  // просто текст
   return await http.post<Parameters<typeof sendMessage>[2], { id: number }>(
     path,
     requestBody,

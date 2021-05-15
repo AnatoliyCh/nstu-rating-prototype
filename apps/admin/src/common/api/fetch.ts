@@ -53,7 +53,11 @@ export async function post<T, U>(
   body: T,
   config?: RequestInit
 ): Promise<[U | undefined, ApiError | undefined]> {
-  const init = { method: "post", body: JSON.stringify(body), ...config };
+  const init = {
+    method: "post",
+    body: body instanceof FormData ? body : JSON.stringify(body),
+    ...config,
+  };
   return await http<U>(path, init);
 }
 export async function put<T, U>(
