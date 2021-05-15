@@ -17,7 +17,7 @@
       >
         <a-list-item slot="renderItem" slot-scope="item">
           <a-comment
-            :author="item.sender"
+            :author="mapFullnameUsers.get(item.sender)"
             :datetime="item.dateTime"
             size="small"
           >
@@ -43,14 +43,15 @@
             >
               Отправить
             </a-button>
-            <!-- <a-upload
-              :file-list="fileList"
+            <a-upload
+              :file-list="files"
               :before-upload="beforeUpload"
               :remove="handleRemove"
               multiple
+              style="margin-left: 8px"
             >
               <a-button> <a-icon type="upload" /> Выбрать файлы </a-button>
-            </a-upload> -->
+            </a-upload>
           </a-form-item>
         </div>
       </a-comment>
@@ -59,6 +60,7 @@
 </template>
 <script lang="ts">
 import api from "@/common/api";
+import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
@@ -69,15 +71,19 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   chatId = Number(this.$route.params["id"]); // id тек. чата
   eventName = this.$route.params["eventName"]; // чат меропрития
   eventId = Number(this.$route.params["eventId"]); // id меропрития
+  // сообщения
   messageList: Message[] = []; // список сообщений
   message = ""; // сообщение
   isLoadingMessage = false; // анимация кнопки отправки сообщения
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
-  // файлы
-  fileList: File[] = [];
+
+  mapFullnameUsers = new Map(); // map id -> ФИО пользователя
+
+  files: File[] = []; // список выбранных файлов
 
   async created(): Promise<void> {
     this.menuKey = [3];
+    await this.getChatById();
     await this.getMessages();
     this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
   }
@@ -88,6 +94,20 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   // элемент списка, для прокрутки
   get elementList(): Element | null {
     return this.$el.querySelector("#list");
+  }
+  /** получение чата по id */
+  async getChatById() {
+    this.isLoading = true;
+    const [response, error] = await api.chat.getChatById(
+      this.accessToken,
+      this.chatId
+    );
+    if (response && !error) {
+      for (const user of response.users ?? [])
+        if ("profile" in user)
+          this.mapFullnameUsers.set(user.id, viewFullName(user.profile, true));
+    }
+    this.isLoading = false;
   }
   // получение списка сообщений
   async getMessages(): Promise<void> {
@@ -116,7 +136,8 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     const [response, error] = await api.chat.sendMessage(
       this.accessToken,
       this.chatId,
-      newMessage
+      newMessage,
+      this.files
     );
     if (!error && response) {
       this.message = "";
@@ -154,34 +175,33 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   /** возвращение к списку четов или меропрития */
   backRouting(): void {
     if (this.eventName) {
-      this.$router.push({
-        name: "event-details",
-        params: { id: this.eventId.toString() },
-      });
+      this.routing("event-details", { id: this.eventId.toString() });
       return;
     }
 
     this.routing("chat-list");
   }
   //* файлы
-  // beforeUpload(file: File) {
-  //   debugger;
-  //   // const a = new FormData();a.set()
-  //   this.fileList = [...this.fileList, file];
-  //   return false;
-  // }
-  // handleRemove(file: File) {
-  //   // const index = this.fileList.indexOf(file);
-  //   // const newFileList = this.fileList.slice();
-  //   // newFileList.splice(index, 1);
-  //   // this.fileList = newFileList;
-  //   var a = document.createElement("a"),
-  //     url = URL.createObjectURL(file);
-  //   a.href = url;
-  //   a.download = file.name;
-  //   document.body.appendChild(a);
-  //   a.click();
-  // }
+  // добавление файлов в список
+  beforeUpload(file: File) {
+    // const a = new FormData();a.set()
+    this.files = [...this.files, file];
+    return false;
+  }
+  // удаление файлов из списка
+  handleRemove(file: File) {
+    const index = this.files.indexOf(file);
+    const newFileList = this.files.slice();
+    newFileList.splice(index, 1);
+    this.files = newFileList;
+    // скачивание
+    // var a = document.createElement("a"),
+    //   url = URL.createObjectURL(file);
+    // a.href = url;
+    // a.download = file.name;
+    // document.body.appendChild(a);
+    // a.click();
+  }
 }
 </script>
 
@@ -202,6 +222,10 @@ export default class VChatDetails extends mixins(VBaseMixin) {
       max-height: calc(100% - 250px);
       overflow: auto;
     }
+  }
+  // ширина списка файлов
+  .ant-upload-list.ant-upload-list-text {
+    width: 25%;
   }
 }
 </style>
