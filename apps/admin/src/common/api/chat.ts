@@ -5,6 +5,7 @@ import {
   CreateChat,
   MessageObject,
 } from "../../../../common/types/api";
+import { Chat } from "../../../../common/types/model";
 import * as http from "../api";
 
 /** создание чата */
@@ -27,6 +28,18 @@ export async function getChats(
   path: string
 ): Promise<[ChatObject | undefined, ApiError | undefined]> {
   return await http.get<ChatObject>(path, {
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
+/** получение чата по id */
+export async function getChatById(
+  accessToken: string,
+  path: string
+): Promise<[Chat | undefined, ApiError | undefined]> {
+  return await http.get<Chat>(path, {
     headers: {
       accept: "application/json",
       Authorization: "Bearer " + accessToken,

@@ -191,6 +191,12 @@ export class Api {
         this.pathBase + `chat/api/v1/chat?offset=${offset}&limit=${limit}`
       );
     },
+    getChatById: async (accessToken: string, id: number) => {
+      return chat.getChatById(
+        accessToken,
+        this.pathBase + `chat/api/v1/chat/${id}`
+      );
+    },
     getMessages: async (
       accessToken: string,
       idChat: number,
