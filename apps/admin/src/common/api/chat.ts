@@ -74,7 +74,6 @@ export async function sendMessage(
     return await http.post<FormData, { id: number }>(path, formData, {
       headers: {
         accept: "application/json",
-        "Content-Type": "multipart/form-data",
         Authorization: "Bearer " + accessToken,
       },
     });

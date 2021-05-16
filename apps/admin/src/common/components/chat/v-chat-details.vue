@@ -22,6 +22,37 @@
             size="small"
           >
             <p slot="content">{{ item.text }}</p>
+            <!-- файлы -->
+            <template v-if="item.files.length">
+              <template v-for="(file, index) in item.files">
+                <!-- длинное название -->
+                <a-tooltip
+                  v-if="file.name.length > maxLengthFileName"
+                  :key="index"
+                  :title="file.name"
+                >
+                  <a-button
+                    type="primary"
+                    icon="download"
+                    size="small"
+                    @click="getFile(file.path)"
+                  >
+                    {{ `${file.name.slice(0, maxLengthFileName)}...` }}
+                  </a-button>
+                </a-tooltip>
+                <!-- короткое название -->
+                <a-button
+                  v-else
+                  :key="index"
+                  type="primary"
+                  icon="download"
+                  size="small"
+                  @click="getFile(file.path)"
+                >
+                  {{ file.name }}
+                </a-button>
+              </template>
+            </template>
           </a-comment>
         </a-list-item>
       </a-list>
@@ -80,6 +111,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   mapFullnameUsers = new Map(); // map id -> ФИО пользователя
 
   files: File[] = []; // список выбранных файлов
+  maxLengthFileName = 20;
 
   async created(): Promise<void> {
     this.menuKey = [3];
@@ -141,6 +173,7 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     );
     if (!error && response) {
       this.message = "";
+      this.files = [];
       await this.getMessages();
     } else if (error) {
       console.warn(error);
@@ -178,18 +211,16 @@ export default class VChatDetails extends mixins(VBaseMixin) {
       this.routing("event-details", { id: this.eventId.toString() });
       return;
     }
-
     this.routing("chat-list");
   }
   //* файлы
   // добавление файлов в список
-  beforeUpload(file: File) {
-    // const a = new FormData();a.set()
+  beforeUpload(file: File): boolean {
     this.files = [...this.files, file];
     return false;
   }
   // удаление файлов из списка
-  handleRemove(file: File) {
+  handleRemove(file: File): void {
     const index = this.files.indexOf(file);
     const newFileList = this.files.slice();
     newFileList.splice(index, 1);
@@ -201,6 +232,13 @@ export default class VChatDetails extends mixins(VBaseMixin) {
     // a.download = file.name;
     // document.body.appendChild(a);
     // a.click();
+  }
+  // получение файла
+  getFile(path: string): void {
+    let newWindow = window.open(`${api.pathBase}${path.slice(1, path.length)}`);
+    // setTimeout(() => {
+    //   newWindow && newWindow.close();
+    // }, 500);
   }
 }
 </script>
@@ -226,6 +264,13 @@ export default class VChatDetails extends mixins(VBaseMixin) {
   // ширина списка файлов
   .ant-upload-list.ant-upload-list-text {
     width: 25%;
+  }
+  // блок с файлами
+  .ant-comment-nested {
+    > * {
+      margin-right: 8px;
+      margin-bottom: 4px;
+    }
   }
 }
 </style>

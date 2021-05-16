@@ -10,6 +10,8 @@ export interface Message {
     id?: number | null;
     /** путь на сервере */
     path?: string | null;
+    /** название файла */
+    name: string | null;
   };
   /** время сообщения */
   dateTime: string | null;
