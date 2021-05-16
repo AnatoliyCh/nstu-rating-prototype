@@ -6,7 +6,7 @@
       @back="goGroupDetails"
     >
       <template slot="extra">
-        <a-button key="1" type="primary" @click="routing('event-create')">
+        <a-button key="1" type="primary" @click="modalRequestsVisible = true">
           Заявки на распределение
         </a-button>
       </template>
@@ -20,6 +20,10 @@
       bordered
       size="small"
       @change="changePagination"
+    />
+    <v-modal-change-achievement-request
+      v-model="modalRequestsVisible"
+      :requests="achievementRequests"
     />
   </div>
 </template>
@@ -43,6 +47,7 @@ export default class VGroupGradebookPage extends mixins(
   disciplineId = Number(this.$route.params["disciplineId"]);
 
   achievementRequests: Achievement[] = []; // список запросов на распределение баллов
+  modalRequestsVisible = false; // видимость модального окна распределения запросов
 
   async created(): Promise<void> {
     this.menuKey = [4];
@@ -72,10 +77,7 @@ export default class VGroupGradebookPage extends mixins(
       undefined,
       this.gradebookPage.id
     );
-    if (response && !error) {
-      this.achievementRequests = response.data ?? [];
-      console.log(this.achievementRequests);
-    }
+    if (response && !error) this.achievementRequests = response.data ?? [];
   }
   /** доступ к этой странице */
   get viewGradebookPage(): boolean {

@@ -175,7 +175,10 @@
                   style="width: 100%"
                   disabled
                 />
-                <a-button @click="showModalReward(criteria)">
+                <a-button
+                  v-if="userAccess.event.reward"
+                  @click="showModalReward(criteria)"
+                >
                   Наградить
                 </a-button>
               </a-space>
@@ -205,7 +208,10 @@
                   style="width: 100%"
                   disabled
                 />
-                <a-button @click="showModalReward(criteria)">
+                <a-button
+                  v-if="userAccess.event.reward"
+                  @click="showModalReward(criteria)"
+                >
                   Наградить
                 </a-button>
               </a-space>
@@ -233,9 +239,9 @@
             >
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
-                  <a slot="title" href="">
+                  <label slot="title">
                     {{ item.profile | viewFullName }}
-                  </a>
+                  </label>
                 </a-list-item-meta>
               </a-list-item>
             </a-list>

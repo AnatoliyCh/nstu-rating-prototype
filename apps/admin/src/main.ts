@@ -30,6 +30,12 @@ Vue.component("v-modal-create-achievement", VModalCreateAchievement);
 // модальное окно получения журанала
 import VModalGetGradebook from "@/common/components/rating/v-modal-get-gradebook.vue";
 Vue.component("v-modal-get-gradebook", VModalGetGradebook);
+// модальное окно изменения статуса заявки на распределение
+import VModalChangeAchievementRequest from "@/common/components/rating/v-modal-change-achievement-request.vue";
+Vue.component(
+  "v-modal-change-achievement-request",
+  VModalChangeAchievementRequest
+);
 
 new Vue({
   router,

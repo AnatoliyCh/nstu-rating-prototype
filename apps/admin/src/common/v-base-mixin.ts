@@ -78,6 +78,13 @@ export default class VBaseMixin extends Vue {
         ]),
         // присоединиться
         join: this.getIsContainsAccessRole(["участник"]),
+        // награждение
+        reward: this.getIsContainsAccessRole([
+          "администратор",
+          "тьютор",
+          "организатор",
+          "преподаватель",
+        ]),
       },
       eventType: {
         viewList: true,

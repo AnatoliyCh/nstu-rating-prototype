@@ -369,13 +369,15 @@ export class Api {
       accessToken: string,
       offset: number,
       limit: number,
-      userId: number | undefined = undefined
+      userId: number | undefined = undefined,
+      gradebookPageId: number | undefined = undefined
     ) => {
       return rating.getAchievementRequests(
         accessToken,
         this.pathBase +
           `rating/api/v1/achievement/request?offset=${offset}&limit=${limit}` +
-          `${userId ? `&userId=${userId}` : ""}`
+          `${userId ? `&userId=${userId}` : ""}` +
+          `${gradebookPageId ? `&gradebookPageId=${gradebookPageId}` : ""}`
       );
     },
     createAchievement: async (
@@ -413,6 +415,21 @@ export class Api {
         accessToken,
         this.pathBase +
           `rating/api/v1/achievement/${achievementId}/gradebook/page/${gradebookPageId}/request/${requestId}`
+      );
+    },
+    changeAchievementRequest: async (
+      accessToken: string,
+      achievementId: number,
+      gradebookPageId: number,
+      requestId: number,
+      status: 1 | 2 | 3
+    ) => {
+      // 1 - WAIT, 2 - APPROVED, 3- REJECTED
+      return rating.changeAchievementRequest(
+        accessToken,
+        this.pathBase +
+          `rating/api/v1/achievement/${achievementId}/gradebook/page/${gradebookPageId}/request/${requestId}`,
+        { status: status }
       );
     },
     //* gradebook
