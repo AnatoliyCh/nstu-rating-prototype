@@ -16,12 +16,12 @@
           />
         </a-tab-pane>
         <!-- история распределения достижений -->
-        <a-tab-pane key="2" tab="История распределения достижений">
+        <!-- <a-tab-pane key="2" tab="История распределения достижений">
           <v-user-table-achievements
             :key="renderKey.history"
             :getData="getAchievementsHistory"
           />
-        </a-tab-pane>
+        </a-tab-pane> -->
         <!-- мои запросы на распределение -->
         <a-tab-pane key="3" tab="Мои запросы на распределение">
           <v-user-table-achievements
