@@ -5,6 +5,11 @@
       class="v-group-gradebook-page-header-block"
       @back="goGroupDetails"
     >
+      <template slot="extra">
+        <a-button key="1" type="primary" @click="routing('event-create')">
+          Заявки на распределение
+        </a-button>
+      </template>
     </a-page-header>
     <a-table
       :columns="columnsTable"
@@ -23,7 +28,7 @@ import VBaseMixin from "@/common/v-base-mixin";
 import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component } from "vue-property-decorator";
-import { GradebookPage } from "../../../../../common/types/model";
+import { Achievement, GradebookPage } from "../../../../../common/types/model";
 import { viewFullName } from "@/common/filters";
 import { Dictionary } from "node_modules/vue-router/types/router";
 import api from "@/common/api";
@@ -36,6 +41,8 @@ export default class VGroupGradebookPage extends mixins(
   gradebookPage: GradebookPage | null = null; // отображаемая сущность
   groupId = Number(this.$route.params["groupId"]);
   disciplineId = Number(this.$route.params["disciplineId"]);
+
+  achievementRequests: Achievement[] = []; // список запросов на распределение баллов
 
   async created(): Promise<void> {
     this.menuKey = [4];
@@ -52,7 +59,23 @@ export default class VGroupGradebookPage extends mixins(
     if (response && !error) this.gradebookPage = response;
     // this.test();
     this.pagination.total = this.gradebookPage?.studentsMarks?.length ?? 0;
+    await this.getAchievementRequests();
     this.isDataLoading = false;
+  }
+  /** получение всех запросов на распределение для этой дисциплины */
+  async getAchievementRequests() {
+    if (!this.gradebookPage?.id) return;
+    const [response, error] = await api.rating.getAchievementRequests(
+      this.accessToken,
+      0,
+      99999,
+      undefined,
+      this.gradebookPage.id
+    );
+    if (response && !error) {
+      this.achievementRequests = response.data ?? [];
+      console.log(this.achievementRequests);
+    }
   }
   /** доступ к этой странице */
   get viewGradebookPage(): boolean {
@@ -149,14 +172,12 @@ export default class VGroupGradebookPage extends mixins(
   }
   /** название заголовка страницы */
   get titleName(): string {
-    return `Просмотр: страница журнала ${
+    return `Просмотр: страница журнала дисциплины "${
       this.gradebookPage?.discipline?.name ?? ""
-    }`;
+    }"`;
   }
   /** переключение страниц */
-  async changePagination(
-    pagination: VPaginationMixin["pagination"]
-  ): Promise<void> {
+  changePagination(pagination: VPaginationMixin["pagination"]): void {
     this.pagination.current = pagination.current;
   }
   test(): void {
