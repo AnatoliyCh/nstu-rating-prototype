@@ -17,8 +17,19 @@ export const PATH_PROXY_HOST = PATH_PROXY + PATH_HOST; // прокси + хос�
 
 export class Api {
   basePath: string;
+  /** путь к приложению авторизации */
+  pathAuthorization: string;
+
   public constructor() {
-    this.basePath = PATH_BASE + PATH_HOST;
+    const pathOrigin: string = (window as any).PATH_APP.origin;
+    if (pathOrigin && typeof pathOrigin === "string") {
+      this.basePath = PATH_BASE + pathOrigin;
+      this.pathAuthorization =
+        this.basePath + (window as any).PATH_APP.authorization;
+    } else {
+      this.basePath = PATH_BASE + PATH_HOST;
+      this.pathAuthorization = PATH_BASE + PATH_HOST + "authorization";
+    }
   }
   public auth = {
     login: async (requestBody: Account) => {
