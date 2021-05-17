@@ -9,7 +9,14 @@
       @change="changePagination"
     >
       <div v-if="Boolean(actionName)" slot="action" slot-scope="achievement">
-        <a @click="actionClick(achievement)"> {{ actionName }} </a>
+        <a
+          v-if="
+            !Boolean(achievement.status) || achievement.status === 'Ожидание'
+          "
+          @click="actionClick(achievement)"
+        >
+          {{ actionName }}
+        </a>
       </div>
     </a-table>
   </div>
@@ -55,19 +62,8 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         item.event?.name ??
         viewFullName(item.awardedUser?.profile ?? null, true),
       discipline: item.gradebookPage?.discipline?.name ?? "",
+      status: this.getStatusRequestToText(item.status),
     }));
-    // const a: any[] = [];
-    // for (let i = 0; i < 40; i++) {
-    //   a.push({
-    //     id: i,
-    //     name: `name ${i}`,
-    //     balanceScore: i,
-    //     score: i,
-    //     eventName: `eventName ${i}`,
-    //     discipline: "",
-    //   });
-    // }
-    // return a;
   }
   // колонки таблицы
   // eslint-disable-next-line
@@ -122,12 +118,24 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
         width: 200,
         ellipsis: true,
       });
+    //показывать статус при наличии
+    const showStatus = Boolean(this.data.find((item) => item.status));
+    if (showStatus)
+      columns.push({
+        title: "Статус",
+        dataIndex: "status",
+        key: "status",
+        width: 200,
+        align: "center",
+        ellipsis: true,
+      });
     if (this.actionName)
       columns.push({
         title: "Действия",
         key: "action",
         width: 150,
         ellipsis: true,
+        align: "center",
         scopedSlots: { customRender: "action" },
       });
     return columns;
@@ -147,6 +155,19 @@ export default class VUserTableAchievements extends mixins(VPaginationMixin) {
       this.pagination.total = total;
     }
     this.isDataLoading = false;
+  }
+  /** приобразование кода статуса в текстовывй вариант */
+  getStatusRequestToText(status: Achievement["status"]): string {
+    switch (status) {
+      case 1:
+        return "Ожидание";
+      case 2:
+        return "Принят";
+      case 3:
+        return "Отклонён";
+      default:
+        return "";
+    }
   }
 }
 </script>

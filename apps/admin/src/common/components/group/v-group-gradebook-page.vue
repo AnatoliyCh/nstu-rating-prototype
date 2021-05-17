@@ -24,6 +24,7 @@
     <v-modal-change-achievement-request
       v-model="modalRequestsVisible"
       :requests="achievementRequests"
+      @successful="getAchievementRequests"
     />
   </div>
 </template>
@@ -51,7 +52,10 @@ export default class VGroupGradebookPage extends mixins(
 
   async created(): Promise<void> {
     this.menuKey = [4];
-    if (!this.viewGradebookPage) this.goGroupDetails();
+    if (!this.viewGradebookPage) {
+      this.goGroupDetails();
+      return;
+    }
     this.isDataLoading = true;
     const [
       response,

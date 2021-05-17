@@ -26,4 +26,7 @@ export interface Achievement {
   user?: User | null;
   /** кто наградил (при награждении от мероприятия - пусто) */
   awardedUser?: User | null;
+  /** статус для request
+   * 1 - WAIT, 2 - APPROVED, 3- REJECTED */
+  status?: 1 | 2 | 3 | null;
 }

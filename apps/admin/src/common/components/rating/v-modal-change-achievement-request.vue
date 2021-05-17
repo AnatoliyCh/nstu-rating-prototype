@@ -16,13 +16,20 @@
       :scroll="{ y: 'calc(50vh)' }"
     >
       <div slot="action" slot-scope="record">
-        <a @click="!isLoading && changeAchievementRequest(record.request, 2)">
+        <!-- принимаем если статус ожидание/отклонено -->
+        <a
+          v-if="record.status === 1 || record.status === 3"
+          @click="!isLoading && changeAchievementRequest(record.request, 2)"
+        >
           Принять
         </a>
-        <a-divider type="vertical" />
-        <a @click="!isLoading && changeAchievementRequest(record.request, 3)">
-          Отклонить
-        </a>
+        <a-divider v-if="record.status === 1" type="vertical" />
+        <template v-if="record.status === 1 || record.status === 2">
+          <!-- отклоняем если статус принято -->
+          <a @click="!isLoading && changeAchievementRequest(record.request, 3)">
+            Отклонить
+          </a>
+        </template>
       </div>
     </a-table>
   </a-modal>
@@ -74,10 +81,16 @@ export default class VModalChangeAchievementRequest extends mixins(
       status
     );
     if (response && !error) {
+      const text =
+        status === 2
+          ? "Баллы успешно распределены"
+          : "Заявка успешно отклонена";
+      value.status = status;
       this.$notification.success({
-        message: "Баллы успешно распределены",
+        message: text,
         description: "",
       });
+      this.$emit("successful"); // обновление данных в родительском элементе
     } else {
       console.warn(error);
       this.$notification.warning({
@@ -85,6 +98,7 @@ export default class VModalChangeAchievementRequest extends mixins(
         description: "",
       });
     }
+
     this.isLoading = false;
   }
   // данные для таблицы
@@ -94,6 +108,7 @@ export default class VModalChangeAchievementRequest extends mixins(
       key: index,
       name: viewFullName(item.user?.profile ?? null, true),
       score: item.score,
+      status: item.status,
       request: item,
     }));
   }

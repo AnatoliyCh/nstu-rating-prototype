@@ -21,12 +21,14 @@
       :scroll="{ y: 'calc(50vh)' }"
     >
       <a
+        v-if="isEdit"
         slot="name"
         slot-scope="name, record"
         @click="goGroupGradebookPage(record.page)"
       >
         {{ name }}
       </a>
+      <label v-else> {{ name }} </label>
       <a
         v-if="isEdit"
         slot="action"
