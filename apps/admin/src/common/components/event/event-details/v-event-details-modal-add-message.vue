@@ -49,7 +49,7 @@ import { User, Discipline } from "../../../../../../common/types/model";
 import { GradebookPageCreate } from "../../../../../../common/types/api";
 import { viewFullName } from "@/common/filters";
 import api from "@/common/api";
-/** добавление к группе страницы журнала успеваемости */
+/** новая записьв ленту мероприятия */
 @Component
 export default class VEventDetailsModalAddMessage extends mixins(VBaseMixin) {
   /** видимость окна */
@@ -115,6 +115,9 @@ export default class VEventDetailsModalAddMessage extends mixins(VBaseMixin) {
 <style lang="scss">
 @import "src/common/main.scss";
 .v-event-details-modal-add-message {
+  .ant-modal-body {
+    padding: 0 24px;
+  }
   .ant-row.ant-form-item {
     margin: 0;
   }

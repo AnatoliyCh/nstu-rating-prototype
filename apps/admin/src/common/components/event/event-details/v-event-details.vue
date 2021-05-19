@@ -32,11 +32,17 @@
           <v-event-details-info
             :event="event"
             :members="members"
+            :requestMembersCount="requests.length"
             @addMember="getMembers()"
-            @AddMessageVisible="modalAddMessageVisible = true"
+            @requestsMembersVisible="modalRequestsMembersVisible = true"
+            @addMessageVisible="modalAddMessageVisible = true"
           />
           <!-- участники -->
-          <v-event-details-members :members="members" />
+          <v-event-details-members
+            v-if="event"
+            :members="members"
+            :eventId="event.id"
+          />
         </a-col>
         <a-col :span="14">
           <!-- чат/лог -->
@@ -53,6 +59,14 @@
         v-if="event && event.chat"
         :chatId="event.chat.id"
         @newMessage="keyChat++"
+      />
+      <!-- принятие заявок -->
+      <v-event-details-modal-change-requests-members
+        v-model="modalRequestsMembersVisible"
+        v-if="event"
+        :eventId="event.id"
+        :requestsMembers="requests"
+        @changeRequest="getMembers()"
       />
     </div>
   </div>
@@ -76,6 +90,7 @@ import VEventDetailsInfo from "./v-event-details-info.vue";
 import VEventDetailsMembers from "./v-event-details-members.vue";
 import VEventDetailsChat from "./v-event-details-chat.vue";
 import VEventDetailsModalAddMessage from "./v-event-details-modal-add-message.vue";
+import VEventDetailsModalChangeRequestsMembers from "./v-event-details-modal-change-requests-members.vue";
 
 @Component({
   components: {
@@ -83,14 +98,17 @@ import VEventDetailsModalAddMessage from "./v-event-details-modal-add-message.vu
     "v-event-details-members": VEventDetailsMembers,
     "v-event-details-chat": VEventDetailsChat,
     "v-event-details-modal-add-message": VEventDetailsModalAddMessage,
+    "v-event-details-modal-change-requests-members": VEventDetailsModalChangeRequestsMembers,
   },
 })
 export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   event: OutstudyEvent | null = null;
   members: User[] = []; // участники
+  requests: Request[] = []; // заявки на участие
 
   keyChat = 0; // при отправке сообщения перерисовка чата/лога
-  modalAddMessageVisible = false;
+  modalAddMessageVisible = false; // окно создания сообщения
+  modalRequestsMembersVisible = false; // окно заявок на вступление
 
   async created(): Promise<void> {
     this.menuKey = [1];
@@ -99,12 +117,11 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     await this.getEvent();
     if (this.event) {
       await this.getMembers();
-      // await this.getMessages();
-      // this.timerId = setInterval(async () => await this.getMessages(), 10000); // каждые 10 секунд получаем сообщения
+      await this.getRequests();
     }
     this.isLoading = false;
   }
-  // получение текущего event по id в url
+  /** получение текущего event по id в url */
   async getEvent(): Promise<void> {
     const idCurrentEvent = Number(this.$route.params["id"]);
     const [response, error] = await api.event.getEventById(
@@ -121,7 +138,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       // await this.routing("event-list");
     } else console.error(error);
   }
-  // получение списка участников
+  /** получение списка участников */
   async getMembers(message = true): Promise<void> {
     if (!this.event?.id) return;
     const [response, error] = await api.event.getMembersEvent(
@@ -137,6 +154,28 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       });
     } else console.error(error);
   }
+  /** список заявок на участие */
+  async getRequests(): Promise<void> {
+    this.isLoading = true;
+    if (!this.event?.id || !this.isOrganizer) return;
+    const [response, error] = await api.event.getRequestsEvent(
+      this.accessToken,
+      this.event.id
+    );
+    if (response && !error) this.requests = response.data ?? [];
+    this.isLoading = false;
+  }
+  /** название мероприятия */
+  get eventName(): string {
+    return `Мероприятие: ${this.event?.name ?? ""}`;
+  }
+  /** тек. польз. организатор (или админ или тьютор) */
+  get isOrganizer(): boolean {
+    return (
+      this.currentUser?.id === this.event?.organizer?.user?.id ||
+      this.getIsContainsAccessRole(["администратор", "тьютор"])
+    );
+  }
 
   outstudyEvent: OutstudyEvent | null = null; // массив мероприятий
   // всё что касается типа
@@ -145,10 +184,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     "Критерий: Фиксированное количество баллов за участие";
   readonly criteriaTypeTwoName = "Критерий: Пропорционально занятому месту";
   readonly criteriaTypeThreeName = "Критерий: По набранному баллу";
-  // модальное окно (заявки)
-  visibleModalRequest = false;
-  isLoadingRequests = false;
-  requests: Request[] = []; // заявки на участие
   // модальное окно (награждение)
   visibleModalReward = false;
   isLoadingReward = false;
@@ -160,10 +195,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   message = ""; // сообщение
   isLoadingMessage = false; // анимация кнопки отправки сообщения
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
-
-  get eventName(): string {
-    return `Мероприятие: ${this.event?.name ?? ""}`;
-  }
 
   beforeDestroy(): void {
     // отписка от прослушивания получения сообщений
@@ -231,113 +262,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       (item) => item.typeId === 3 && newArr.push(item)
     );
     return newArr;
-  }
-
-  //* модальное окно и таблица (заявки)
-  // показать модальное окно
-  async showModalRequest(): Promise<void> {
-    this.visibleModalRequest = true;
-    this.isLoadingRequests = true;
-    await this.getRequestsEvent();
-  }
-  handleOkRequest(): void {
-    this.visibleModalRequest = false;
-    this.requests = [];
-  }
-  handleCancelRequest(): void {
-    this.visibleModalRequest = false;
-    this.requests = [];
-  }
-  // список заявок на участие (все: принятые, не принятые)
-  async getRequestsEvent(): Promise<void> {
-    if (!this.userAccess.event.membersConfirmation) return;
-    if (!this.outstudyEvent?.id) return;
-    const [response, error] = await api.event.getRequestsEvent(
-      this.accessToken,
-      this.outstudyEvent.id
-    );
-    if (!error && response && response.data) this.requests = response.data;
-    else if (error && this.$router.currentRoute.name === "event-details") {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoadingRequests = false;
-  }
-  // рахрешение на принятие участников
-  get membersConfirmationAcces(): boolean {
-    return (
-      Boolean(this.outstudyEvent?.isNeedMemberConfirmation) &&
-      this.userAccess.event.membersConfirmation
-    );
-  }
-  // принятие/отклонение заявок
-  async changeRequest(
-    idRequest: number,
-    status: 1 | 2 | 3 | null
-  ): Promise<void> {
-    if (!this.outstudyEvent?.id || !status) return;
-    this.isLoadingRequests = true;
-    const [response, error] = await api.event.memberEventRequestChange(
-      this.accessToken,
-      this.outstudyEvent.id,
-      idRequest,
-      status
-    );
-    if (!error && response) {
-      const find = this.requests.find((item) => item.id === idRequest);
-      find && (find.status = status);
-      await this.getMembers(false);
-    } else if (error && this.$router.currentRoute.name === "event-details") {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoadingRequests = false;
-  }
-  // колонки таблицы
-  // eslint-disable-next-line
-  get columnsTableRequests() {
-    return [
-      {
-        title: "Имя",
-        dataIndex: "name",
-        key: "name",
-        width: 200,
-        ellipsis: true,
-      },
-      {
-        title: "Статус",
-        dataIndex: "status",
-        key: "status",
-        width: 150,
-      },
-      {
-        title: "Действия",
-        key: "action",
-        scopedSlots: { customRender: "action" },
-        width: 200,
-      },
-    ];
-  }
-  // данные для таблицы
-  // eslint-disable-next-line
-  get dataTableRequests() {
-    return this.requests.map((item) => {
-      let newStatus = "";
-      if (item.status === 1) newStatus = "новая заявка";
-      else if (item.status === 2) newStatus = "принято";
-      else if (item.status === 3) newStatus = "отказано";
-      return {
-        key: item.id,
-        name: viewFullName(item.user?.profile ?? null, false),
-        status: newStatus,
-      };
-    });
   }
 
   //* модальное окно и таблица (награждение)
@@ -457,92 +381,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
         description: "",
       });
     } else console.error(error);
-  }
-
-  //* чат
-  // id чата
-  get chatId(): number {
-    return this.outstudyEvent?.chat?.id ?? -1;
-  }
-  // элемент списка, для прокрутки
-  get elementList(): Element | null {
-    return this.$el.querySelector("#list");
-  }
-  // parent элемент для прокрутки (из-за чата)
-  get elementParent(): Element | null {
-    return document.querySelector(".app-body-content");
-  }
-  // получение списка сообщений
-  async getMessages(): Promise<void> {
-    this.isLoading = true;
-    const scroll = this.elementParent?.scrollTop; // сохранение тек. скролла на странице
-    const [response, error] = await api.chat.getMessages(
-      this.accessToken,
-      this.chatId,
-      0,
-      999
-    );
-    if (!error && response && response.data) {
-      // изменение времени
-      response.data.forEach(
-        (item) =>
-          item.dateTime &&
-          (item.dateTime = `${new Date(
-            item.dateTime
-          ).toLocaleDateString()} ${new Date(
-            item.dateTime
-          ).toLocaleTimeString()}`)
-      );
-      this.messageList = response.data;
-    } else if (error && this.$router.currentRoute.name === "event-details") {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoading = false;
-    // возвращение скролла
-    this.$nextTick(() => {
-      scroll && this.elementParent && (this.elementParent.scrollTop = scroll);
-    });
-  }
-  /** отправка сообщений */
-  async sendMessage(): Promise<void> {
-    const newMessage = this.message;
-    this.isLoading = this.isLoadingMessage = true;
-    const [response, error] = await api.chat.sendMessage(
-      this.accessToken,
-      this.chatId,
-      newMessage
-    );
-    if (!error && response) {
-      this.message = "";
-      await this.getMessages();
-    } else if (error && this.$router.currentRoute.name === "event-details") {
-      console.warn(error);
-      this.$notification.warning({
-        message: error?.message ?? "",
-        description: "",
-      });
-    } else console.error(error);
-    this.isLoading = this.isLoadingMessage = false;
-    // прокрутка вниз, после отпраки сообщения
-    this.elementList &&
-      (this.elementList.scrollTop = this.elementList.scrollHeight);
-  }
-  // переход на страницу чата
-  goChatDetails(): void {
-    if (!this.chatId || !this.outstudyEvent?.name || !this.outstudyEvent?.id)
-      return;
-    this.$router.push({
-      name: "chat-details",
-      params: {
-        id: this.chatId.toString(),
-        eventName: this.outstudyEvent.name,
-        eventId: this.outstudyEvent.id?.toString(),
-      },
-    });
   }
 }
 </script>

@@ -64,10 +64,14 @@
           </template>
           <!-- принятие заявок -->
           <a-tooltip
-            v-if="isOrganizer && status && isRequestMember"
-            title="Начать мероприятие"
+            v-if="isOrganizer && isRequestMember"
+            title="Заявки на участие"
           >
-            <a-button icon="usergroup-add" type="primary" />
+            <a-button
+              icon="usergroup-add"
+              type="primary"
+              @click="() => $emit('requestsMembersVisible')"
+            />
           </a-tooltip>
           <!-- участвовать -->
           <a-tooltip v-if="isJoin && !isMember" title="Участвовать">
@@ -75,13 +79,13 @@
           </a-tooltip>
           <!-- сообщение в ленту -->
           <a-tooltip
-            v-if="(isOrganizer || isMember) && status !== 40"
+            v-if="(isOrganizer || isMember) && ![30, 40].includes(status)"
             title="Сообщение в ленту"
           >
             <a-button
               icon="message"
               type="primary"
-              @click="() => $emit('AddMessageVisible')"
+              @click="() => $emit('addMessageVisible')"
             />
           </a-tooltip>
           <!-- в архив -->
@@ -116,9 +120,9 @@ export default class VEventDetailsInfo extends mixins(
 ) {
   @Prop({ type: Object, default: null }) readonly event!: OutstudyEvent | null;
   @Prop({ type: Array, default: [] }) readonly members!: User[];
+  @Prop({ type: Number, default: 0 }) readonly requestMembersCount!: number;
 
   types: TypeEvent[] = []; // все типы мероприятияй
-  requests: Request[] = [];
   api: any;
 
   // назвение
@@ -173,7 +177,9 @@ export default class VEventDetailsInfo extends mixins(
   // заявки
   get isRequestMember(): boolean {
     return (
-      (this.event?.isNeedMemberConfirmation && this.requests.length > 0) ??
+      (this.event?.isNeedMemberConfirmation &&
+        this.requestMembersCount > 0 &&
+        [10, 20].includes(this.status ?? -1)) ??
       false
     );
   }
@@ -196,6 +202,8 @@ export default class VEventDetailsInfo extends mixins(
         return `Анонсировано`;
       case 20:
         return `В процессе`;
+      case 30:
+        return `Завершено`;
       case 40:
         return `В архиве`;
       default:
@@ -209,22 +217,13 @@ export default class VEventDetailsInfo extends mixins(
         return "#1890ff";
       case 20: // В процессе
         return "#52c41a";
+      case 30: // завершено
+        return "#ff4d4f";
       case 40: // В архиве
         return "#ff4d4f";
       default:
         return "gray";
     }
-  }
-  /** список заявок на участие */
-  async getRequests(): Promise<void> {
-    this.isLoading = true;
-    if (!this.event?.id) return;
-    const [response, error] = await api.event.getRequestsEvent(
-      this.accessToken,
-      this.event.id
-    );
-    if (response && !error) this.requests = response.data ?? [];
-    this.isLoading = false;
   }
   // регистрация тек. пользователя в мероприятии
   async registration(): Promise<void> {

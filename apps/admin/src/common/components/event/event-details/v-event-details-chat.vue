@@ -93,7 +93,6 @@ export default class VEventDetailsChat extends mixins(
       this.accessToken,
       this.chatId
     );
-    console.log(response, error);
     if (response && !error) {
       for (const user of response.users ?? [])
         if ("profile" in user)

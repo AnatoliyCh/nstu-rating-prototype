@@ -241,6 +241,8 @@ export default class VEventList2 extends mixins(
         return `Анонсировано`;
       case 20:
         return `В процессе`;
+      case 30:
+        return `Завершено`;
       case 40:
         return `В архиве`;
       default:
@@ -254,6 +256,8 @@ export default class VEventList2 extends mixins(
         return "#1890ff";
       case 20: // В процессе
         return "#52c41a";
+      case 30: // завершено
+        return "orange";
       case 40: // В архиве
         return "#ff4d4f";
       default:

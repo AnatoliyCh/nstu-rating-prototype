@@ -1,5 +1,25 @@
 <template>
   <div class="v-event-details-members">
+    <div class="filter-wrapper">
+      <!-- поиск -->
+      <a-input-search
+        v-model="filterName"
+        placeholder="поиск по ФИО..."
+        allowClear
+        style="width: 200px"
+      />
+      <!-- наградить за места -->
+      <a-tooltip
+        v-if="isOrganizer && ![30, 40].includes(status)"
+        title="Наградить за места"
+      >
+        <a-button
+          icon="message"
+          type="primary"
+          @click="() => $emit('addMessageVisible')"
+        />
+      </a-tooltip>
+    </div>
     <a-card>
       <a-list size="small" item-layout="horizontal" :data-source="tableData">
         <a-list-item slot="renderItem" slot-scope="item">
@@ -29,24 +49,50 @@ export default class VEventDetailsMembers extends mixins(
   VEventApiMixin
 ) {
   @Prop({ type: Array, default: [] }) readonly members!: User[];
+  @Prop({ type: Object, default: null }) readonly event!: OutstudyEvent | null;
+  filterName = ""; // фильтр по ФИО
+
+  /** тек. польз. организатор (или админ или тьютор) */
+  get isOrganizer(): boolean {
+    return (
+      this.currentUser?.id === this.event?.organizer?.user?.id ||
+      this.getIsContainsAccessRole(["администратор", "тьютор"])
+    );
+  }
+  // статус
+  get status(): number | null {
+    return this.event?.status ?? null;
+  }
 
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    return this.members.map((item, index) => ({
+    const data = this.members.map((item, index) => ({
       key: index,
       name: viewFullName(item.profile, false),
       user: item,
     }));
+    if (this.filterName)
+      return data.filter((x) =>
+        x.name.toLowerCase().includes(this.filterName.toLowerCase())
+      );
+    return data;
   }
 }
 </script>
 
 <style lang="scss">
 .v-event-details-members {
-  height: calc(100vh - 22em);
-  overflow: auto;
+  // height: calc(100vh - 22em);
+  // overflow: auto;
+  .filter-wrapper {
+    padding: 8px 12px;
+    border-right: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8;
+  }
   > div.ant-card.ant-card-bordered {
+    height: calc(100vh - 25.6em);
+    overflow: auto;
     border-top: none !important;
     border-left: none !important;
     border-radius: 0;

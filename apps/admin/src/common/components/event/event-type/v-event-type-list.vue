@@ -8,7 +8,7 @@
         <a-input-search
           v-model="filterName"
           key="2"
-          placeholder="поиск поназванию..."
+          placeholder="поиск по названию..."
           allowClear
           style="width: 200px"
         />
