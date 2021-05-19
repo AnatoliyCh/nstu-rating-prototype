@@ -90,7 +90,7 @@
         <!-- список страниц журнала группы -->
         <a-col :span="9">
           <v-group-details-gradebook-pages
-            v-if="this.group.id !== -1 && this.group.id && keyPages"
+            v-if="this.group.id !== -1 && keyPages"
             :groupId="this.group.id"
             :isEdit="isEdit"
             :key="keyPages"
@@ -146,7 +146,7 @@ export default class VEditDetailsGroup extends mixins(VBaseMixin) {
     this.menuKey = [4];
     const id = Number(this.$route.params["id"]); // id тек. группы
     // получение тек. группы по id
-    if (id) {
+    if (!isNaN(id)) {
       this.group.id = id;
       // тек. группа
       const [response, error] = await api.group.getGroupById(

@@ -73,6 +73,25 @@ export async function getEventById(
     },
   });
 }
+/** редактирование статуса */
+export async function changeEventStatus(
+  accessToken: string,
+  path: string,
+  status: number
+): Promise<[boolean | undefined, ApiError | undefined]> {
+  const [response, error] = await http.put<any, any>(
+    path,
+    { status: status },
+    {
+      headers: {
+        accept: "*/*",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: "Bearer " + accessToken,
+      },
+    }
+  );
+  return [response ? true : undefined, error];
+}
 /** создание мероприятия */
 export async function createEvent(
   accessToken: string,

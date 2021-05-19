@@ -71,7 +71,7 @@ const routes: Array<RouteConfig> = [
         meta: {
           exact: true,
         },
-        component: () => import("@/common/components/event/v-event-list.vue"),
+        component: () => import("@/common/components/event/v-event-list-2.vue"),
       },
       // создание мероприятия
       {
@@ -91,7 +91,7 @@ const routes: Array<RouteConfig> = [
           exact: false,
         },
         component: () =>
-          import("@/common/components/event/v-event-details.vue"),
+          import("@/common/components/event/event-details/v-event-details.vue"),
       },
     ],
   },

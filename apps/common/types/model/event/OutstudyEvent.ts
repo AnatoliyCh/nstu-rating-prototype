@@ -8,13 +8,18 @@ export interface OutstudyEvent {
   /** id типа мероприятия */
   outstudyEventKindId: number | null; // для создания
   eventKindId?: number | null; // при получении мероприятия
-  /** статус */
-  status: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  /** статус
+   * 10 - новое / анонс (ещё не началось)
+   * 20 - в процессе
+   * 30 - завершенное
+   * 40 - архивное
+   */
+  status: number;
   /** дата начала */
   dateStart: string | null;
   /** дата окончания */
   dateEnd: string | null;
-  /** вид участия (свободный/подтверждение) */
+  /** вид участия (подтверждение/свободный) */
   isNeedMemberConfirmation: boolean;
   /** место проведения */
   address: string | null;

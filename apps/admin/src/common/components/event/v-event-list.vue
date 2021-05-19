@@ -178,8 +178,7 @@ export default class VEventList extends mixins(
       this.pagination.pageSize,
       this.dateStart,
       this.dateEnd,
-      this.status,
-      this.isConfirmed
+      this.status
     );
     if (!error && response) {
       const newEvents = response.data ?? [];

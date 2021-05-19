@@ -102,22 +102,57 @@ export class Api {
       dateStart: Date | null | undefined = undefined,
       dateEnd: Date | null | undefined = undefined,
       status: number | null | undefined = undefined,
-      isConfirmed: boolean | undefined = undefined
+      memberId: number | null | undefined = undefined,
+      organizerId: number | null | undefined = undefined
     ) => {
       return event.getEvents(
         accessToken,
         this.pathBase +
           `event/api/v1/outstudy-event?offset=${offset}&limit=${limit}` +
-          `${dateStart ? `&dateStart=${dateStart.toISOString()}` : ""}` +
-          `${dateEnd ? `&dateEnd=${dateEnd.toISOString()}` : ""}` +
-          `${status ? `&status=${status}` : ""}` +
-          `${isConfirmed ? `&isConfirmed=${isConfirmed}` : ""}`
+          `${
+            dateStart
+              ? `&dateStart=${dateStart
+                  .toISOString()
+                  .slice(0, dateStart.toISOString().length - 5)}`
+              : ""
+          }` +
+          `${
+            dateEnd
+              ? `&dateEnd=${dateEnd
+                  .toISOString()
+                  .slice(0, dateEnd.toISOString().length - 5)}`
+              : ""
+          }` +
+          `${
+            status !== undefined && status !== null ? `&status=${status}` : ""
+          }` +
+          `${
+            memberId !== undefined && memberId !== null
+              ? `&memberId=${memberId}`
+              : ""
+          }` +
+          `${
+            organizerId !== undefined && organizerId !== null
+              ? `&organizerId=${organizerId}`
+              : ""
+          }`
       );
     },
     getEventById: async (accessToken: string, id: number) => {
       return event.getEventById(
         accessToken,
         this.pathBase + `event/api/v1/outstudy-event/${id}`
+      );
+    },
+    сhangeEventStatus: async (
+      accessToken: string,
+      id: number,
+      status: number
+    ) => {
+      return event.changeEventStatus(
+        accessToken,
+        this.pathBase + `event/api/v1/out-study-event/${id}/status`,
+        status
       );
     },
     createEvent: async (accessToken: string, requestBody: OutstudyEvent) => {
@@ -137,7 +172,7 @@ export class Api {
       return event.getMembersEvent(
         accessToken,
         this.pathBase +
-          `event/api/v1/outstudy-event/${idEvent}/members?offset=0&limit=99`
+          `event/api/v1/outstudy-event/${idEvent}/members?offset=0&limit=999999`
       );
     },
     getRequestsEvent: async (accessToken: string, idEvent: number) => {
