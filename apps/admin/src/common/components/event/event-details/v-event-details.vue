@@ -36,6 +36,7 @@
             @addMember="getMembers()"
             @requestsMembersVisible="modalRequestsMembersVisible = true"
             @addMessageVisible="modalAddMessageVisible = true"
+            @rewardMembersVisible="modalRewardMembersVisible = true"
           />
           <!-- участники -->
           <v-event-details-members
@@ -68,6 +69,13 @@
         :requestsMembers="requests"
         @changeRequest="getMembers()"
       />
+      <!-- наградить за места -->
+      <v-event-details-modal-change-reward-members
+        v-model="modalRewardMembersVisible"
+        v-if="event && members.length"
+        :eventId="event.id"
+        :members="members"
+      />
     </div>
   </div>
 </template>
@@ -91,6 +99,7 @@ import VEventDetailsMembers from "./v-event-details-members.vue";
 import VEventDetailsChat from "./v-event-details-chat.vue";
 import VEventDetailsModalAddMessage from "./v-event-details-modal-add-message.vue";
 import VEventDetailsModalChangeRequestsMembers from "./v-event-details-modal-change-requests-members.vue";
+import VEventDetailsModalChangeRewardMembers from "./v-event-details-modal-change-reward-members.vue";
 
 @Component({
   components: {
@@ -99,6 +108,7 @@ import VEventDetailsModalChangeRequestsMembers from "./v-event-details-modal-cha
     "v-event-details-chat": VEventDetailsChat,
     "v-event-details-modal-add-message": VEventDetailsModalAddMessage,
     "v-event-details-modal-change-requests-members": VEventDetailsModalChangeRequestsMembers,
+    "v-event-details-modal-change-reward-members": VEventDetailsModalChangeRewardMembers,
   },
 })
 export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
@@ -109,6 +119,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   keyChat = 0; // при отправке сообщения перерисовка чата/лога
   modalAddMessageVisible = false; // окно создания сообщения
   modalRequestsMembersVisible = false; // окно заявок на вступление
+  modalRewardMembersVisible = false; // окно награждения позанятому месту
 
   async created(): Promise<void> {
     this.menuKey = [1];
@@ -195,45 +206,6 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   message = ""; // сообщение
   isLoadingMessage = false; // анимация кнопки отправки сообщения
   timerId: ReturnType<typeof setTimeout> | null = null; // id для setTimeout
-
-  beforeDestroy(): void {
-    // отписка от прослушивания получения сообщений
-    this.timerId && clearTimeout(this.timerId);
-  }
-  //* данные о мероприятии
-  // удаление мероприятия
-  async deleteEvent(): Promise<void> {
-    if (!this.userAccess.event.delete) return;
-    this.$confirm({
-      title: "Удаление мероприятия",
-      content: "Вы точно хотите удалить данное мероприятие?",
-      onOk: async () => {
-        if (!this.outstudyEvent?.id) return;
-        const [response, error] = await api.event.deleteEvent(
-          this.accessToken,
-          this.outstudyEvent.id
-        );
-        if (!error && response) this.routing("event-list");
-        else if (error && this.$router.currentRoute.name === "event-details") {
-          console.warn(error);
-          this.$notification.warning({
-            message: error?.message ?? "",
-            description: "",
-          });
-          await this.routing("event-list");
-        } else console.error(error);
-      },
-    });
-  }
-  // получение типа мероприятия
-  async getType(): Promise<void> {
-    if (!this.outstudyEvent || !this.outstudyEvent.eventKindId) return;
-    const types = await this.getEventTypes();
-    types.forEach(
-      (item) =>
-        item.id === this.outstudyEvent?.eventKindId && (this.typeEvent = item)
-    );
-  }
 
   //* критерий
   // критерий: за участие

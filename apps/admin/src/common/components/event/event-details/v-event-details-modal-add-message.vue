@@ -49,7 +49,7 @@ import { User, Discipline } from "../../../../../../common/types/model";
 import { GradebookPageCreate } from "../../../../../../common/types/api";
 import { viewFullName } from "@/common/filters";
 import api from "@/common/api";
-/** новая записьв ленту мероприятия */
+/** новая запись в ленту мероприятия */
 @Component
 export default class VEventDetailsModalAddMessage extends mixins(VBaseMixin) {
   /** видимость окна */

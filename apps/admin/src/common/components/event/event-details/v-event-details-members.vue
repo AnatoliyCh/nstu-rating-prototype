@@ -6,19 +6,7 @@
         v-model="filterName"
         placeholder="поиск по ФИО..."
         allowClear
-        style="width: 200px"
       />
-      <!-- наградить за места -->
-      <a-tooltip
-        v-if="isOrganizer && ![30, 40].includes(status)"
-        title="Наградить за места"
-      >
-        <a-button
-          icon="message"
-          type="primary"
-          @click="() => $emit('addMessageVisible')"
-        />
-      </a-tooltip>
     </div>
     <a-card>
       <a-list size="small" item-layout="horizontal" :data-source="tableData">
@@ -59,10 +47,6 @@ export default class VEventDetailsMembers extends mixins(
       this.getIsContainsAccessRole(["администратор", "тьютор"])
     );
   }
-  // статус
-  get status(): number | null {
-    return this.event?.status ?? null;
-  }
 
   // данные для таблицы
   // eslint-disable-next-line
@@ -86,6 +70,8 @@ export default class VEventDetailsMembers extends mixins(
   // height: calc(100vh - 22em);
   // overflow: auto;
   .filter-wrapper {
+    display: flex;
+    justify-content: space-between;
     padding: 8px 12px;
     border-right: 1px solid #e8e8e8;
     border-bottom: 1px solid #e8e8e8;

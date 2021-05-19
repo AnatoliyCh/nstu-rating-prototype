@@ -2,7 +2,7 @@
   <a-modal
     :visible="value"
     @change="changeVisible"
-    title="Заявки на учстие"
+    title="Заявки на участие"
     centered
     :cancel-button-props="{ props: { disabled: Boolean(isLoading) } }"
     :footer="null"
@@ -15,6 +15,7 @@
       :loading="isDataLoading"
       :pagination="pagination"
       :scroll="{ y: 'calc(100vh - 16em)' }"
+      @change="changePagination"
       size="small"
     >
       <span slot="action" slot-scope="item">
@@ -38,18 +39,13 @@
   </a-modal>
 </template>
 <script lang="ts">
+import api from "@/common/api";
+import { viewFullName } from "@/common/filters";
 import VBaseMixin from "@/common/v-base-mixin";
+import VPaginationMixin from "@/common/v-pagination-mixin";
 import { mixins } from "vue-class-component";
 import { Component, Emit, Model, Prop } from "vue-property-decorator";
-import {
-  User,
-  Discipline,
-  Request,
-} from "../../../../../../common/types/model";
-import VPaginationMixin from "@/common/v-pagination-mixin";
-import { GradebookPageCreate } from "../../../../../../common/types/api";
-import { viewFullName } from "@/common/filters";
-import api from "@/common/api";
+import { Request } from "../../../../../../common/types/model";
 /** заявки на участие в мероприятии */
 @Component
 export default class VEventDetailsModalChangeRequestsMembers extends mixins(
@@ -135,6 +131,10 @@ export default class VEventDetailsModalChangeRequestsMembers extends mixins(
         width: 200,
       },
     ];
+  }
+  /** переключение страниц */
+  changePagination(pagination: VPaginationMixin["pagination"]): void {
+    this.pagination.current = pagination.current;
   }
 }
 </script>

@@ -85,6 +85,10 @@ export default class VEventDetailsChat extends mixins(
     await this.getMessages();
     this.timerId = setInterval(async () => await this.getMessages(), 20000); // каждые 10 секунд получаем сообщения
   }
+  beforeDestroy(): void {
+    // отписка от прослушивания получения сообщений
+    this.timerId && clearTimeout(this.timerId);
+  }
   /** получение чата по id */
   async getChatById() {
     this.isLoading = true;

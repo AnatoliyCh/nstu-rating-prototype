@@ -34,7 +34,8 @@
           </label>
         </label>
       </div>
-      <div class="vertical-margin-element-8">
+      <!-- кнопки -->
+      <div v-if="event" class="vertical-margin-element-8">
         <a-space>
           <template v-if="isOrganizer">
             <!-- начать мероприятие -->
@@ -86,6 +87,17 @@
               icon="message"
               type="primary"
               @click="() => $emit('addMessageVisible')"
+            />
+          </a-tooltip>
+          <!-- наградить за места -->
+          <a-tooltip
+            v-if="isOrganizer && ![30, 40].includes(status) && members.length"
+            title="Наградить за места"
+          >
+            <a-button
+              icon="ordered-list"
+              type="primary"
+              @click="() => $emit('rewardMembersVisible')"
             />
           </a-tooltip>
           <!-- в архив -->
