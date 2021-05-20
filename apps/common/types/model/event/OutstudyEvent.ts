@@ -35,4 +35,6 @@ export interface OutstudyEvent {
   organizer?: { user: User | null };
   /** привязанный чат */
   chat?: { id?: number | null; name?: string | null; type?: number | null };
+  /** количество учатников */
+  membersSize?: number;
 }

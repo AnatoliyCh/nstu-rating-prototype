@@ -106,7 +106,7 @@
               {{ record.confirmation ? "с подтверждением" : "свободный" }}
             </label>
             <label>
-              Участники: {{ record.minMembers }} / {{ record.maxMembers }}
+              Участники: {{ record.membersSize }} / {{ record.maxMembers }}
             </label>
           </div>
           <div>
@@ -228,6 +228,7 @@ export default class VEventList2 extends mixins(
         confirmation: item.isNeedMemberConfirmation, // вид участия
         minMembers: item.minMembers,
         maxMembers: item.maxMembers,
+        membersSize: item.membersSize ?? 0,
         address: item.address,
         status: this.getStatusToString(item.status),
         statusColor: this.getStatusColor(item.status),
