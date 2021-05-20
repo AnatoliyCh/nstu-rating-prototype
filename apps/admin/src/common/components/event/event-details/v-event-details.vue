@@ -36,13 +36,15 @@
             @addMember="getMembers()"
             @requestsMembersVisible="modalRequestsMembersVisible = true"
             @addMessageVisible="modalAddMessageVisible = true"
+            @rewardMembersPlaceVisible="modalRewardMembersPlaceVisible = true"
             @rewardMembersVisible="modalRewardMembersVisible = true"
           />
           <!-- участники -->
           <v-event-details-members
             v-if="event"
-            :members="members"
             :eventId="event.id"
+            :members="members"
+            :userTopBoard="userTopBoard"
           />
         </a-col>
         <a-col :span="14">
@@ -70,6 +72,15 @@
         @changeRequest="getMembers()"
       />
       <!-- наградить за места -->
+      <v-event-details-modal-change-reward-members-place
+        v-model="modalRewardMembersPlaceVisible"
+        v-if="event && members.length"
+        :eventId="event.id"
+        :members="members"
+        :userTopBoard="userTopBoard"
+        @changeUserTopBoard="getUserTopBoard()"
+      />
+      <!-- награждение за задание -->
       <v-event-details-modal-change-reward-members
         v-model="modalRewardMembersVisible"
         v-if="event && members.length"
@@ -93,12 +104,14 @@ import {
   Request,
   TypeEvent,
   User,
+  UserTopBoard,
 } from "../../../../../../common/types/model";
 import VEventDetailsInfo from "./v-event-details-info.vue";
 import VEventDetailsMembers from "./v-event-details-members.vue";
 import VEventDetailsChat from "./v-event-details-chat.vue";
 import VEventDetailsModalAddMessage from "./v-event-details-modal-add-message.vue";
 import VEventDetailsModalChangeRequestsMembers from "./v-event-details-modal-change-requests-members.vue";
+import VEventDetailsModalChangeRewardMembersPlace from "./v-event-details-modal-change-reward-members-place.vue";
 import VEventDetailsModalChangeRewardMembers from "./v-event-details-modal-change-reward-members.vue";
 
 @Component({
@@ -108,6 +121,7 @@ import VEventDetailsModalChangeRewardMembers from "./v-event-details-modal-chang
     "v-event-details-chat": VEventDetailsChat,
     "v-event-details-modal-add-message": VEventDetailsModalAddMessage,
     "v-event-details-modal-change-requests-members": VEventDetailsModalChangeRequestsMembers,
+    "v-event-details-modal-change-reward-members-place": VEventDetailsModalChangeRewardMembersPlace,
     "v-event-details-modal-change-reward-members": VEventDetailsModalChangeRewardMembers,
   },
 })
@@ -115,11 +129,18 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
   event: OutstudyEvent | null = null;
   members: User[] = []; // участники
   requests: Request[] = []; // заявки на участие
+  // участники по занятым местам
+  userTopBoard: UserTopBoard | null = {
+    userPlace: [],
+    minBall: 0,
+    maxBall: 0,
+  };
 
   keyChat = 0; // при отправке сообщения перерисовка чата/лога
   modalAddMessageVisible = false; // окно создания сообщения
   modalRequestsMembersVisible = false; // окно заявок на вступление
-  modalRewardMembersVisible = false; // окно награждения позанятому месту
+  modalRewardMembersPlaceVisible = false; // окно награждения позанятому месту
+  modalRewardMembersVisible = false; // окно награждения за задание
 
   async created(): Promise<void> {
     this.menuKey = [1];
@@ -129,6 +150,7 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
     if (this.event) {
       await this.getMembers();
       await this.getRequests();
+      await this.getUserTopBoard();
     }
     this.isLoading = false;
   }
@@ -174,6 +196,18 @@ export default class VEventDetails extends mixins(VBaseMixin, VEventApiMixin) {
       this.event.id
     );
     if (response && !error) this.requests = response.data ?? [];
+    this.isLoading = false;
+  }
+  /** получение мест учстников */
+  async getUserTopBoard() {
+    this.isLoading = true;
+    if (!this.event?.id) return;
+    this.isLoading = true;
+    const [response, error] = await api.event.getUserTopBoard(
+      this.accessToken,
+      this.event.id
+    );
+    if (response && this.event) this.userTopBoard = response;
     this.isLoading = false;
   }
   /** название мероприятия */

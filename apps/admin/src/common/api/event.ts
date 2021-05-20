@@ -6,7 +6,11 @@ import {
   EventRequestObject,
   UserObject,
 } from "../../../../common/types/api";
-import { OutstudyEvent, TypeEvent } from "../../../../common/types/model";
+import {
+  OutstudyEvent,
+  TypeEvent,
+  UserTopBoard,
+} from "../../../../common/types/model";
 import * as http from "../api";
 
 /** получение типов мероприятия */
@@ -195,4 +199,33 @@ export async function membersReward(
       },
     }
   );
+}
+//* TopBoard
+
+/** получение мест участников */
+export async function getUserTopBoard(
+  accessToken: string,
+  path: string
+): Promise<[UserTopBoard | undefined, ApiError | undefined]> {
+  return await http.get<UserTopBoard>(path, {
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+}
+/** обновление мест участников */
+export async function changeUserTopBoard(
+  accessToken: string,
+  path: string,
+  body: UserTopBoard
+): Promise<[boolean | undefined, ApiError | undefined]> {
+  const [response, error] = await http.put<UserTopBoard, any>(path, body, {
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json;charset=UTF-8",
+      Authorization: "Bearer " + accessToken,
+    },
+  });
+  return [response ? true : undefined, error];
 }

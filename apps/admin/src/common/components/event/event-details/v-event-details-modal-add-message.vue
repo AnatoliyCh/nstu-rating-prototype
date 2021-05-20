@@ -78,7 +78,10 @@ export default class VEventDetailsModalAddMessage extends mixins(VBaseMixin) {
   }
   /** отправка сообщений */
   async sendMessage(): Promise<void> {
-    const newMessage = this.message;
+    const newMessage = `${viewFullName(
+      this.currentUser?.profile ?? null,
+      true
+    )} ${this.message}`;
     if (!this.chatId) return;
     this.isLoading = true;
     const [response, error] = await api.chat.sendMessage(

@@ -97,6 +97,17 @@
             <a-button
               icon="ordered-list"
               type="primary"
+              @click="() => $emit('rewardMembersPlaceVisible')"
+            />
+          </a-tooltip>
+          <!-- наградить за активность -->
+          <a-tooltip
+            v-if="isOrganizer && ![30, 40].includes(status) && members.length"
+            title="Наградить за активность"
+          >
+            <a-button
+              icon="plus-circle"
+              type="primary"
               @click="() => $emit('rewardMembersVisible')"
             />
           </a-tooltip>

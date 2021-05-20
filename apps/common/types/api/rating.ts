@@ -12,6 +12,8 @@ export interface AchievementCreate {
   name: string;
   /** тот, кому начилсяют */
   userId: number;
+  /** id мероприятия */
+  eventId: number | null;
 }
 /** создание запроса на распределение */
 export interface AchievementRequestCreate {

@@ -13,6 +13,7 @@ import {
   OutstudyEvent,
   TypeEvent,
   GradebookPage,
+  UserTopBoard,
 } from "../../../../common/types/model";
 import * as auth from "./auth";
 import * as chat from "./chat";
@@ -209,6 +210,23 @@ export class Api {
         accessToken,
         this.pathBase + `event/api/v1/outstudy-event/${idEvent}/reward`,
         requestBody
+      );
+    },
+    getUserTopBoard: async (accessToken: string, eventId: number) => {
+      return event.getUserTopBoard(
+        accessToken,
+        this.pathBase + `event/api/v1/outstudy-event/${eventId}/user-top-board`
+      );
+    },
+    changeUserTopBoard: async (
+      accessToken: string,
+      eventId: number,
+      body: UserTopBoard
+    ) => {
+      return event.changeUserTopBoard(
+        accessToken,
+        this.pathBase + `event/api/v1/outstudy-event/${eventId}/user-top-board`,
+        body
       );
     },
   };
@@ -419,12 +437,13 @@ export class Api {
       accessToken: string,
       score: number,
       name: string,
-      userId: number
+      userId: number,
+      eventId: number | null = null
     ) => {
       return rating.createAchievement(
         accessToken,
         this.pathBase + "rating/api/v1/achievement",
-        { score: score, name: name, userId: userId }
+        { score: score, name: name, userId: userId, eventId: eventId }
       );
     },
     createAchievementRequest: async (

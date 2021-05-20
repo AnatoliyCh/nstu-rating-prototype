@@ -11,7 +11,7 @@
     <a-card>
       <a-list size="small" item-layout="horizontal" :data-source="tableData">
         <a-list-item slot="renderItem" slot-scope="item">
-          <a> {{ item.name }} </a>
+          <a> {{ `${item.place ? `${item.place} ` : ""}${item.name}` }} </a>
         </a-list-item>
       </a-list>
     </a-card>
@@ -27,6 +27,7 @@ import {
   TypeEvent,
   Request,
   User,
+  UserTopBoard,
 } from "../../../../../../common/types/model";
 import api from "@/common/api";
 import { viewFullName } from "@/common/filters";
@@ -38,6 +39,7 @@ export default class VEventDetailsMembers extends mixins(
 ) {
   @Prop({ type: Array, default: [] }) readonly members!: User[];
   @Prop({ type: Object, default: null }) readonly event!: OutstudyEvent | null;
+  @Prop({ type: Object }) readonly userTopBoard!: UserTopBoard;
   filterName = ""; // фильтр по ФИО
 
   /** тек. польз. организатор (или админ или тьютор) */
@@ -51,11 +53,21 @@ export default class VEventDetailsMembers extends mixins(
   // данные для таблицы
   // eslint-disable-next-line
   get tableData() {
-    const data = this.members.map((item, index) => ({
-      key: index,
-      name: viewFullName(item.profile, false),
-      user: item,
-    }));
+    const data = this.members.map((item, index) => {
+      const find = this.userTopBoard.userPlace.find((x) => x.user === item.id)
+        ?.place;
+      return {
+        key: index,
+        name: viewFullName(item.profile, false),
+        place: find ?? "",
+        user: item,
+      };
+    });
+    data.sort((a, b) => {
+      if (a.place > b.place) return 1;
+      if (a.place < b.place) return -1;
+      return 0; // a == b
+    });
     if (this.filterName)
       return data.filter((x) =>
         x.name.toLowerCase().includes(this.filterName.toLowerCase())
